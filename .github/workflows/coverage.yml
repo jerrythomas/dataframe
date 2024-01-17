@@ -51,6 +51,6 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_TOKEN }}
         with:
-          coverageCommand: pnpm coverage:lcov
+          coverageCommand: pnpm coverage
           debug: true
           coverageLocations: lcov.info:lcov
