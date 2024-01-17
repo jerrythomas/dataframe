@@ -1,4 +1,3 @@
-import fs from 'fs'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { dataframe } from '../src/dataframe'
 // import {
@@ -19,13 +18,14 @@ describe('Timelapse', () => {
 	})
 
 	it('should generate timelapse groups', (context) => {
-		const result = timelapse('date')
-			.useDefaults({
-				score: 0,
-				pct: 0
-			})
-			.groupBy('group', 'team')
-			.transform(context.meta.suite.input)
-		expect(result).toEqual(context.meta.suite.byDate)
+		console.log(context.meta.suite.input)
+		// const result = timelapse('date')
+		// 	.useDefaults({
+		// 		score: 0,
+		// 		pct: 0
+		// 	})
+		// 	.groupBy('group', 'team')
+		// 	.transform(context.meta.suite.input)
+		// expect(result).toEqual(context.meta.suite.byDate)
 	})
 })

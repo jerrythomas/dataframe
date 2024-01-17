@@ -1,5 +1,10 @@
 {
-	"include": ["src/**/*.js"],
+	"include": [
+		"src/**/*.js",
+		"spec/convert.spec.js",
+		"spec/tabular.spec.js",
+		"spec/filter.spec.js"
+, "spec/infer.spec.js"	],
 	"compilerOptions": {
 		"allowJs": true,
 		"lib": ["es2020", "dom"],

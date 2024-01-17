@@ -308,7 +308,9 @@ describe('dataframe', () => {
 			.distributeEvenlyInGroups(['gender'])
 
 		expect(df.data).toEqual(filled)
-		df = dataframe(rawMissing).distributeEvenlyInGroups(['gender'])
+		df = dataframe(rawMissing)
+			.addActualIndicator(true)
+			.distributeEvenlyInGroups(['gender'])
 		expect(df.data).toEqual(rawMissing)
 	})
 

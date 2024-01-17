@@ -1,16 +1,7 @@
 /**
- * Options for joining two data sets
- *
- * @typedef OptionsToRenameKeys
- * @property {string} [prefix]         - Prefix to be added to each attribute
- * @property {string} [suffix]         - Suffix to be added to each attribute
- * @property {string} [separator]      - Separator to be used when adding prefix or suffix. defaults to _
- */
-
-/**
  * Returns a function that renames keys of an object by adding a prefix or suffix to each key
  *
- * @param {OptionsToRenameKeys} opts
+ * @param {import('./types.js').OptionsToRenameKeys} opts
  * @returns
  */
 export function renameUsing(opts = {}) {

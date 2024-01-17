@@ -1,5 +1,5 @@
 import { ascending, descending } from 'd3-array'
-import { counter } from './summary'
+import { counter } from './aggregators'
 
 /**
  * @typedef {Object} ColumnSorter
@@ -7,10 +7,18 @@ import { counter } from './summary'
  * @property {function} sorter
  */
 
+function isDateString(value) {
+	return !isNaN(Date.parse(value))
+}
+
+function getType(value) {
+	let type = Array.isArray(value) ? 'array' : typeof value
+	return type === 'string' && isDateString(value) ? 'date' : type
+}
 /**
  *
  * @param  {...[string|[string, boolean]]} cols
- * @returns {Array<ColumnSorter>}
+ * @returns {Array<{import('./types.js').ColumnSorter}}>}
  */
 export function deriveSortableColumns(...cols) {
 	return cols.map((value) => {
@@ -21,6 +29,12 @@ export function deriveSortableColumns(...cols) {
 	})
 }
 
+/**
+ * Derive an array of column aggregators from a list of aggregation names
+ *
+ * @param  {...[string|[string, function, string]]} cols
+ * @returns {Array<{import('./types.js').ColumnAggregator}}>}
+ */
 export function deriveAggregators(...cols) {
 	return cols.map((name) => {
 		if (Array.isArray(name)) {
@@ -45,11 +59,33 @@ export function deriveDataTypes(data) {
 	let dataTypes = Object.keys(data[0])
 		.map((field) => ({
 			field,
-			type: data.map((d) => d[field]).some(isNaN) ? 'string' : 'numeric'
+			type: data.map((d) => d[field]).some(isNaN) ? 'string' : 'number'
 		}))
 		.reduce(
 			(acc, cur) => ({ ...acc, [cur.type]: [...acc[cur.type], cur.field] }),
-			{ string: [], numeric: [] }
+			{ string: [], number: [] }
 		)
 	return dataTypes
+}
+export function inferDataType(values) {
+	if (values.length === 0) {
+		return 'undefined'
+	}
+
+	const nonNullValues = values.filter((value) => value !== null)
+
+	if (nonNullValues.length === 0) {
+		return 'null'
+	}
+
+	let type = getType(nonNullValues[0])
+
+	for (let i = 1; i < nonNullValues.length; i++) {
+		if (getType(nonNullValues[i]) !== type) {
+			type = 'mixed'
+			break
+		}
+	}
+
+	return type
 }

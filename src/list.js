@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store'
+import { writable, get } from 'svelte/store'
 import { nest } from 'd3-collection'
 import { v4 as uuid } from '@lukeed/uuid'
 import { ascending } from 'd3-array'
@@ -75,7 +75,7 @@ export class List {
 		return this.sort().refresh()
 	}
 
-	groupBy(key, lookup) {
+	groupBy(key, lookup = null) {
 		this.groupKey = key
 
 		if (lookup) this.lookup = lookup
@@ -159,6 +159,9 @@ export class List {
 
 		this.filtered.set(data)
 		return this
+	}
+	current() {
+		return get(this.filtered)
 	}
 }
 

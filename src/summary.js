@@ -1,16 +1,16 @@
-import { quantile } from 'd3-array'
+// import { quantile } from 'd3-array'
 import { omit, pick, mergeLeft, map, difference, uniq, pipe } from 'ramda'
 import { deriveAggregators } from './infer'
 
-export const counter = (values) => values.length
+// export const counter = (values) => values.length
 
-export const quantiles = (values) => {
-	const q1 = quantile(values, 0.25)
-	const q3 = quantile(values, 0.75)
-	const iqr = q3 - q1
+// export const quantiles = (values) => {
+// 	const q1 = quantile(values, 0.25)
+// 	const q3 = quantile(values, 0.75)
+// 	const iqr = q3 - q1
 
-	return { q1, q3, iqr, qr_min: q1 - 1.5 * iqr, qr_max: q1 + 1.5 * iqr }
-}
+// 	return { q1, q3, iqr, qr_min: q1 - 1.5 * iqr, qr_max: q1 + 1.5 * iqr }
+// }
 
 export function groupBy(data, by, opts = {}) {
 	const select = opts.include ? pick(opts.include) : omit(opts.exclude || [])

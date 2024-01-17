@@ -9,13 +9,8 @@ import {
 	filled
 } from './fixtures/data'
 
-import {
-	counter,
-	quantiles,
-	groupBy,
-	summarize,
-	fillMissingGroups
-} from '../src/summary'
+import { groupBy, summarize, fillMissingGroups } from '../src/summary'
+import { counter, quantiles } from '../src/aggregators'
 
 describe('aggregators', () => {
 	const custom = (values) => ({
@@ -120,5 +115,20 @@ describe('aggregators', () => {
 		}))
 
 		expect(result).toEqual(withValues)
+		// result = fillMissingGroups(missing, ['gender'])
+		// expect(result).toEqual(filled)
+		result = fillMissingGroups(missing, ['gender'], {
+			defaults: { count: 0 },
+			addActualIndicator: true
+		})
+		let withIndicator = filled.map((d) => ({
+			...d,
+			_df: d._df.map((x) => ({
+				...x,
+				count: x.count === null ? 0 : x.count,
+				_actual: x.count === null ? 0 : 1
+			}))
+		}))
+		expect(result).toEqual(withIndicator)
 	})
 })
