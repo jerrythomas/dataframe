@@ -18,14 +18,13 @@ describe('Timelapse', () => {
 	})
 
 	it('should generate timelapse groups', (context) => {
-		console.log(context.meta.suite.input)
-		// const result = timelapse('date')
-		// 	.useDefaults({
-		// 		score: 0,
-		// 		pct: 0
-		// 	})
-		// 	.groupBy('group', 'team')
-		// 	.transform(context.meta.suite.input)
-		// expect(result).toEqual(context.meta.suite.byDate)
+		const result = timelapse('date')
+			.useDefaults({
+				score: 0,
+				pct: 0
+			})
+			.groupBy('group', 'team')
+			.transform(context.task.suite.input)
+		expect(result).toEqual(context.task.suite.byDate)
 	})
 })

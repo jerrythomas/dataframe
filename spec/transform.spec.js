@@ -18,7 +18,7 @@ describe('Animation transform', () => {
 	})
 
 	it('should return data without transforming', (context) => {
-		const input = context.meta.suite.input
+		const input = context.task.suite.input
 		let result = tweenable().transform(input)
 		expect(result).toEqual(input)
 		result = tweenable().group(['name']).transform(input)
@@ -30,8 +30,8 @@ describe('Animation transform', () => {
 	})
 
 	it('should create flat groups', (context) => {
-		const input = context.meta.suite.input
-		const expected = context.meta.suite.groups
+		const input = context.task.suite.input
+		const expected = context.task.suite.groups
 
 		let result = tweenable().rollup('score').group(['team']).transform(input)
 		// expect(result).toEqual(expected['team-score'])
@@ -47,8 +47,8 @@ describe('Animation transform', () => {
 	})
 
 	it('should create nested arrays', (context) => {
-		const input = context.meta.suite.input
-		const expected = context.meta.suite.nested
+		const input = context.task.suite.input
+		const expected = context.task.suite.nested
 
 		let result = tweenable().rollup('score').group(['team']).key('date').transform(input)
 		// console.log(JSON.stringify(result, null, 2))
