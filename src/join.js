@@ -14,19 +14,14 @@ export function renameUsing(opts = {}) {
 	}
 
 	return (row) =>
-		Object.entries(row).reduce(
-			(acc, [key, value]) => ({ ...acc, [rename(key)]: value }),
-			{}
-		)
+		Object.entries(row).reduce((acc, [key, value]) => ({ ...acc, [rename(key)]: value }), {})
 }
 function leftJoin(a, b, query, opts = {}) {
 	const { inner } = { inner: true, ...opts }
 	const rename = renameUsing(opts)
 	return a
 		.map((x) => {
-			const matched = b
-				.filter((y) => query(x, y))
-				.map((y) => ({ ...rename(y), ...x }))
+			const matched = b.filter((y) => query(x, y)).map((y) => ({ ...rename(y), ...x }))
 			return matched.length ? matched : inner ? [] : [x]
 		})
 		.reduce((acc, cur) => [...acc, ...cur], [])

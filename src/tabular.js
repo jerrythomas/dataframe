@@ -5,9 +5,7 @@ export function filterObjectArray(data, options) {
 	let filtered = data
 	if (!operator || !value) return filtered
 	if (column) {
-		filtered = data.filter((row) =>
-			filterOperations[operator](row[column], value)
-		)
+		filtered = data.filter((row) => filterOperations[operator](row[column], value))
 	} else {
 		const op = operator.startsWith('!') ? operator.slice(1) : operator
 

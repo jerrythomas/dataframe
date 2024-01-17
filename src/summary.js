@@ -77,20 +77,14 @@ export function getGeneratorForMissingRows(data, cols, opts = {}) {
 
 	const groups = pipe(map(pick(cols)), uniq)(data)
 
-	const generator = pipe(
-		map(pick(cols)),
-		uniq,
-		difference(groups),
-		map(mergeLeft(imputedValues))
-	)
+	const generator = pipe(map(pick(cols)), uniq, difference(groups), map(mergeLeft(imputedValues)))
 
 	return generator
 }
 
 export function fillMissingGroups(data, cols, opts = {}) {
 	let addAttr = (x) => x
-	if (!Array.isArray(cols))
-		throw new TypeError('cols must be an array of column names')
+	if (!Array.isArray(cols)) throw new TypeError('cols must be an array of column names')
 	if (cols.length == 0) throw new Error('cols must contain at least one column')
 
 	if (opts.addActualIndicator) {

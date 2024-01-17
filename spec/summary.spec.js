@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { sum, min, max, mean, deviation } from 'd3-array'
-import {
-	data,
-	grouped,
-	exclusions,
-	inclusions,
-	missing,
-	filled
-} from './fixtures/data'
+import { data, grouped, exclusions, inclusions, missing, filled } from './fixtures/data'
 
 import { groupBy, summarize, fillMissingGroups } from '../src/summary'
 import { counter, quantiles } from '../src/aggregators'
@@ -98,13 +91,9 @@ describe('aggregators', () => {
 	})
 
 	it('Should fill missing groups', () => {
-		expect(() => fillMissingGroups([])).toThrowError(
-			/cols must be an array of column names/
-		)
+		expect(() => fillMissingGroups([])).toThrowError(/cols must be an array of column names/)
 
-		expect(() => fillMissingGroups([], [])).toThrowError(
-			/cols must contain at least one column/
-		)
+		expect(() => fillMissingGroups([], [])).toThrowError(/cols must contain at least one column/)
 
 		let result = fillMissingGroups(missing, ['gender'])
 		expect(result).toEqual(filled)

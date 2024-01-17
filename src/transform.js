@@ -67,13 +67,7 @@ export function tweenable() {
 				data = data.map(({ key, value }) => ({
 					key,
 					value: spread(
-						addHiddenValues(
-							value,
-							missingRows,
-							combiCounts,
-							valueField,
-							groupBy
-						),
+						addHiddenValues(value, missingRows, combiCounts, valueField, groupBy),
 						valueField
 					)
 				}))
@@ -90,14 +84,12 @@ export function tweenable() {
 function addHiddenValues(values, missingRows, counts, valueField, groupBy) {
 	const dummy = { y: 0, tweenVisibility: 0 }
 	const sorter = multiAttributeSorter(groupBy)
-	const result = [...values, ...missingRows(values)]
-		.sort(sorter)
-		.map((item) => {
-			const key = JSON.stringify(pick(groupBy, item))
-			const diff = counts[key] - item[valueField].length
-			item[valueField] = [...item[valueField], ...Array(diff).fill(dummy)]
-			return item
-		})
+	const result = [...values, ...missingRows(values)].sort(sorter).map((item) => {
+		const key = JSON.stringify(pick(groupBy, item))
+		const diff = counts[key] - item[valueField].length
+		item[valueField] = [...item[valueField], ...Array(diff).fill(dummy)]
+		return item
+	})
 
 	return result
 }
@@ -112,9 +104,7 @@ function flatObjectGroup(data, fields, y) {
 	const attr = fields.map((x) => (d) => d[x])
 	const keys = [...fields, y]
 	let grouped = flatGroup(data, ...attr)
-		.map((x) =>
-			x.reduce((acc, item, index) => ({ ...acc, [keys[index]]: item }), {})
-		)
+		.map((x) => x.reduce((acc, item, index) => ({ ...acc, [keys[index]]: item }), {}))
 		.map((d) => ({
 			...d,
 			[y]: d[y].map((v) => ({ y: v[y], tweenVisibility: 1 }))

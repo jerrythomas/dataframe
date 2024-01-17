@@ -97,9 +97,7 @@ export function flatObjectGroup(data, fields, y) {
 	const attr = fields.map((x) => (d) => d[x])
 	const keys = [...fields, y]
 	let grouped = flatGroup(data, ...attr)
-		.map((x) =>
-			x.reduce((acc, item, index) => ({ ...acc, [keys[index]]: item }), {})
-		)
+		.map((x) => x.reduce((acc, item, index) => ({ ...acc, [keys[index]]: item }), {}))
 		.map((d) => ({
 			...d,
 			[y]: d[y].map((v) => ({ y: v[y], isTweenHidden: false }))
@@ -164,13 +162,7 @@ export function flatObjectGroup(data, fields, y) {
 // 	}))
 // }
 
-export function fillMissingValues(
-	values,
-	missingRows,
-	counts,
-	valueField,
-	groupBy
-) {
+export function fillMissingValues(values, missingRows, counts, valueField, groupBy) {
 	const dummy = { y: 0, isTweenHidden: true }
 	const result = [...values, ...missingRows(values)].map((x) => {
 		const key = JSON.stringify(pick(groupBy, x))

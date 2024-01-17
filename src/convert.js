@@ -35,9 +35,6 @@ export function fromArray(input) {
 		})
 	})
 
-	const types = columns.reduce(
-		(acc, x) => ({ ...acc, [x]: inferDataType(data[x]) }),
-		{}
-	)
+	const types = columns.reduce((acc, x) => ({ ...acc, [x]: inferDataType(data[x]) }), {})
 	return { data, columns, types }
 }
