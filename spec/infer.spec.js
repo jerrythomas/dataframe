@@ -17,16 +17,11 @@ describe('utils', () => {
 	it('should derive column names', () => {
 		expect(deriveColumns([])).toEqual([])
 		expect(deriveColumns(data)).toEqual(Object.keys(data[0]))
-		expect(deriveColumns([{ name: 'alpha' }, { rank: 1 }])).toEqual([
-			'name',
-			'rank'
-		])
+		expect(deriveColumns([{ name: 'alpha' }, { rank: 1 }])).toEqual(['name', 'rank'])
 	})
 
 	it('should derive sorted columns', () => {
-		expect(deriveSortableColumns('name')).toEqual([
-			{ column: 'name', sorter: ascending }
-		])
+		expect(deriveSortableColumns('name')).toEqual([{ column: 'name', sorter: ascending }])
 		expect(deriveSortableColumns('city', 'name')).toEqual([
 			{ column: 'city', sorter: ascending },
 			{ column: 'name', sorter: ascending }
@@ -68,12 +63,8 @@ describe('utils', () => {
 		expect(inferDataType([null, 2, null, 4, 5, null])).toEqual('number')
 		expect(inferDataType(['a', 'b', 'c', null])).toEqual('string')
 		expect(inferDataType([true, false, true, null])).toEqual('boolean')
-		expect(
-			inferDataType([Date('2020-01-01'), '2020-01-02', '2020-01-03'])
-		).toEqual('date')
-		expect(
-			inferDataType(['2020-01-01', '2020-01-02', '2020-01-03', 1])
-		).toEqual('mixed')
+		expect(inferDataType([Date('2020-01-01'), '2020-01-02', '2020-01-03'])).toEqual('date')
+		expect(inferDataType(['2020-01-01', '2020-01-02', '2020-01-03', 1])).toEqual('mixed')
 	})
 	it('should infer string and numeric columns', () => {
 		const dataTypes = deriveDataTypes(data)

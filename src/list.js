@@ -15,10 +15,7 @@ export function compare(a, b, list) {
 	let result = 0
 
 	if (list.groupKey) {
-		result = ascending(
-			list.lookup[a[list.groupKey]],
-			list.lookup[b[list.groupKey]]
-		)
+		result = ascending(list.lookup[a[list.groupKey]], list.lookup[b[list.groupKey]])
 	}
 	if (result == 0) {
 		result = ascending(a[list.sortKey], b[list.sortKey])
@@ -34,9 +31,7 @@ export function compare(a, b, list) {
  * @returns
  */
 export function quickSearch(list, value) {
-	return list.data.filter((d) =>
-		d[list.filterKey].toLowerCase().includes(value.toLowerCase())
-	)
+	return list.data.filter((d) => d[list.filterKey].toLowerCase().includes(value.toLowerCase()))
 }
 
 export class List {
@@ -61,9 +56,7 @@ export class List {
 
 	key(value) {
 		this.primaryKey = value
-		this.data = this.data.map((item) =>
-			value in item ? item : { ...item, [value]: uuid() }
-		)
+		this.data = this.data.map((item) => (value in item ? item : { ...item, [value]: uuid() }))
 
 		return this
 	}
@@ -99,9 +92,7 @@ export class List {
 	}
 
 	add(item) {
-		const index = this.data.findIndex(
-			(d) => d[this.primaryKey] === item[this.primaryKey]
-		)
+		const index = this.data.findIndex((d) => d[this.primaryKey] === item[this.primaryKey])
 		if (index == -1) {
 			if (!(this.primaryKey in item)) {
 				item[this.primaryKey] = uuid()
@@ -113,9 +104,7 @@ export class List {
 	}
 
 	remove(item) {
-		const index = this.data.findIndex(
-			(d) => d[this.primaryKey] === item[this.primaryKey]
-		)
+		const index = this.data.findIndex((d) => d[this.primaryKey] === item[this.primaryKey])
 		if (index > -1) {
 			this.data = [...this.data.slice(0, index), ...this.data.slice(index + 1)]
 			this.refresh()
@@ -124,9 +113,7 @@ export class List {
 	}
 
 	modify(item) {
-		const index = this.data.findIndex(
-			(d) => d[this.primaryKey] === item[this.primaryKey]
-		)
+		const index = this.data.findIndex((d) => d[this.primaryKey] === item[this.primaryKey])
 		if (index > -1) {
 			this.data[index] = { ...item }
 			this.sort().refresh()

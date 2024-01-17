@@ -76,9 +76,7 @@ export function filterColumnarStore(store, filter) {
 
 	const filteredData = {}
 	columns.forEach((key) => {
-		filteredData[key] = data[key].filter((rowValue, index) =>
-			indices.includes(index)
-		)
+		filteredData[key] = data[key].filter((rowValue, index) => indices.includes(index))
 	})
 
 	return filteredData

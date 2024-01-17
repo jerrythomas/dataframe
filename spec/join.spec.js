@@ -72,9 +72,7 @@ describe('join', () => {
 		const B = data.slice(2).map((d) => pick(['age', 'rank'], d))
 		const AB = data
 			.slice(0, 4)
-			.map((d, index) =>
-				index < 2 ? pick(['rank', 'name'], d) : pick(['age', 'rank', 'name'], d)
-			)
+			.map((d, index) => (index < 2 ? pick(['rank', 'name'], d) : pick(['age', 'rank', 'name'], d)))
 
 		expect(outerJoin(A, B, byRank)).toEqual(AB)
 	})
@@ -88,8 +86,8 @@ describe('join', () => {
 				index < 2
 					? pick(['rank', 'name'], d)
 					: index < 4
-					? pick(['age', 'rank', 'name'], d)
-					: pick(['age', 'rank'], d)
+						? pick(['age', 'rank', 'name'], d)
+						: pick(['age', 'rank'], d)
 			)
 
 		expect(fullJoin(A, B, byRank)).toEqual(AB)

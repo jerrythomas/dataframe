@@ -39,10 +39,7 @@ describe('Animation transform', () => {
 		result = tweenable().rollup('score').group(['group']).transform(input)
 		// expect(result).toEqual(expected['group-score'])
 
-		result = tweenable()
-			.rollup('score')
-			.group(['group', 'team'])
-			.transform(input)
+		result = tweenable().rollup('score').group(['group', 'team']).transform(input)
 		// expect(result).toEqual(expected['group-team-score'])
 
 		result = tweenable().rollup('pct').group(['group', 'team']).transform(input)
@@ -53,19 +50,11 @@ describe('Animation transform', () => {
 		const input = context.meta.suite.input
 		const expected = context.meta.suite.nested
 
-		let result = tweenable()
-			.rollup('score')
-			.group(['team'])
-			.key('date')
-			.transform(input)
+		let result = tweenable().rollup('score').group(['team']).key('date').transform(input)
 		// console.log(JSON.stringify(result, null, 2))
 		// expect(result).toEqual(expected['date-team-score'])
 
-		result = tweenable()
-			.rollup('score')
-			.group(['group', 'team'])
-			.key('date')
-			.transform(input)
+		result = tweenable().rollup('score').group(['group', 'team']).key('date').transform(input)
 		// expect(result).toEqual(expected['date-group-team-score'])
 	})
 })

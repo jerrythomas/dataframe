@@ -141,10 +141,7 @@ describe('List Data', () => {
 		data.additions.map(({ item, result }) => {
 			l.add(item)
 			expect(l.data).toEqual(result.data.unsorted)
-			expect(l.current()).toEqual(
-				result.data.unsorted,
-				'Should update store after add'
-			)
+			expect(l.current()).toEqual(result.data.unsorted, 'Should update store after add')
 		})
 	})
 
@@ -155,10 +152,7 @@ describe('List Data', () => {
 		data.additions.map(({ item, result }) => {
 			l.add(item)
 			expect(l.data).toEqual(result.data.sorted)
-			expect(l.current()).toEqual(
-				result.data.sorted,
-				'Should update store after add'
-			)
+			expect(l.current()).toEqual(result.data.sorted, 'Should update store after add')
 		})
 	})
 
@@ -169,10 +163,7 @@ describe('List Data', () => {
 		data.additions.map(({ item, result }) => {
 			l.add(item)
 			expect(l.data).toEqual(result.data.unsorted)
-			expect(l.current()).toEqual(
-				result.grouped.unsorted,
-				'Should update store after add'
-			)
+			expect(l.current()).toEqual(result.grouped.unsorted, 'Should update store after add')
 		})
 	})
 
@@ -185,10 +176,7 @@ describe('List Data', () => {
 		data.additions.map(({ item, result }) => {
 			l.add(item)
 			expect(l.data).toEqual(result.data.sorted)
-			expect(l.current()).toEqual(
-				result.grouped.sorted,
-				'Should update store after add'
-			)
+			expect(l.current()).toEqual(result.grouped.sorted, 'Should update store after add')
 		})
 	})
 
@@ -199,10 +187,7 @@ describe('List Data', () => {
 		data.removals.map(({ item, result }) => {
 			l.remove(item)
 			expect(l.data).toEqual(result.data.unsorted)
-			expect(l.current()).toEqual(
-				result.data.unsorted,
-				'Should update store after remove'
-			)
+			expect(l.current()).toEqual(result.data.unsorted, 'Should update store after remove')
 		})
 	})
 
@@ -213,10 +198,7 @@ describe('List Data', () => {
 		data.removals.map(({ item, result }) => {
 			l.remove(item)
 			expect(l.data).toEqual(result.data.sorted)
-			expect(l.current()).toEqual(
-				result.data.sorted,
-				'Should update store after remove'
-			)
+			expect(l.current()).toEqual(result.data.sorted, 'Should update store after remove')
 		})
 	})
 
@@ -227,10 +209,7 @@ describe('List Data', () => {
 		data.removals.map(({ item, result }) => {
 			l.remove(item)
 			expect(l.data).toEqual(result.data.unsorted)
-			expect(l.current()).toEqual(
-				result.grouped.unsorted,
-				'Should update store after remove'
-			)
+			expect(l.current()).toEqual(result.grouped.unsorted, 'Should update store after remove')
 		})
 	})
 
@@ -243,10 +222,7 @@ describe('List Data', () => {
 		data.removals.map(({ item, result }) => {
 			l.remove(item)
 			expect(l.data).toEqual(result.data.sorted)
-			expect(l.current()).toEqual(
-				result.grouped.sorted,
-				'Should update store after remove'
-			)
+			expect(l.current()).toEqual(result.grouped.sorted, 'Should update store after remove')
 		})
 	})
 
@@ -258,10 +234,7 @@ describe('List Data', () => {
 			l.modify(item)
 
 			expect(l.data).toEqual(result.data.unsorted)
-			expect(l.current()).toEqual(
-				result.data.unsorted,
-				'Should update store after modify'
-			)
+			expect(l.current()).toEqual(result.data.unsorted, 'Should update store after modify')
 		})
 	})
 
@@ -272,10 +245,7 @@ describe('List Data', () => {
 		data.modifications.map(({ item, result }) => {
 			l.modify(item)
 			expect(l.data).toEqual(result.data.sorted)
-			expect(l.current()).toEqual(
-				result.data.sorted,
-				'Should update store after modify'
-			)
+			expect(l.current()).toEqual(result.data.sorted, 'Should update store after modify')
 		})
 	})
 
@@ -286,10 +256,7 @@ describe('List Data', () => {
 		data.modifications.map(({ item, result }) => {
 			l.modify(item)
 			expect(l.data).toEqual(result.data.unsorted)
-			expect(l.current()).toEqual(
-				result.grouped.unsorted,
-				'Should update store after modify'
-			)
+			expect(l.current()).toEqual(result.grouped.unsorted, 'Should update store after modify')
 		})
 	})
 
@@ -302,10 +269,7 @@ describe('List Data', () => {
 		data.modifications.map(({ item, result }) => {
 			l.modify(item)
 			expect(l.data).toEqual(result.grouped.data)
-			expect(l.current()).toEqual(
-				result.grouped.sorted,
-				'Should update store after modify'
-			)
+			expect(l.current()).toEqual(result.grouped.sorted, 'Should update store after modify')
 		})
 	})
 

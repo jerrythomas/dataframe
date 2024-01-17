@@ -3,14 +3,7 @@ import { omit } from 'ramda'
 import { join } from './join'
 import { groupBy, summarize, fillMissingGroups } from './summary'
 import { deriveColumns, deriveSortableColumns } from './infer'
-import {
-	__data__,
-	__cols__,
-	__opts__,
-	__pkey__,
-	__subdf__,
-	__defaults__
-} from './symbols'
+import { __data__, __cols__, __opts__, __pkey__, __subdf__, __defaults__ } from './symbols'
 
 const defaultOpts = {
 	missingColumns: false
@@ -26,11 +19,7 @@ export class DataFrame {
 		this[__opts__] = { ...opts }
 		this[__subdf__] = '_df'
 		this[__cols__] =
-			data.length === 0
-				? []
-				: opts.missingColumns
-				? deriveColumns(data)
-				: Object.keys(data[0])
+			data.length === 0 ? [] : opts.missingColumns ? deriveColumns(data) : Object.keys(data[0])
 
 		this[__defaults__] = {}
 		this[__pkey__] = undefined
@@ -83,9 +72,7 @@ export class DataFrame {
 			this[__cols__] = addColumnNames(this[__cols__], row)
 		}
 
-		this[__data__].push(
-			this[__opts__].hasSurrogatePK ? { ...row, id: uuid() } : row
-		)
+		this[__data__].push(this[__opts__].hasSurrogatePK ? { ...row, id: uuid() } : row)
 		// add row to indexes
 		return this
 	}
@@ -98,9 +85,7 @@ export class DataFrame {
 
 	update(query, data) {
 		if (data) {
-			this[__data__] = this[__data__].map((d) =>
-				query(d) ? { ...d, ...data } : d
-			)
+			this[__data__] = this[__data__].map((d) => (query(d) ? { ...d, ...data } : d))
 			this[__cols__] = addColumnNames(this[__cols__], data)
 			// reindex keys included in data
 		} else {

@@ -50,9 +50,7 @@ export function deriveAggregators(...cols) {
 
 export function deriveColumns(data) {
 	if (data.length === 0) return []
-	return Array.from(
-		data.map((row) => Object.keys(row)).reduce((p, n) => new Set([...p, ...n]))
-	)
+	return Array.from(data.map((row) => Object.keys(row)).reduce((p, n) => new Set([...p, ...n])))
 }
 
 export function deriveDataTypes(data) {
@@ -61,10 +59,10 @@ export function deriveDataTypes(data) {
 			field,
 			type: data.map((d) => d[field]).some(isNaN) ? 'string' : 'number'
 		}))
-		.reduce(
-			(acc, cur) => ({ ...acc, [cur.type]: [...acc[cur.type], cur.field] }),
-			{ string: [], number: [] }
-		)
+		.reduce((acc, cur) => ({ ...acc, [cur.type]: [...acc[cur.type], cur.field] }), {
+			string: [],
+			number: []
+		})
 	return dataTypes
 }
 export function inferDataType(values) {
