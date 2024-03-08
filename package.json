@@ -20,7 +20,7 @@
     "test:ui": "vitest --ui",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "release": "release-it --preRelease=next",
+    "release:next": "release-it --preRelease=next",
     "upgrade": "pnpm upgrade"
   },
   "exports": {
@@ -38,6 +38,7 @@
     "js-yaml": "^4.1.0",
     "jsdom": "^20.0.3",
     "prettier": "3",
+    "release-it": "^17.1.1",
     "typescript": "~4.6.4",
     "vite": "5",
     "vitest": "~1.2.0"
