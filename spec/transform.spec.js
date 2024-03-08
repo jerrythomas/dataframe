@@ -1,7 +1,6 @@
-import fs from 'fs'
-import yaml from 'js-yaml'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { tweenable } from '../src/transform'
+import { data } from './fixtures/data'
 
 describe('Animation transform', () => {
 	beforeAll((suite) => {
@@ -17,15 +16,15 @@ describe('Animation transform', () => {
 		// )
 	})
 
-	it('should return data without transforming', (context) => {
-		const input = context.task.suite.input
+	it('should return data without transforming', () => {
+		const input = data
 		let result = tweenable().transform(input)
 		expect(result).toEqual(input)
 		result = tweenable().group(['name']).transform(input)
 		expect(result).toEqual(input)
 		result = tweenable().key('name').transform(input)
 		expect(result).toEqual(input)
-		result = tweenable().key('name').sort().group(['gender']).transform(input)
+		result = tweenable().key('name').sort().group(['country']).transform(input)
 		expect(result).toEqual(input)
 	})
 

@@ -1,12 +1,4 @@
-import { filterOperations } from './filter'
-
-const typeConverters = {
-	string: (value) => String(value),
-	number: (value) => Number(value),
-	boolean: (value) => Boolean(value),
-	date: (value) => Date(value),
-	mixed: (value) => value
-}
+import { filterOperations, typeConverters } from './constants'
 
 export function sortDataStore(dataStore, sortColumns) {
 	const indices = [...Array(dataStore.data[0].length).keys()]

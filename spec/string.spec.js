@@ -73,6 +73,43 @@ describe('Utility Functions', () => {
 		])
 	})
 
+	it('Should generate ordered list of names', () => {
+		const values = [
+			'arrows/expand',
+			'arrow/up',
+			'arrow/right',
+			'arrow/narrow/up',
+			'circle/down',
+			'arrow/narrow/down',
+			'arrow/narrow/right',
+			'arrow/narrow/left',
+			'arrow/left',
+			'arrow/down',
+			'arrow/circle/up',
+			'arrow/circle/right',
+			'arrow/circle/left',
+			'arrow/circle/right',
+			'arrow/circle/down'
+		]
+		expect(values.sort((a, b) => sortByParts(a, b, '/'))).toEqual([
+			'arrow/down',
+			'arrow/left',
+			'arrow/right',
+			'arrow/up',
+			'arrow/circle/down',
+			'arrow/circle/left',
+			'arrow/circle/right',
+			'arrow/circle/right',
+			'arrow/circle/up',
+			'arrow/narrow/down',
+			'arrow/narrow/left',
+			'arrow/narrow/right',
+			'arrow/narrow/up',
+			'arrows/expand',
+			'circle/down'
+		])
+	})
+
 	it('should generate a unique id', () => {
 		vi.useFakeTimers()
 		let value = uniqueId()

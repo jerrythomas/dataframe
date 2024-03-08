@@ -1,10 +1,4 @@
 import { inferDataType } from './infer'
-/**
- * @typedef Dataframe
- * @property {Array<string>} columns
- * @property {Record<string,Array<any>} data
- * @property {Record<string,string} types
- */
 
 /**
  * Converts an array of objects into a columnar structure, returning an object with two attributes:
@@ -13,7 +7,7 @@ import { inferDataType } from './infer'
  * - data, which is an object with column names as keys and arrays as values.
  *
  * @param {Array<Object>} input
- * @returns {Dataframe}
+ * @returns {import('./types').Dataframe}
  */
 export function fromArray(input) {
 	let data = {}

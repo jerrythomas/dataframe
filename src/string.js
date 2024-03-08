@@ -2,8 +2,8 @@ import { filter } from 'ramda'
 /**
  * Capitalizes the first letter of input string
  *
- * @param {String} str
- * @returns {String}
+ * @param {string} str
+ * @returns {string}
  */
 export function toInitCapCase(text) {
 	return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
@@ -12,8 +12,8 @@ export function toInitCapCase(text) {
 /**
  * Convert a hyphen separated string to PascalCase
  *
- * @param {String} text
- * @returns
+ * @param {string} text
+ * @returns {string}
  */
 export function toPascalCase(text) {
 	return text
@@ -25,8 +25,8 @@ export function toPascalCase(text) {
 /**
  * Convert a PascalCase string to snake case with separator as hyphen
  *
- * @param {Strin} text
- * @returns
+ * @param {string} text
+ * @returns {string}
  */
 export function toHyphenCase(text) {
 	return text.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`).replace(/^-/, '')
@@ -35,13 +35,14 @@ export function toHyphenCase(text) {
 /**
  * Sort by splitting hyphen separated strings while keeping strings with same number of parts together
  *
- * @param {String} a hyphen separates string
- * @param {String} b hyphen separates string
- * @returns
+ * @param {string} a         - hyphen separated string
+ * @param {string} b         - hyphen separated string
+ * @param {string} separator - separator to split the string
+ * @returns {Number} -1, 0, 1 based on comparison
  */
-export function sortByParts(a, b) {
-	const partsOfA = a.split('-')
-	const partsOfB = b.split('-')
+export function sortByParts(a, b, separator = '-') {
+	const partsOfA = a.split(separator)
+	const partsOfB = b.split(separator)
 
 	let result = compareStrings(partsOfA[0], partsOfB[0])
 	if (result == 0) result = partsOfA.length - partsOfB.length
@@ -52,9 +53,9 @@ export function sortByParts(a, b) {
 /**
  * Simple comparison for two strings
  *
- * @param {String} a
- * @param {String} b
- * @returns
+ * @param {string} a
+ * @param {string} b
+ * @returns {Number} -1, 0, 1 based on comparison
  */
 export function compareStrings(a, b) {
 	return a > b ? 1 : a < b ? -1 : 0
@@ -63,7 +64,7 @@ export function compareStrings(a, b) {
 /**
  * Generates a unique id from current timestamp
  *
- * @returns {String} timestamp based unique id
+ * @returns {string} timestamp based unique id
  */
 export function uniqueId(prefix = '', separator = '-') {
 	let pair = prefix && prefix.length > 0 ? [prefix] : []
@@ -86,7 +87,7 @@ export function compact(obj) {
  *
  * @param {number} value
  * @param {number} size
- * @returns
+ * @returns {string}
  */
 export function toHexString(value, size = 2) {
 	return value.toString(16).padStart(size, '0')
