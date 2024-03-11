@@ -20,7 +20,7 @@ describe('convert', () => {
 		let expectedOutput = {
 			data: { a: [1, 3, 5], b: [2, 4, 6] },
 			columns: ['a', 'b'],
-			types: { a: 'number', b: 'number' }
+			types: { a: 'integer', b: 'integer' }
 		}
 		const result = fromArray(input)
 		expect(result.columns).toEqual(expectedOutput.columns)
@@ -37,7 +37,7 @@ describe('convert', () => {
 		let expectedOutput = {
 			data: { a: [1, 3, 5], b: [2, 4, 6], c: [null, 5, 7], d: [null, null, 8] },
 			columns: ['a', 'b', 'c', 'd'],
-			types: { a: 'number', b: 'number', c: 'number', d: 'number' }
+			types: { a: 'integer', b: 'integer', c: 'integer', d: 'integer' }
 		}
 		const result = fromArray(input)
 		expect(result.columns).toEqual(expectedOutput.columns)
@@ -55,7 +55,7 @@ describe('convert', () => {
 				d: [null, null, 'x']
 			},
 			columns: ['a', 'b', 'c', 'd'],
-			types: { a: 'number', b: 'number', c: 'number', d: 'string' }
+			types: { a: 'integer', b: 'integer', c: 'integer', d: 'string' }
 		}
 		const result = fromArray(input)
 		// console.log(result.types)

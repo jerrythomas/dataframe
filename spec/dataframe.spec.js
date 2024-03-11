@@ -83,7 +83,29 @@ describe('dataframe', () => {
 		})
 		expect(df).toBeInstanceOf(DataFrame)
 		expect(df.data).toEqual(input)
-		expect(df.columns).toEqual(['name', 'age', 'rank', 'country', 'level'])
+		expect(df.columns).toEqual([
+			{
+				fields: {
+					text: 'name'
+				},
+				name: 'name',
+				type: 'string'
+			},
+			{
+				fields: {
+					text: 'age'
+				},
+				name: 'age',
+				type: 'integer'
+			},
+			{
+				fields: {
+					text: 'rank'
+				},
+				name: 'rank',
+				type: 'integer'
+			}
+		])
 		expect(df.opts).toEqual({
 			missingColumns: true,
 			isGrouped: false,

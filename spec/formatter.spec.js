@@ -42,4 +42,19 @@ describe('createFormatter', () => {
 		const formatCurrency = createFormatter('currency', 'en-US', 2)
 		expect(formatCurrency(1234.5, 'USD')).toBe('$1,234.50')
 	})
+
+	it('should format objects', () => {
+		const formatObject = createFormatter('object')
+		expect(formatObject({ a: 1, b: 2 })).toBe('{"a":1,"b":2}')
+	})
+
+	it('should format arrays', () => {
+		const formatArray = createFormatter('array')
+		expect(formatArray([1, 2, 3])).toBe('[1,2,3]')
+	})
+
+	it('should return ellipsis', () => {
+		const formatEllipsis = createFormatter('ellipsis')
+		expect(formatEllipsis()).toBe('...')
+	})
 })

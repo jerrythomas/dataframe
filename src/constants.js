@@ -1,11 +1,14 @@
 import { identity } from 'ramda'
 
+// scanMode = 'fast' | 'deep'
+
 export const defaultViewOptions = {
 	expanded: false,
 	path: null,
 	separator: '/',
 	actions: [],
-	language: 'en-US'
+	language: 'en-US',
+	scanMode: 'fast'
 }
 
 export const defaultActionOrder = {

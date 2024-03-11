@@ -2,6 +2,8 @@ import { ascending, descending } from 'd3-array'
 import { counter } from './aggregators'
 import { createFormatter } from './formatter'
 import { defaultViewOptions, defaultActionOrder } from './constants'
+import { compact } from './string'
+import { omit } from 'ramda'
 
 /**
  * Check if a value is a date string
@@ -19,6 +21,7 @@ function isDateString(value) {
  */
 function getType(value) {
 	let type = Array.isArray(value) ? 'array' : typeof value
+	if (type === 'number' && Number.isInteger(value)) return 'integer'
 	return type === 'string' && isDateString(value) ? 'date' : type
 }
 /**
@@ -54,6 +57,15 @@ export function deriveAggregators(...cols) {
 	})
 }
 
+function getDeepScanSample(data) {
+	return data.reduce(
+		(acc, cur) => ({
+			...acc,
+			...compact(omit(Object.keys(acc), cur))
+		}),
+		{}
+	)
+}
 /**
  * Derives a unique list of column names from an array of data objects.
  * Each data object represents a row and this function compiles a list of all unique property keys
@@ -62,10 +74,13 @@ export function deriveAggregators(...cols) {
  * @param {Object[]} data - The array of data objects to analyze for column names.
  * @returns {string[]} - An array of strings representing the unique column names found across all data objects.
  */
-export function deriveColumns(data, full = false) {
+export function deriveColumns(data, options) {
 	if (data.length === 0) return []
-	if (!full) Object.keys(data[0])
-	return Array.from(data.map((row) => Object.keys(row)).reduce((p, n) => new Set([...p, ...n])))
+
+	const { scanMode, language } = { ...defaultViewOptions, ...options }
+	const sample = scanMode === 'fast' ? data[0] : getDeepScanSample(data)
+
+	return deriveColumnsFromSample(sample, language)
 }
 
 /**
@@ -130,33 +145,67 @@ export function inferDataType(values) {
  * @param {Array} data - The data to derive column metadata from.
  * @returns {Array<import('./types').ColumnMetadata>} - The derived column metadata.
  */
-export function deriveColumnMetadata(dataArray, options = {}) {
-	if (dataArray.length === 0) return []
-
+export function deriveMetadata(dataArray, options = {}) {
+	let { columns = [] } = options
+	if (dataArray.length === 0) return columns
 	const { path, separator, actions, language } = { ...defaultViewOptions, ...options }
-	const firstRow = dataArray[0]
 
-	let columns = []
+	if (columns.length === 0) columns = deriveColumns(dataArray, options)
+	columns = addFormatters(columns, language)
+	if (path) addPathAttribute(columns, path, separator)
+	if (actions.length > 0) columns = deriveActions(columns, actions)
 
-	for (const key in firstRow) {
-		const dataType = getType(firstRow[key])
-		const formatter = createFormatter(dataType, language)
+	return columns
+}
+
+/**
+ * Adds a formatter function to each column in the array based on the column type. If a formatter
+ * function is already present, it will not be overwritten. The formatter is created based on the
+ * override formatter if present, or the column type and language.
+ *
+ * @param {Array<import('./types').ColumnMetadata>} columns - The array of column metadata to add formatters to.
+ * @param {string} language - The language to use for formatting.
+ * @returns {Array<import('./types').ColumnMetadata>} - The array of column metadata with formatters added.
+ */
+export function addFormatters(columns, language) {
+	return columns.map((column) => {
+		const formatter = column.formatter ?? column.type
+		if (typeof formatter !== 'function') {
+			const digits = column.digits ?? (['number', 'currency'].includes(column.type) ? 2 : 0)
+			column.formatter = createFormatter(formatter, language, digits)
+		}
+		return column
+	})
+}
+
+/**
+ * Derives column metadata from the data to be used in a tabular component.
+ *
+ * @param {Object} sample - The data to derive column metadata from.
+ * @param {string} language - The language to use for formatting.
+ * @returns {Array<import('./types').ColumnMetadata>} - The derived column metadata.
+ */
+function deriveColumnsFromSample(sample, language) {
+	const columns = []
+
+	for (const key in sample) {
+		const type = getType(sample[key])
 		const fields = { text: key }
+		const digits = type === 'number' ? 2 : null
 
 		if (key.endsWith('_currency')) {
 			deriveCurrencyAttribute(key, columns, language)
 		} else {
-			columns.push({
-				name: key,
-				dataType: dataType,
-				fields,
-				formatter
-			})
+			columns.push(
+				compact({
+					name: key,
+					type,
+					fields,
+					digits
+				})
+			)
 		}
 	}
-	if (path) addPathAttribute(columns, path, separator)
-	if (actions.length > 0) columns = deriveActions(columns, actions)
-
 	return columns
 }
 
@@ -173,9 +222,9 @@ function deriveCurrencyAttribute(key, columns, language) {
 
 	// Find the existing column and update its currency attribute
 	const existingColumn = columns.find((column) => column.name === baseColumn)
-	existingColumn.dataType = 'currency'
-	existingColumn.formatter = createFormatter('currency', language, 2)
 	if (existingColumn) {
+		existingColumn.type = 'currency'
+		existingColumn.formatter = createFormatter('currency', language, 2)
 		existingColumn.fields = {
 			...existingColumn.fields,
 			currency: currencyColumn
