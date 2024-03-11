@@ -1,5 +1,8 @@
 # Dataframe
 
+[![Test Coverage][coverage_badge]][coverage_url]
+[![Maintainability][maintainability_badge]][maintainability_url]
+
 The DataFrame UI Library is a JavaScript library that provides a set of tools for managing and manipulating data in user interfaces. It is framework agnostic and can be used with any ui framework.
 
 - Use the `createView` function to make a data view that lets you change and watch the data.
@@ -36,3 +39,8 @@ view.filter((row) => row.age > 25)
 ```
 
 The `createView` function initializes a manageable data state with methods that allow for manipulation and observation of data changes, integrating smoothly with UI updates.
+
+[coverage_badge]: https://api.codeclimate.com/v1/badges/165df677f6d552814a33/test_coverage
+[coverage_url]: https://codeclimate.com/github/jerrythomas/dataframe/test_coverage
+[maintainability_badge]: https://api.codeclimate.com/v1/badges/165df677f6d552814a33/maintainability
+[maintainability_url]: https://codeclimate.com/github/jerrythomas/dataframe/maintainability
