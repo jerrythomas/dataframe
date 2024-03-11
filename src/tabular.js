@@ -1,7 +1,7 @@
 import { deriveMetadata, deriveHierarchy, deriveSortableColumns } from './infer'
 
-export function createView(data, columns, options) {
-	const { path, separator = '/', actions = [] } = options ?? {}
+export function createView(data, options) {
+	const { path } = options ?? {}
 	let sortGroup = path ? [path] : []
 
 	const metadata = deriveMetadata(data, options)

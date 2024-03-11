@@ -1,8 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { tweenable } from '../src/transform'
-import { data } from './fixtures/data'
 import fs from 'fs'
-import yaml from 'js-yaml'
 
 describe('Animation transform', () => {
 	const input = JSON.parse(fs.readFileSync('./spec/fixtures/nba/data.json'))
