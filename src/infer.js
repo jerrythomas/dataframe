@@ -4,26 +4,9 @@ import { createFormatter } from './formatter'
 import { defaultViewOptions, defaultActionOrder } from './constants'
 import { compact } from './string'
 import { omit } from 'ramda'
+import { getType } from './utils'
+import { deriveColumnProperties } from './metadata'
 
-/**
- * Check if a value is a date string
- * @param {string} value
- * @returns {boolean}
- */
-function isDateString(value) {
-	return !isNaN(Date.parse(value))
-}
-
-/**
- * Derive the type of a value
- * @param {any} value
- * @returns {string}
- */
-function getType(value) {
-	let type = Array.isArray(value) ? 'array' : typeof value
-	if (type === 'number' && Number.isInteger(value)) return 'integer'
-	return type === 'string' && isDateString(value) ? 'date' : type
-}
 /**
  *
  * @param  {...[string|[string, boolean]]} cols
@@ -77,10 +60,10 @@ function getDeepScanSample(data) {
 export function deriveColumns(data, options) {
 	if (data.length === 0) return []
 
-	const { scanMode, language } = { ...defaultViewOptions, ...options }
+	const { scanMode } = { ...defaultViewOptions, ...options }
 	const sample = scanMode === 'fast' ? data[0] : getDeepScanSample(data)
 
-	return deriveColumnsFromSample(sample, language)
+	return deriveColumnProperties(sample, options)
 }
 
 /**
@@ -148,11 +131,11 @@ export function inferDataType(values) {
 export function deriveMetadata(dataArray, options = {}) {
 	let { columns = [] } = options
 	if (dataArray.length === 0) return columns
-	const { path, separator, actions, language } = { ...defaultViewOptions, ...options }
+	const { actions, language } = { ...defaultViewOptions, ...options }
 
 	if (columns.length === 0) columns = deriveColumns(dataArray, options)
 	columns = addFormatters(columns, language)
-	if (path) addPathAttribute(columns, path, separator)
+	// if (path) addPathAttribute(columns, path, separator)
 	if (actions.length > 0) columns = deriveActions(columns, actions)
 
 	return columns
@@ -176,60 +159,6 @@ export function addFormatters(columns, language) {
 		}
 		return column
 	})
-}
-
-/**
- * Derives column metadata from the data to be used in a tabular component.
- *
- * @param {Object} sample - The data to derive column metadata from.
- * @param {string} language - The language to use for formatting.
- * @returns {Array<import('./types').ColumnMetadata>} - The derived column metadata.
- */
-function deriveColumnsFromSample(sample, language) {
-	const columns = []
-
-	for (const key in sample) {
-		const type = getType(sample[key])
-		const fields = { text: key }
-		const digits = type === 'number' ? 2 : null
-
-		if (key.endsWith('_currency')) {
-			deriveCurrencyAttribute(key, columns, language)
-		} else {
-			columns.push(
-				compact({
-					name: key,
-					type,
-					fields,
-					digits
-				})
-			)
-		}
-	}
-	return columns
-}
-
-/**
- * Adds a currency attribute to the column metadata. This function updates the columns array in place.
- *
- * @param {string} key                                      - The key of the currency column.
- * @param {Array<import('./types').ColumnMetadata>} columns - The column metadata to update.
- * @param {string} language                                 - The language to use for formatting the currency.
- */
-function deriveCurrencyAttribute(key, columns, language) {
-	const currencyColumn = key
-	const baseColumn = key.replace(/_currency$/, '')
-
-	// Find the existing column and update its currency attribute
-	const existingColumn = columns.find((column) => column.name === baseColumn)
-	if (existingColumn) {
-		existingColumn.type = 'currency'
-		existingColumn.formatter = createFormatter('currency', language, 2)
-		existingColumn.fields = {
-			...existingColumn.fields,
-			currency: currencyColumn
-		}
-	}
 }
 
 /**
@@ -270,24 +199,6 @@ export function deriveActions(columns, input) {
 			action: name
 		}))
 	return [...actionColumns, ...columns]
-}
-
-/**
- * Adds a hierarchical path column to the column metadata
- *
- * @param {Array<import('./types').ColumnMetadata>} columns - The column metadata to update.
- * @param {string} path - The column name to be used as hierarchical path.
- * @param {string} separator - The separator to be used in the path.
- * @returns {Array<import('./types').ColumnMetadata>} - The updated column metadata.
- */
-export function addPathAttribute(columns, path, separator) {
-	let pathColumn = columns.find(({ name }) => name === path)
-
-	if (pathColumn) {
-		pathColumn.path = true
-		pathColumn.separator = separator
-	}
-	return columns
 }
 
 /**

@@ -1,11 +1,14 @@
 import { identity } from 'ramda'
 
-// scanMode = 'fast' | 'deep'
-
-export const defaultViewOptions = {
-	expanded: false,
+export const defaultPathOptions = {
 	path: null,
 	separator: '/',
+	currencySuffix: '_currency'
+}
+
+export const defaultViewOptions = {
+	...defaultPathOptions,
+	expanded: false,
 	actions: [],
 	language: 'en-US',
 	scanMode: 'fast'

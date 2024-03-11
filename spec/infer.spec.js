@@ -208,7 +208,6 @@ describe('infer', () => {
 				{
 					name: 'salary',
 					type: 'number',
-					digits: 2,
 					fields: { text: 'salary' },
 					formatter: expect.any(Function)
 				}
@@ -305,7 +304,6 @@ describe('infer', () => {
 				{
 					name: 'salary',
 					type: 'number',
-					digits: 2,
 					fields: { text: 'salary' },
 					formatter: expect.any(Function)
 				}

@@ -55,17 +55,37 @@ function updateChildren(hierarchy, index) {
 	})
 }
 
+/**
+ * Determines the selected state of a group of children in the hierarchy.
+ * If all children are checked, returns 'checked'.
+ * If all children are unchecked, returns 'unchecked'.
+ * Otherwise, returns 'indeterminate'.
+ *
+ * @param {Array<Object>} children - The array of child objects with a 'selected' property.
+ * @returns {string} The determined selected state: 'checked', 'unchecked', or 'indeterminate'.
+ */
+function determineSelectedState(children) {
+	const allChecked = children.every((child) => child.selected === 'checked')
+	const allUnchecked = !allChecked && children.every((child) => child.selected === 'unchecked')
+
+	return allChecked ? 'checked' : allUnchecked ? 'unchecked' : 'indeterminate'
+}
+
+/**
+ * Updates the selection state of parent nodes in the hierarchy based on their children's states.
+ * It traverses up from the provided `index` position in the hierarchy array, ensuring each
+ * parent's selected state reflects whether all, none, or some of its children are selected.
+ *
+ * @param {Array<Object>} hierarchy - The hierarchy structure containing nodes with
+ *                                    'parent' and 'children' references.
+ * @param {number} index - The index of the node in the hierarchy array from where
+ *                         to start updating parent nodes.
+ */
 function updateParents(hierarchy, index) {
 	let parent = hierarchy[index].parent
 
 	while (parent) {
-		const allChildrenSelected = parent.children.every((child) => child.selected === 'checked')
-		const allChildrenDeselected = parent.children.every((child) => child.selected === 'unchecked')
-		parent.selected = allChildrenSelected
-			? 'checked'
-			: allChildrenDeselected
-				? 'unchecked'
-				: 'indeterminate'
+		parent.selected = determineSelectedState(parent.children)
 		parent = parent.parent
 	}
 }
