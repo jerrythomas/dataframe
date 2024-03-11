@@ -14,26 +14,19 @@ import { filterOperations } from './constants'
  */
 export function filterObjectArray(data, options) {
 	const { column, value, operator } = options
-	let filtered = data
 	// If no operator or value is given, return the data unchanged.
-	if (!operator || !value) return filtered
+	if (!operator || !value) return data
 	// If a column is specified, perform the filtering on that specific column.
-	if (column) {
-		filtered = data.filter((row) => filterOperations[operator](row[column], value))
-	} else {
-		// Otherwise, check all columns for a match.
-		const op = operator.startsWith('!') ? operator.slice(1) : operator
+	if (column) return data.filter((row) => filterOperations[operator](row[column], value))
 
-		filtered = data.filter((row) =>
-			Object.keys(row).find((key) => filterOperations[op](row[key], value))
-		)
-		if (op !== operator) {
-			// If the operator indicates negation, exclude the previously included rows.
-			filtered = data.filter((row) => !filtered.includes(row))
-		}
-	}
+	return data.filter((row) => findMatchingRow(row, value, operator))
+}
 
-	return filtered
+function findMatchingRow(row, value, operator) {
+	let op = operator.startsWith('!') ? operator.slice(1) : operator
+	let matched = Object.keys(row).some((key) => filterOperations[op](row[key], value))
+
+	return operator.startsWith('!') ? !matched : matched
 }
 
 /**
