@@ -1,0 +1,68 @@
+[
+  {
+    "group": "Western Conference",
+    "team": "Los Angeles Lakers",
+    "pct": 85,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Western Conference",
+    "team": "Golden State Warriors",
+    "pct": 80,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Western Conference",
+    "team": "Los Angeles Clippers",
+    "pct": 82,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Western Conference",
+    "team": "Houston Rockets",
+    "pct": 81,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Western Conference",
+    "team": "Denver Nuggets",
+    "pct": 86,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Western Conference",
+    "team": "Utah Jazz",
+    "pct": 80,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Eastern Conference",
+    "team": "Milwaukee Bucks",
+    "pct": 90,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Eastern Conference",
+    "team": "Toronto Raptors",
+    "pct": 75,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Eastern Conference",
+    "team": "Boston Celtics",
+    "pct": 88,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Eastern Conference",
+    "team": "Miami Heat",
+    "pct": 84,
+    "tweenVisibility": 1
+  },
+  {
+    "group": "Eastern Conference",
+    "team": "Philadelphia 76ers",
+    "pct": 79,
+    "tweenVisibility": 1
+  }
+]

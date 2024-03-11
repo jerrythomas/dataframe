@@ -25,6 +25,9 @@ devDependencies:
   '@types/d3-array':
     specifier: ^3.2.1
     version: 3.2.1
+  '@types/d3-collection':
+    specifier: ^1.0.13
+    version: 1.0.13
   '@types/node':
     specifier: ^20.11.25
     version: 20.11.25
@@ -568,6 +571,10 @@ packages:
 
   /@types/d3-array@3.2.1:
     resolution: {integrity: sha512-Y2Jn2idRrLzUfAKV2LyRImR+y4oa2AntrgID95SHJxuMUrkNXmanDSed71sRNZysveJVt1hLLemQZIady0FpEg==}
+    dev: true
+
+  /@types/d3-collection@1.0.13:
+    resolution: {integrity: sha512-v0Rgw3IZebRyamcwVmtTDCZ8OmQcj4siaYjNc7wGMZT7PmdSHawGsCOQMxyLvZ7lWjfohYLK0oXtilMOMgfY8A==}
     dev: true
 
   /@types/estree@1.0.5:
