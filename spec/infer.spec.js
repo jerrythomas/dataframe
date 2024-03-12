@@ -430,6 +430,46 @@ describe('infer', () => {
 			expect(result).toEqual(expected)
 		})
 
+		it('should derive hierarchy where root is empty', () => {
+			const data = [
+				{ id: 1, route: '/' },
+				{ id: 2, route: '/apple' },
+				{ id: 3, route: '/banana' }
+			]
+			const expected = [
+				{
+					depth: 0,
+					isExpanded: false,
+					isParent: true,
+					path: '/',
+					value: '',
+					row: data[0]
+				},
+				{
+					depth: 1,
+					children: [],
+					isParent: false,
+					path: '/apple',
+					value: 'apple',
+					row: data[1]
+				},
+				{
+					depth: 1,
+					children: [],
+					isParent: false,
+					path: '/banana',
+					value: 'banana',
+					row: data[2]
+				}
+			]
+			expected[0].children = [expected[1], expected[2]]
+			expected[1].parent = expected[0]
+			expected[2].parent = expected[0]
+
+			const result = deriveHierarchy(data, { path: 'route' })
+			expect(result).toEqual(expected)
+		})
+
 		it('should derive hierarchy from data with a custom path and separator', () => {
 			const input = data.map((x) => ({ ...x, route: x.route.replace(/\//g, '-').slice(1) }))
 

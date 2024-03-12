@@ -28,11 +28,11 @@ export function flattenNestedChildren(arr) {
  */
 function updateParentFlags(item) {
 	if (!item.parent) return
-
-	if (item.parent.removedByFilter) {
-		item.parent.removedByFilter = false
+	// console.log(item.parent)
+	if (item.parent.excluded) {
+		item.parent.excluded = false
 		item.parent.retainedByChild = true
-		// Recursively update parent's parent
+
 		updateParentFlags(item.parent)
 	}
 }
@@ -44,12 +44,10 @@ function updateParentFlags(item) {
  */
 export function hierarchicalFilter(arr, filterFn) {
 	arr.forEach((item) => {
-		item.removedByFilter = !filterFn(item)
+		item.excluded = !filterFn(item)
 	})
 
 	arr.forEach((item) => {
-		if (item.parent) {
-			updateParentFlags(item)
-		}
+		if (!item.excluded) updateParentFlags(item)
 	})
 }

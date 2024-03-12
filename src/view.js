@@ -40,7 +40,6 @@ function sortNested(elements, group) {
 	elements
 		.sort((a, b) => {
 			for (const item of group) {
-				// console.log(a.row.name, b.row.name, item.column, item.sorter(a, b))
 				const result = item.sorter(a, b)
 				if (result !== 0) return result
 			}
@@ -50,7 +49,6 @@ function sortNested(elements, group) {
 			if (Array.isArray(x.children) && x.children.length > 0) {
 				sortNested(x.children, group)
 			}
-			// return x
 		})
 }
 
@@ -117,11 +115,4 @@ function toggleExpansion(hierarchy, index) {
 			child.isHidden = !hierarchy[index].isExpanded
 		})
 	}
-}
-
-function sortByPath(a, b, separator) {
-	const parentPathOfA = a.path.split(separator).slice(0, -1).join(separator)
-	const parentPathOfB = b.path.split(separator).slice(0, -1).join(separator)
-
-	return parentPathOfA.localeCompare(parentPathOfB)
 }
