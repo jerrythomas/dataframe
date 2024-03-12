@@ -63,6 +63,9 @@ export function deriveColumnProperties(sample, options) {
 	let columns = Object.keys(sample).map((key) => ({
 		name: key,
 		type: getType(sample[key]),
+		sortable: true,
+		filterable: true,
+		sorted: 'none',
 		fields: { text: key }
 	}))
 

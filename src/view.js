@@ -1,15 +1,17 @@
 import { deriveMetadata, deriveHierarchy, deriveSortableColumns } from './infer'
-
+import { defaultViewOptions } from './constants'
+import { flattenNestedChildren, removeChildren } from './hierarchy'
 export function createView(data, options) {
-	const { path } = options ?? {}
-	let sortGroup = path ? [path] : []
+	const { path, separator } = { ...defaultViewOptions, ...options }
+	let sortGroup = []
 
 	const metadata = deriveMetadata(data, options)
-	const hierarchy = deriveHierarchy(data, options)
+	let hierarchy = deriveHierarchy(data, options)
 
 	const sortBy = (name, ascending = true) => {
 		sortGroup = [...sortGroup, [name, ascending]]
 		groupSort(hierarchy, sortGroup)
+		// console.log(hierarchy)
 	}
 
 	return {
@@ -24,16 +26,34 @@ export function createView(data, options) {
 }
 
 export function groupSort(hierarchy, sortGroup) {
-	const group = deriveSortableColumns(...sortGroup)
+	let group = deriveSortableColumns(...sortGroup).map(({ column, sorter }) => ({
+		column,
+		sorter: (a, b) => sorter(a.row[column], b.row[column])
+	}))
 
-	hierarchy.sort((a, b) => {
-		for (const item of group) {
-			const result = item.sorter(a.row[item.column], b.row[item.column])
-			if (result !== 0) return result
-		}
-		return 0
-	})
+	removeChildren(hierarchy)
+	sortNested(hierarchy, group)
+	flattenNestedChildren(hierarchy)
 }
+
+function sortNested(elements, group) {
+	elements
+		.sort((a, b) => {
+			for (const item of group) {
+				// console.log(a.row.name, b.row.name, item.column, item.sorter(a, b))
+				const result = item.sorter(a, b)
+				if (result !== 0) return result
+			}
+			return 0
+		})
+		.map((x) => {
+			if (Array.isArray(x.children) && x.children.length > 0) {
+				sortNested(x.children, group)
+			}
+			// return x
+		})
+}
+
 export function toggleSelection(hierarchy, index) {
 	hierarchy[index].selected = hierarchy[index].selected === 'checked' ? 'unchecked' : 'checked'
 
@@ -97,4 +117,11 @@ function toggleExpansion(hierarchy, index) {
 			child.isHidden = !hierarchy[index].isExpanded
 		})
 	}
+}
+
+function sortByPath(a, b, separator) {
+	const parentPathOfA = a.path.split(separator).slice(0, -1).join(separator)
+	const parentPathOfB = b.path.split(separator).slice(0, -1).join(separator)
+
+	return parentPathOfA.localeCompare(parentPathOfB)
 }

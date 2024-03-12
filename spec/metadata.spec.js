@@ -13,13 +13,30 @@ describe('metadata', () => {
 
 			const columns = deriveColumnProperties(sample)
 			expect(columns).toEqual([
-				{ name: 'name', type: 'string', fields: { text: 'name' } },
-				{ name: 'age', type: 'integer', fields: { text: 'age' } },
+				{
+					name: 'name',
+					type: 'string',
+					fields: { text: 'name' },
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
+				},
+				{
+					name: 'age',
+					type: 'integer',
+					fields: { text: 'age' },
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
+				},
 				{
 					name: 'amount',
 					type: 'currency',
 					fields: { text: 'amount', currency: 'amount_currency' },
-					digits: 2
+					digits: 2,
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
 				}
 			])
 		})
@@ -37,9 +54,19 @@ describe('metadata', () => {
 					type: 'string',
 					path: true,
 					separator: '/',
-					fields: { text: 'lineage' }
+					fields: { text: 'lineage' },
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
 				},
-				{ name: 'name', type: 'string', fields: { text: 'name' } }
+				{
+					name: 'name',
+					type: 'string',
+					fields: { text: 'name' },
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
+				}
 			])
 		})
 
@@ -56,9 +83,19 @@ describe('metadata', () => {
 					type: 'string',
 					path: true,
 					separator: '-',
-					fields: { text: 'lineage' }
+					fields: { text: 'lineage' },
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
 				},
-				{ name: 'name', type: 'string', fields: { text: 'name' } }
+				{
+					name: 'name',
+					type: 'string',
+					fields: { text: 'name' },
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
+				}
 			])
 		})
 
@@ -72,12 +109,18 @@ describe('metadata', () => {
 				{
 					name: 'amount',
 					type: 'integer',
-					fields: { text: 'amount' }
+					fields: { text: 'amount' },
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
 				},
 				{
 					name: 'amt_currency',
 					type: 'string',
-					fields: { text: 'amt_currency' }
+					fields: { text: 'amt_currency' },
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
 				}
 			])
 		})
@@ -93,7 +136,10 @@ describe('metadata', () => {
 					name: 'amount',
 					type: 'currency',
 					fields: { text: 'amount', currency: 'amount_curr' },
-					digits: 2
+					digits: 2,
+					sortable: true,
+					filterable: true,
+					sorted: 'none'
 				}
 			])
 		})

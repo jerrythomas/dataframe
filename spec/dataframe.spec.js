@@ -89,21 +89,30 @@ describe('dataframe', () => {
 					text: 'name'
 				},
 				name: 'name',
-				type: 'string'
+				type: 'string',
+				sortable: true,
+				filterable: true,
+				sorted: 'none'
 			},
 			{
 				fields: {
 					text: 'age'
 				},
 				name: 'age',
-				type: 'integer'
+				type: 'integer',
+				sortable: true,
+				filterable: true,
+				sorted: 'none'
 			},
 			{
 				fields: {
 					text: 'rank'
 				},
 				name: 'rank',
-				type: 'integer'
+				type: 'integer',
+				sortable: true,
+				filterable: true,
+				sorted: 'none'
 			}
 		])
 		expect(df.opts).toEqual({

@@ -21,8 +21,22 @@ describe('infer', () => {
 		it('should derive column names', () => {
 			expect(deriveColumns([])).toEqual([])
 			expect(deriveColumns([{ name: 'alpha', rank: 1 }])).toEqual([
-				{ name: 'name', type: 'string', fields: { text: 'name' } },
-				{ name: 'rank', type: 'integer', fields: { text: 'rank' } }
+				{
+					name: 'name',
+					type: 'string',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
+					fields: { text: 'name' }
+				},
+				{
+					name: 'rank',
+					type: 'integer',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
+					fields: { text: 'rank' }
+				}
 			])
 		})
 
@@ -32,9 +46,30 @@ describe('infer', () => {
 				{ name: 'beta', rank: 2, score: 100 }
 			]
 			expect(deriveColumns(mixedData, { scanMode: 'deep' })).toEqual([
-				{ name: 'name', type: 'string', fields: { text: 'name' } },
-				{ name: 'rank', type: 'integer', fields: { text: 'rank' } },
-				{ name: 'score', type: 'integer', fields: { text: 'score' } }
+				{
+					name: 'name',
+					type: 'string',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
+					fields: { text: 'name' }
+				},
+				{
+					name: 'rank',
+					type: 'integer',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
+					fields: { text: 'rank' }
+				},
+				{
+					name: 'score',
+					type: 'integer',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
+					fields: { text: 'score' }
+				}
 			])
 		})
 	})
@@ -196,18 +231,27 @@ describe('infer', () => {
 				{
 					name: 'name',
 					type: 'string',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'name' },
 					formatter: expect.any(Function)
 				},
 				{
 					name: 'age',
 					type: 'integer',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'age' },
 					formatter: expect.any(Function)
 				},
 				{
 					name: 'salary',
 					type: 'number',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'salary' },
 					formatter: expect.any(Function)
 				}
@@ -225,18 +269,27 @@ describe('infer', () => {
 				{
 					name: 'name',
 					type: 'string',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'name' },
 					formatter: expect.any(Function)
 				},
 				{
 					name: 'age',
 					type: 'integer',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'age' },
 					formatter: expect.any(Function)
 				},
 				{
 					name: 'salary',
 					type: 'currency',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					digits: 2,
 					fields: { text: 'salary', currency: 'salary_currency' },
 					formatter: expect.any(Function)
@@ -260,6 +313,9 @@ describe('infer', () => {
 				{
 					name: 'route',
 					type: 'string',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					path: true,
 					separator: '/',
 					fields: { text: 'route' },
@@ -268,6 +324,9 @@ describe('infer', () => {
 				{
 					name: 'age',
 					type: 'integer',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'age' },
 					formatter: expect.any(Function)
 				}
@@ -292,18 +351,27 @@ describe('infer', () => {
 				{
 					name: 'name',
 					type: 'string',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'name' },
 					formatter: expect.any(Function)
 				},
 				{
 					name: 'age',
 					type: 'integer',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'age' },
 					formatter: expect.any(Function)
 				},
 				{
 					name: 'salary',
 					type: 'number',
+					sortable: true,
+					filterable: true,
+					sorted: 'none',
 					fields: { text: 'salary' },
 					formatter: expect.any(Function)
 				}
@@ -330,7 +398,7 @@ describe('infer', () => {
 		it('should derive hierarchy from data with a custom path', () => {
 			const expected = [
 				{
-					depth: 0,
+					depth: 1,
 					isExpanded: false,
 					isParent: true,
 					path: '/fruits',
@@ -338,7 +406,7 @@ describe('infer', () => {
 					row: data[0]
 				},
 				{
-					depth: 1,
+					depth: 2,
 					children: [],
 					isParent: false,
 					path: '/fruits/apple',
@@ -346,7 +414,7 @@ describe('infer', () => {
 					row: data[1]
 				},
 				{
-					depth: 1,
+					depth: 2,
 					children: [],
 					isParent: false,
 					path: '/fruits/banana',
@@ -367,7 +435,7 @@ describe('infer', () => {
 
 			const expected = [
 				{
-					depth: 0,
+					depth: 1,
 					isExpanded: false,
 					isParent: true,
 					path: 'fruits',
@@ -375,7 +443,7 @@ describe('infer', () => {
 					row: input[0]
 				},
 				{
-					depth: 1,
+					depth: 2,
 					children: [],
 					isParent: false,
 					path: 'fruits-apple',
@@ -383,7 +451,7 @@ describe('infer', () => {
 					row: input[1]
 				},
 				{
-					depth: 1,
+					depth: 2,
 					children: [],
 					isParent: false,
 					path: 'fruits-banana',
@@ -402,7 +470,7 @@ describe('infer', () => {
 		it('should mark all parents as expanded', () => {
 			const expected = [
 				{
-					depth: 0,
+					depth: 1,
 					row: data[0],
 					isExpanded: true,
 					isParent: true,
@@ -410,7 +478,7 @@ describe('infer', () => {
 					value: 'fruits'
 				},
 				{
-					depth: 1,
+					depth: 2,
 					row: data[1],
 					children: [],
 					isParent: false,
@@ -419,7 +487,7 @@ describe('infer', () => {
 					value: 'apple'
 				},
 				{
-					depth: 1,
+					depth: 2,
 					row: data[2],
 					children: [],
 					isParent: false,

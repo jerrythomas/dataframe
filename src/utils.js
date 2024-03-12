@@ -17,6 +17,7 @@ export function getType(value) {
 	if (value instanceof Date) return 'date'
 
 	let type = typeof value
+	if (type === 'string' && isDateString(value)) return 'date'
 	if (type === 'number' && Number.isInteger(value)) return 'integer'
-	return type === 'string' && isDateString(value) ? 'date' : type
+	return type
 }

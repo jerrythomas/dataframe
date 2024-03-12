@@ -215,8 +215,8 @@ export function deriveHierarchy(data, options) {
 
 	let hierarchy = data.map((row) => {
 		const parts = row[path].split(separator).filter((part) => part.length > 0)
-		const depth = parts.length - 1
-		const value = parts[depth]
+		const depth = parts.length
+		const value = depth > 0 ? parts[depth - 1] : ''
 		return { depth, value, path: row[path], row }
 	})
 
