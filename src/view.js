@@ -1,8 +1,9 @@
 import { deriveMetadata, deriveHierarchy, deriveSortableColumns } from './infer'
 import { defaultViewOptions } from './constants'
 import { flattenNestedChildren, removeChildren } from './hierarchy'
+
 export function createView(data, options) {
-	const { path, separator } = { ...defaultViewOptions, ...options }
+	const { path } = { ...defaultViewOptions, ...options }
 	let sortGroup = []
 
 	const metadata = deriveMetadata(data, options)
@@ -20,8 +21,8 @@ export function createView(data, options) {
 		filter: () => {},
 		clearSort: () => (sortGroup = path ? [path] : []),
 		sortBy,
-		select: (index) => toggleSelection(hierarchy, index),
-		toggle: (index) => toggleExpansion(hierarchy, index)
+		select: (index) => toggleSelection(hierarchy[index]),
+		toggle: (index) => toggleExpansion(hierarchy[index])
 	}
 }
 
@@ -52,11 +53,11 @@ function sortNested(elements, group) {
 		})
 }
 
-export function toggleSelection(hierarchy, index) {
-	hierarchy[index].selected = hierarchy[index].selected === 'checked' ? 'unchecked' : 'checked'
+export function toggleSelection(item) {
+	item.selected = item.selected === 'checked' ? 'unchecked' : 'checked'
 
-	updateParents(hierarchy, index)
-	updateChildren(hierarchy, index)
+	updateParents(item)
+	updateChildren(item)
 }
 
 /**
@@ -65,11 +66,12 @@ export function toggleSelection(hierarchy, index) {
  * @param {Array<import('./types').Hierarchy>} hierarchy - The hierarchy to update.
  * @param {number} index - The index of the node to update.
  */
-function updateChildren(hierarchy, index) {
-	if (!hierarchy[index].children) return
+function updateChildren(item) {
+	if (!item.children) return
 
-	hierarchy[index].children.forEach((child) => {
-		child.selected = hierarchy[index].selected
+	item.children.forEach((child) => {
+		child.selected = item.selected
+		updateChildren(child)
 	})
 }
 
@@ -84,7 +86,8 @@ function updateChildren(hierarchy, index) {
  */
 function determineSelectedState(children) {
 	const allChecked = children.every((child) => child.selected === 'checked')
-	const allUnchecked = !allChecked && children.every((child) => child.selected === 'unchecked')
+	const allUnchecked =
+		!allChecked && children.every((child) => !child.selected || child.selected === 'unchecked')
 
 	return allChecked ? 'checked' : allUnchecked ? 'unchecked' : 'indeterminate'
 }
@@ -99,8 +102,8 @@ function determineSelectedState(children) {
  * @param {number} index - The index of the node in the hierarchy array from where
  *                         to start updating parent nodes.
  */
-function updateParents(hierarchy, index) {
-	let parent = hierarchy[index].parent
+function updateParents(item) {
+	let parent = item.parent
 
 	while (parent) {
 		parent.selected = determineSelectedState(parent.children)
@@ -108,11 +111,20 @@ function updateParents(hierarchy, index) {
 	}
 }
 
-function toggleExpansion(hierarchy, index) {
-	if (hierarchy[index].isParent) {
-		hierarchy[index].isExpanded = !hierarchy[index].isExpanded
-		hierarchy[index].children.forEach((child) => {
-			child.isHidden = !hierarchy[index].isExpanded
+function hideChildren(node) {
+	if (node.children) {
+		node.children.forEach((child) => {
+			child.isHidden = true
+			hideChildren(child)
+		})
+	}
+}
+function toggleExpansion(node) {
+	if (node.isParent) {
+		node.isExpanded = !node.isExpanded
+		node.children.forEach((child) => {
+			child.isHidden = !node.isExpanded
+			if (child.isHidden) hideChildren(child)
 		})
 	}
 }

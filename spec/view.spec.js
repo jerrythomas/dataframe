@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createView } from '../src/view'
-import { omit } from 'ramda'
+import { pick, omit } from 'ramda'
 
 describe('View', () => {
 	describe('createView', () => {
@@ -223,6 +223,86 @@ describe('View', () => {
 						lineage: '/Smith/Alice/Lexi',
 						age: 30
 					}
+				])
+			})
+
+			it('should select/deselect a child row', () => {
+				const view = createView(data, { path: 'lineage' })
+				view.select(3)
+				expect(view.hierarchy.map((x) => pick(['path', 'selected'], x))).toEqual([
+					{ path: '/Smith', selected: 'indeterminate' },
+					{ path: '/Smith/Bob' },
+					{ path: '/Smith/Alice', selected: 'indeterminate' },
+					{ path: '/Smith/Alice/Lexi', selected: 'checked' },
+					{ path: '/Smith/Alice/Sofia' },
+					{ path: '/Snow' },
+					{ path: '/Snow/Charlie' },
+					{ path: '/Snow/Eve' }
+				])
+
+				view.select(3)
+				expect(view.hierarchy.map((x) => pick(['path', 'selected'], x))).toEqual([
+					{ path: '/Smith', selected: 'unchecked' },
+					{ path: '/Smith/Bob' },
+					{ path: '/Smith/Alice', selected: 'unchecked' },
+					{ path: '/Smith/Alice/Lexi', selected: 'unchecked' },
+					{ path: '/Smith/Alice/Sofia' },
+					{ path: '/Snow' },
+					{ path: '/Snow/Charlie' },
+					{ path: '/Snow/Eve' }
+				])
+			})
+
+			it('should select/deselect a parent row', () => {
+				const view = createView(data, { path: 'lineage' })
+				view.select(0)
+				expect(view.hierarchy.map((x) => pick(['path', 'selected'], x))).toEqual([
+					{ path: '/Smith', selected: 'checked' },
+					{ path: '/Smith/Bob', selected: 'checked' },
+					{ path: '/Smith/Alice', selected: 'checked' },
+					{ path: '/Smith/Alice/Lexi', selected: 'checked' },
+					{ path: '/Smith/Alice/Sofia', selected: 'checked' },
+					{ path: '/Snow' },
+					{ path: '/Snow/Charlie' },
+					{ path: '/Snow/Eve' }
+				])
+
+				view.select(0)
+				expect(view.hierarchy.map((x) => pick(['path', 'selected'], x))).toEqual([
+					{ path: '/Smith', selected: 'unchecked' },
+					{ path: '/Smith/Bob', selected: 'unchecked' },
+					{ path: '/Smith/Alice', selected: 'unchecked' },
+					{ path: '/Smith/Alice/Lexi', selected: 'unchecked' },
+					{ path: '/Smith/Alice/Sofia', selected: 'unchecked' },
+					{ path: '/Snow' },
+					{ path: '/Snow/Charlie' },
+					{ path: '/Snow/Eve' }
+				])
+			})
+
+			it('should collapse/expand a node', () => {
+				const view = createView(data, { path: 'lineage' })
+				view.toggle(0)
+				expect(view.hierarchy.map((x) => pick(['path', 'isExpanded', 'isHidden'], x))).toEqual([
+					{ path: '/Smith', isExpanded: true },
+					{ path: '/Smith/Bob', isHidden: false },
+					{ path: '/Smith/Alice', isExpanded: false, isHidden: false },
+					{ path: '/Smith/Alice/Lexi' },
+					{ path: '/Smith/Alice/Sofia' },
+					{ path: '/Snow', isExpanded: false },
+					{ path: '/Snow/Charlie' },
+					{ path: '/Snow/Eve' }
+				])
+				view.toggle(0)
+				expect(view.hierarchy.map((x) => pick(['path', 'isExpanded', 'isHidden'], x))).toEqual([
+					{ path: '/Smith', isExpanded: false },
+					{ path: '/Smith/Bob', isHidden: true },
+					{ path: '/Smith/Alice', isExpanded: false, isHidden: true },
+					{ path: '/Smith/Alice/Lexi', isHidden: true },
+					{ path: '/Smith/Alice/Sofia', isHidden: true },
+					{ path: '/Snow', isExpanded: false },
+					{ path: '/Snow/Charlie' },
+					{ path: '/Snow/Eve' }
 				])
 			})
 		})
