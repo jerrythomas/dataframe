@@ -86,8 +86,8 @@ describe('join', () => {
 				index < 2
 					? pick(['rank', 'name'], d)
 					: index < 4
-						? pick(['age', 'rank', 'name'], d)
-						: pick(['age', 'rank'], d)
+					  ? pick(['age', 'rank', 'name'], d)
+					  : pick(['age', 'rank'], d)
 			)
 
 		expect(fullJoin(A, B, byRank)).toEqual(AB)
