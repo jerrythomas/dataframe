@@ -31,10 +31,10 @@ describe('Animation transform', () => {
 
 	it('should create flat groups', () => {
 		let result = tweenable().rollup('score').group(['team']).transform(input)
-		expect(result).toEqual(groups['team'])
+		expect(result).toEqual(groups.team)
 
 		result = tweenable().rollup('score').group(['group']).transform(input)
-		expect(result).toEqual(groups['group'])
+		expect(result).toEqual(groups.group)
 
 		result = tweenable().rollup('score').group(['group', 'team']).transform(input)
 		expect(result).toEqual(groups['group-team'])
