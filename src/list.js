@@ -8,17 +8,17 @@ import { ascending } from 'd3-array'
  *
  * @param {*} a first item
  * @param {*} b second item
- * @param {*} list
+ * @param {*} data
  * @returns
  */
-export function compare(a, b, list) {
+export function compare(a, b, data) {
 	let result = 0
 
-	if (list.groupKey) {
-		result = ascending(list.lookup[a[list.groupKey]], list.lookup[b[list.groupKey]])
+	if (data.groupKey) {
+		result = ascending(data.lookup[a[data.groupKey]], data.lookup[b[data.groupKey]])
 	}
 	if (result === 0) {
-		result = ascending(a[list.sortKey], b[list.sortKey])
+		result = ascending(a[data.sortKey], b[data.sortKey])
 	}
 	return result
 }
@@ -26,12 +26,12 @@ export function compare(a, b, list) {
 /**
  * Search the data for existence of string in the data
  *
- * @param {List} list
+ * @param {List} data
  * @param {string} value
  * @returns
  */
-export function quickSearch(list, value) {
-	return list.data.filter((d) => d[list.filterKey].toLowerCase().includes(value.toLowerCase()))
+export function quickSearch(data, value) {
+	return data.data.filter((d) => d[data.filterKey].toLowerCase().includes(value.toLowerCase()))
 }
 
 export class List {

@@ -82,23 +82,23 @@ export function summarize(data, ...cols) {
 			// Extract the values for the specified column from the dataset.
 			const values = data.map((row) => Number(row[col.column]))
 			// Apply the aggregator function to the extracted values.
-			let result = col.aggregator(values)
+			let aggResult = col.aggregator(values)
 
 			// If the aggregation result is an object, create a new object with renamed keys.
-			if (typeof result === 'object') {
-				result = Object.keys(result).reduce(
+			if (typeof aggResult === 'object') {
+				aggResult = Object.keys(aggResult).reduce(
 					(acc, suffix) => ({
 						...acc,
-						[rename(col.column, suffix)]: result[suffix]
+						[rename(col.column, suffix)]: aggResult[suffix]
 					}),
 					{}
 				)
 			} else {
 				// For single-value results, use the renamed column as the key.
 				const name = rename(col.column, col.suffix)
-				result = { [name]: result }
+				aggResult = { [name]: aggResult }
 			}
-			return result
+			return aggResult
 		})
 		// Combine all result objects into a single summary object.
 		.reduce((acc, curr) => ({ ...acc, ...curr }), {})
