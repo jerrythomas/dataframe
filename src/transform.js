@@ -8,22 +8,22 @@ export function tweenable() {
 	let groupBy = []
 	let valueField = null
 
-	const f = {
+	const fns = {
 		key: (k) => {
 			nestBy = k
-			return f
+			return fns
 		},
 		sort: (order) => {
 			sortOrder = order
-			return f
+			return fns
 		},
 		group: (fields) => {
 			groupBy = [...new Set(fields)]
-			return f
+			return fns
 		},
 		rollup: (field) => {
 			valueField = field
-			return f
+			return fns
 		},
 		transform: (input) => {
 			let data = input
@@ -74,7 +74,7 @@ export function tweenable() {
 		}
 	}
 
-	return f
+	return fns
 }
 
 function addHiddenValues(values, missingRows, counts, valueField, groupBy) {
