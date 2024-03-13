@@ -50,18 +50,3 @@ export const remove = yaml.load(fs.readFileSync('spec/fixtures/list/remove.yml')
 export const modify = yaml.load(fs.readFileSync('spec/fixtures/list/modify.yml'))
 export const altKey = yaml.load(fs.readFileSync('spec/fixtures/list/alt-key.yml'))
 export const sorting = yaml.load(fs.readFileSync('spec/fixtures/list/sort.yml'))
-
-export default {
-	data,
-	sorted,
-	lookup,
-	grouped,
-	sortedAndGrouped,
-	searchResult,
-	groupSearchResult,
-	add,
-	remove,
-	modify,
-	altKey,
-	sorting
-}

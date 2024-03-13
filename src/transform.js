@@ -3,13 +3,10 @@ import { nest } from 'd3-collection'
 import { pipe, map, pick, omit, uniq, mergeLeft, difference } from 'ramda'
 
 export function tweenable() {
-	let nestBy
+	let nestBy = null
 	let sortOrder = ascending
 	let groupBy = []
-	let valueField
-	let combinations
-	let combiCounts
-	let missingRows
+	let valueField = null
 
 	let f = {
 		key: (k) => {
@@ -38,12 +35,12 @@ export function tweenable() {
 
 			if (nestBy && valueField) {
 				let fields = [...groupBy, nestBy, valueField]
-				combinations = pipe(map(pick(groupBy)), uniq)(input)
-				combiCounts = combinations
+				const combinations = pipe(map(pick(groupBy)), uniq)(input)
+				const combiCounts = combinations
 					.map((d) => JSON.stringify(d))
 					.reduce((acc, item) => ({ ...acc, [item]: 0 }), {})
 
-				missingRows = pipe(
+				const missingRows = pipe(
 					map(pick(groupBy)),
 					uniq,
 					difference(combinations),

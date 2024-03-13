@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { compare, quickSearch, list } from '../src/list'
-import context from './fixtures/list-data'
+import * as context from './fixtures/list-data'
 
 describe('List Data', () => {
 	it('Should create a list', () => {
