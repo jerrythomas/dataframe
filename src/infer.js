@@ -168,17 +168,16 @@ export function addFormatters(columns, language) {
  * @returns {Array<import('./types').Action>} - The converted actions.
  */
 export function convertToActions(input) {
-	if (Array.isArray(input)) {
-		const actions = input
-			.map((action) => {
-				if (typeof action === 'string') {
-					return { name: action, label: action, order: defaultActionOrder[action] }
-				}
-				return { order: defaultActionOrder[action.name], ...action }
-			})
-			.sort((a, b) => a.order - b.order)
-		return actions
-	}
+	if (!Array.isArray(input)) return []
+	const actions = input
+		.map((action) => {
+			if (typeof action === 'string') {
+				return { name: action, label: action, order: defaultActionOrder[action] }
+			}
+			return { order: defaultActionOrder[action.name], ...action }
+		})
+		.sort((a, b) => a.order - b.order)
+	return actions
 }
 /**
  * Adds actions to the column metadata. This function updates the columns array in place.

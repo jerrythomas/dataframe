@@ -47,6 +47,7 @@ export function addPathModifier(columns, path, separator) {
 			...columns.slice(index + 1)
 		]
 	}
+	return columns
 }
 
 /**
