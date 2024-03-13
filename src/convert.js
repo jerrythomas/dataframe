@@ -13,14 +13,14 @@ export function fromArray(input) {
 	let data = {}
 	let columns = []
 
-	input.map((items, index) => {
+	input.forEach((items, index) => {
 		const keys = Object.keys(items)
 		const missing = columns.filter((x) => !keys.includes(x))
 
 		columns = [...columns, ...keys.filter((x) => !columns.includes(x))]
 
 		missing.map((key) => (data[key] = [...data[key], null]))
-		keys.map((key) => {
+		keys.forEach((key) => {
 			if (key in data) {
 				data[key] = [...data[key], items[key]]
 			} else {

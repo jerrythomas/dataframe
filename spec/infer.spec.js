@@ -104,7 +104,7 @@ describe('infer', () => {
 
 			expect(agg).toEqual(res)
 
-			agg.map((col) => {
+			agg.forEach((col) => {
 				expect(col.aggregator([1, 2, 3, 4])).toEqual(4)
 			})
 		})

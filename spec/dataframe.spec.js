@@ -133,7 +133,7 @@ describe('dataframe', () => {
 			hasSurrogatePK: false
 		})
 
-		data.map((d, index) => {
+		data.forEach((d, index) => {
 			df.insert(d)
 			expect(df.data).toEqual(data.slice(0, index + 1))
 			expect(df.columns).toEqual(Object.keys(data[0]))
@@ -157,7 +157,7 @@ describe('dataframe', () => {
 		})
 		expect(df.pkey).toEqual('id')
 
-		data.map((d, index) => {
+		data.forEach((d, index) => {
 			let res = df.insert(d)
 			expect(res).toEqual(df)
 			expect(df.data.map((d) => omit(['id'], d))).toEqual(data.slice(0, index + 1))

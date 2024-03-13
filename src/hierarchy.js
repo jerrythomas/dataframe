@@ -71,7 +71,7 @@ export function deriveHierarchy(data, options) {
 		return { depth, value, path: row[path], row }
 	})
 
-	hierarchy.map((row) => {
+	hierarchy.forEach((row) => {
 		row.children = hierarchy.filter(
 			(child) => child.path.startsWith(row.path) && row.depth === child.depth - 1
 		)
@@ -81,7 +81,7 @@ export function deriveHierarchy(data, options) {
 			row.isExpanded = expanded
 			row.isHidden = !row.parent ? false : row.parent.isHidden || !row.parent.isExpanded
 		}
-		row.children.map((child) => {
+		row.children.forEach((child) => {
 			child.parent = row
 			child.isHidden = row.isHidden || !row.isExpanded
 		})

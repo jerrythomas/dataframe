@@ -138,7 +138,7 @@ describe('List Data', () => {
 		const data = context.add
 		let l = list([...data.start])
 
-		data.additions.map(({ item, result }) => {
+		data.additions.forEach(({ item, result }) => {
 			l.add(item)
 			expect(l.data).toEqual(result.data.unsorted)
 			expect(l.current()).toEqual(result.data.unsorted, 'Should update store after add')
@@ -149,7 +149,7 @@ describe('List Data', () => {
 		const data = context.add
 		let l = list([...data.start]).sortBy('id')
 
-		data.additions.map(({ item, result }) => {
+		data.additions.forEach(({ item, result }) => {
 			l.add(item)
 			expect(l.data).toEqual(result.data.sorted)
 			expect(l.current()).toEqual(result.data.sorted, 'Should update store after add')
@@ -160,7 +160,7 @@ describe('List Data', () => {
 		const data = context.add
 		let l = list([...data.start]).groupBy('lookup_id', context.lookup)
 
-		data.additions.map(({ item, result }) => {
+		data.additions.forEach(({ item, result }) => {
 			l.add(item)
 			expect(l.data).toEqual(result.data.unsorted)
 			expect(l.current()).toEqual(result.grouped.unsorted, 'Should update store after add')
@@ -173,7 +173,7 @@ describe('List Data', () => {
 			.groupBy('lookup_id', context.lookup)
 			.sortBy('id')
 
-		data.additions.map(({ item, result }) => {
+		data.additions.forEach(({ item, result }) => {
 			l.add(item)
 			expect(l.data).toEqual(result.data.sorted)
 			expect(l.current()).toEqual(result.grouped.sorted, 'Should update store after add')
@@ -184,7 +184,7 @@ describe('List Data', () => {
 		const data = context.remove
 		let l = list([...data.start])
 
-		data.removals.map(({ item, result }) => {
+		data.removals.forEach(({ item, result }) => {
 			l.remove(item)
 			expect(l.data).toEqual(result.data.unsorted)
 			expect(l.current()).toEqual(result.data.unsorted, 'Should update store after remove')
@@ -195,7 +195,7 @@ describe('List Data', () => {
 		const data = context.remove
 		let l = list([...data.start]).sortBy('name')
 
-		data.removals.map(({ item, result }) => {
+		data.removals.forEach(({ item, result }) => {
 			l.remove(item)
 			expect(l.data).toEqual(result.data.sorted)
 			expect(l.current()).toEqual(result.data.sorted, 'Should update store after remove')
@@ -206,7 +206,7 @@ describe('List Data', () => {
 		const data = context.remove
 		let l = list([...data.start]).groupBy('lookup_id', data.lookup)
 
-		data.removals.map(({ item, result }) => {
+		data.removals.forEach(({ item, result }) => {
 			l.remove(item)
 			expect(l.data).toEqual(result.data.unsorted)
 			expect(l.current()).toEqual(result.grouped.unsorted, 'Should update store after remove')
@@ -219,7 +219,7 @@ describe('List Data', () => {
 			.groupBy('lookup_id', data.lookup)
 			.sortBy('name')
 
-		data.removals.map(({ item, result }) => {
+		data.removals.forEach(({ item, result }) => {
 			l.remove(item)
 			expect(l.data).toEqual(result.data.sorted)
 			expect(l.current()).toEqual(result.grouped.sorted, 'Should update store after remove')
@@ -230,7 +230,7 @@ describe('List Data', () => {
 		const data = context.modify
 		let l = list([...data.start])
 
-		data.modifications.map(({ item, result }) => {
+		data.modifications.forEach(({ item, result }) => {
 			l.modify(item)
 
 			expect(l.data).toEqual(result.data.unsorted)
@@ -242,7 +242,7 @@ describe('List Data', () => {
 		const data = context.modify
 		let l = list([...data.start]).sortBy('name')
 
-		data.modifications.map(({ item, result }) => {
+		data.modifications.forEach(({ item, result }) => {
 			l.modify(item)
 			expect(l.data).toEqual(result.data.sorted)
 			expect(l.current()).toEqual(result.data.sorted, 'Should update store after modify')
@@ -253,7 +253,7 @@ describe('List Data', () => {
 		const data = context.modify
 		let l = list([...data.start]).groupBy('lookup_id', data.lookup)
 
-		data.modifications.map(({ item, result }) => {
+		data.modifications.forEach(({ item, result }) => {
 			l.modify(item)
 			expect(l.data).toEqual(result.data.unsorted)
 			expect(l.current()).toEqual(result.grouped.unsorted, 'Should update store after modify')
@@ -266,7 +266,7 @@ describe('List Data', () => {
 			.groupBy('lookup_id', data.lookup)
 			.sortBy('name')
 
-		data.modifications.map(({ item, result }) => {
+		data.modifications.forEach(({ item, result }) => {
 			l.modify(item)
 			expect(l.data).toEqual(result.grouped.data)
 			expect(l.current()).toEqual(result.grouped.sorted, 'Should update store after modify')

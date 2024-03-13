@@ -57,8 +57,8 @@ export function tweenable() {
 					.rollup((values) => values.map(omit([nestBy])))
 					.entries(data.map(pick(fields)))
 
-				data.map((d) =>
-					d.value.map((x) => {
+				data.forEach((d) =>
+					d.value.forEach((x) => {
 						const key = JSON.stringify(pick(groupBy, x))
 						combiCounts[key] = Math.max(combiCounts[key], x[valueField].length)
 					})
@@ -123,7 +123,7 @@ function flatObjectGroup(data, fields, y) {
 function spread(data, valueField) {
 	let result = []
 
-	data.map((d) => {
+	data.forEach((d) => {
 		if (Array.isArray(d[valueField])) {
 			let groups = omit([valueField], d)
 			result = [

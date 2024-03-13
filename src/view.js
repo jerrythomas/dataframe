@@ -59,7 +59,7 @@ function sortNested(elements, group) {
 			}
 			return 0
 		})
-		.map((x) => {
+		.forEach((x) => {
 			if (Array.isArray(x.children) && x.children.length > 0) {
 				sortNested(x.children, group)
 			}

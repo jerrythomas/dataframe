@@ -131,7 +131,7 @@ export class DataFrame {
 		if (values) this[__defaults__] = values
 
 		this[__data__] = this[__data__].map((d) => {
-			Object.entries(this[__defaults__]).map(([key, value]) => {
+			Object.entries(this[__defaults__]).forEach(([key, value]) => {
 				if (d[key] === undefined || d[key] === null) d[key] = value
 			})
 			return d
