@@ -158,7 +158,7 @@ describe('dataframe', () => {
 		expect(df.pkey).toEqual('id')
 
 		data.forEach((d, index) => {
-			let res = df.insert(d)
+			const res = df.insert(d)
 			expect(res).toEqual(df)
 			expect(df.data.map((d) => omit(['id'], d))).toEqual(data.slice(0, index + 1))
 			expect(df.data.map((d) => d.id.length)).toEqual(Array(index + 1).fill(36))
@@ -176,7 +176,7 @@ describe('dataframe', () => {
 		const df = dataframe(data)
 		expect(df.data.length).toEqual(12)
 
-		let res = df.delete((d) => d.rank > 10)
+		const res = df.delete((d) => d.rank > 10)
 		expect(res).toEqual(df)
 		expect(df.data.length).toEqual(10)
 		expect(df.data.map((d) => d.rank)).toEqual(Array.from({ length: 10 }, (_, i) => i + 1))
@@ -236,7 +236,7 @@ describe('dataframe', () => {
 	})
 
 	it('Should sort data', () => {
-		let df = dataframe(data)
+		const df = dataframe(data)
 
 		df.sortBy('name')
 		let rankOrder = df.data.map((d) => pick(['name', 'age', 'rank'], d))
@@ -252,7 +252,7 @@ describe('dataframe', () => {
 	})
 
 	it('Should group data', () => {
-		let df = dataframe(data).keepGroupsInNestedData().groupBy(['country'])
+		const df = dataframe(data).keepGroupsInNestedData().groupBy(['country'])
 		expect(df).toBeInstanceOf(DataFrame)
 		expect(df.data).toEqual(grouped.country)
 		expect(df.pkey).toBeUndefined()
@@ -266,7 +266,7 @@ describe('dataframe', () => {
 	})
 
 	it('Should summarize data', () => {
-		let df = dataframe(data).summarize('country')
+		const df = dataframe(data).summarize('country')
 		expect(df).toBeInstanceOf(DataFrame)
 		expect(df.data).toEqual([{ country_count: 12 }])
 		expect(df.pkey).toBeUndefined()
@@ -280,7 +280,7 @@ describe('dataframe', () => {
 	})
 
 	it('Should group by and summarize data', () => {
-		let df = dataframe(data)
+		const df = dataframe(data)
 			.groupBy('country')
 			.summarize(['age', mean], ['rank', min, 'min'], ['rank', max, 'max'])
 		expect(df).toBeInstanceOf(DataFrame)

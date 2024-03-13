@@ -10,7 +10,7 @@ export function createView(data, options) {
 	let sortGroup = []
 
 	const metadata = deriveMetadata(data, options)
-	let hierarchy = deriveHierarchy(data, options)
+	const hierarchy = deriveHierarchy(data, options)
 
 	const sortBy = (name, ascending = true) => {
 		sortGroup = [...sortGroup, [name, ascending]]
@@ -35,7 +35,7 @@ export function createView(data, options) {
  * @param {Array<Array<string, boolean>>} sortGroup - The group of sorters to apply.
  */
 export function groupSort(hierarchy, sortGroup) {
-	let group = deriveSortableColumns(...sortGroup).map(({ column, sorter }) => ({
+	const group = deriveSortableColumns(...sortGroup).map(({ column, sorter }) => ({
 		column,
 		sorter: (a, b) => sorter(a.row[column], b.row[column])
 	}))

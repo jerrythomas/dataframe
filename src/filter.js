@@ -23,8 +23,8 @@ export function filterObjectArray(data, options) {
 }
 
 function findMatchingRow(row, value, operator) {
-	let op = operator.startsWith('!') ? operator.slice(1) : operator
-	let matched = Object.keys(row).some((key) => filterOperations[op](row[key], value))
+	const op = operator.startsWith('!') ? operator.slice(1) : operator
+	const matched = Object.keys(row).some((key) => filterOperations[op](row[key], value))
 
 	return operator.startsWith('!') ? !matched : matched
 }

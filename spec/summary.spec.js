@@ -98,7 +98,7 @@ describe('aggregators', () => {
 		let result = fillMissingGroups(missing, ['gender'])
 		expect(result).toEqual(filled)
 		result = fillMissingGroups(missing, ['gender'], { defaults: { count: 0 } })
-		let withValues = filled.map((d) => ({
+		const withValues = filled.map((d) => ({
 			...d,
 			_df: d._df.map((x) => ({ ...x, count: x.count === null ? 0 : x.count }))
 		}))
@@ -110,7 +110,7 @@ describe('aggregators', () => {
 			defaults: { count: 0 },
 			addActualIndicator: true
 		})
-		let withIndicator = filled.map((d) => ({
+		const withIndicator = filled.map((d) => ({
 			...d,
 			_df: d._df.map((x) => ({
 				...x,

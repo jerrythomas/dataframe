@@ -3,8 +3,8 @@ import { fromArray } from '../src/convert'
 
 describe('convert', () => {
 	it('should return an empty object for an empty input array', () => {
-		let input = []
-		let expectedOutput = { data: {}, columns: [], types: {} }
+		const input = []
+		const expectedOutput = { data: {}, columns: [], types: {} }
 		const result = fromArray(input)
 		expect(result.columns).toEqual(expectedOutput.columns)
 		expect(result.data).toEqual(expectedOutput.data)
@@ -12,12 +12,12 @@ describe('convert', () => {
 	})
 
 	it('should return an object with the same keys for an input array with objects that have the same keys', () => {
-		let input = [
+		const input = [
 			{ a: 1, b: 2 },
 			{ a: 3, b: 4 },
 			{ a: 5, b: 6 }
 		]
-		let expectedOutput = {
+		const expectedOutput = {
 			data: { a: [1, 3, 5], b: [2, 4, 6] },
 			columns: ['a', 'b'],
 			types: { a: 'integer', b: 'integer' }
@@ -29,12 +29,12 @@ describe('convert', () => {
 	})
 
 	it('should fill missing values with nulls when new rows have additional attrubutes', () => {
-		let input = [
+		const input = [
 			{ a: 1, b: 2 },
 			{ a: 3, b: 4, c: 5 },
 			{ a: 5, b: 6, c: 7, d: 8 }
 		]
-		let expectedOutput = {
+		const expectedOutput = {
 			data: { a: [1, 3, 5], b: [2, 4, 6], c: [null, 5, 7], d: [null, null, 8] },
 			columns: ['a', 'b', 'c', 'd'],
 			types: { a: 'integer', b: 'integer', c: 'integer', d: 'integer' }

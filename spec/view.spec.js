@@ -117,7 +117,7 @@ describe('View', () => {
 						formatter: expect.any(Function)
 					}
 				])
-				let hierarchy = [
+				const hierarchy = [
 					{
 						depth: 1,
 						isExpanded: false,

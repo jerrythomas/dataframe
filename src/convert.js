@@ -10,7 +10,7 @@ import { inferDataType } from './infer'
  * @returns {import('./types').Dataframe}
  */
 export function fromArray(input) {
-	let data = {}
+	const data = {}
 	let columns = []
 
 	input.forEach((items, index) => {

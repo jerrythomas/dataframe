@@ -4,7 +4,7 @@ import * as context from './fixtures/list-data'
 
 describe('List Data', () => {
 	it('Should create a list', () => {
-		let l = list(context.data)
+		const l = list(context.data)
 		expect(l.data).toBe(context.data)
 		expect(l.primaryKey).toBe('id')
 		expect(l.searchText).toBe('')
@@ -17,7 +17,7 @@ describe('List Data', () => {
 	})
 
 	it('Should create a sorted list', () => {
-		let l = list([...context.data]).sortBy('name')
+		const l = list([...context.data]).sortBy('name')
 
 		expect(l.data).toEqual(context.sorted)
 		expect(l.primaryKey).toBe('id')
@@ -31,7 +31,7 @@ describe('List Data', () => {
 	})
 
 	it('Should create a grouped list', () => {
-		let l = list([...context.data]).groupBy('lookup_id', context.lookup)
+		const l = list([...context.data]).groupBy('lookup_id', context.lookup)
 
 		expect(l.data).toEqual(context.data)
 		expect(l.primaryKey).toBe('id')
@@ -44,7 +44,7 @@ describe('List Data', () => {
 		expect(l.current()).toEqual(context.grouped)
 	})
 	it('Should create a sorted and grouped list', () => {
-		let l = list([...context.data])
+		const l = list([...context.data])
 			.sortBy('name')
 			.groupBy('lookup_id', context.lookup)
 
@@ -60,7 +60,7 @@ describe('List Data', () => {
 	})
 
 	it('Should create a searchable list', () => {
-		let l = list([...context.data]).filterBy('name')
+		const l = list([...context.data]).filterBy('name')
 
 		expect(l.data).toEqual(context.data)
 		expect(l.primaryKey).toBe('id')
@@ -77,7 +77,7 @@ describe('List Data', () => {
 	})
 
 	it('Should create a searchable sorted list', () => {
-		let l = list([...context.data])
+		const l = list([...context.data])
 			.filterBy('name')
 			.sortBy('name')
 
@@ -96,7 +96,7 @@ describe('List Data', () => {
 	})
 
 	it('Should create a searchable grouped list', () => {
-		let l = list([...context.data])
+		const l = list([...context.data])
 			.filterBy('name')
 			.groupBy('lookup_id', context.lookup)
 
@@ -115,7 +115,7 @@ describe('List Data', () => {
 	})
 
 	it('Should create a searchable sorted & grouped list', () => {
-		let l = list([...context.data])
+		const l = list([...context.data])
 			.filterBy('name')
 			.sortBy('name')
 			.groupBy('lookup_id', context.lookup)
@@ -136,7 +136,7 @@ describe('List Data', () => {
 
 	it('Should add an item to list', () => {
 		const data = context.add
-		let l = list([...data.start])
+		const l = list([...data.start])
 
 		data.additions.forEach(({ item, result }) => {
 			l.add(item)
@@ -147,7 +147,7 @@ describe('List Data', () => {
 
 	it('Should add an item to sorted list', () => {
 		const data = context.add
-		let l = list([...data.start]).sortBy('id')
+		const l = list([...data.start]).sortBy('id')
 
 		data.additions.forEach(({ item, result }) => {
 			l.add(item)
@@ -158,7 +158,7 @@ describe('List Data', () => {
 
 	it('Should add an item to grouped list', () => {
 		const data = context.add
-		let l = list([...data.start]).groupBy('lookup_id', context.lookup)
+		const l = list([...data.start]).groupBy('lookup_id', context.lookup)
 
 		data.additions.forEach(({ item, result }) => {
 			l.add(item)
@@ -169,7 +169,7 @@ describe('List Data', () => {
 
 	it('Should add an item to sorted and grouped list', () => {
 		const data = context.add
-		let l = list([...data.start])
+		const l = list([...data.start])
 			.groupBy('lookup_id', context.lookup)
 			.sortBy('id')
 
@@ -182,7 +182,7 @@ describe('List Data', () => {
 
 	it('Should remove an item from list', () => {
 		const data = context.remove
-		let l = list([...data.start])
+		const l = list([...data.start])
 
 		data.removals.forEach(({ item, result }) => {
 			l.remove(item)
@@ -193,7 +193,7 @@ describe('List Data', () => {
 
 	it('Should remove an item from sorted list', () => {
 		const data = context.remove
-		let l = list([...data.start]).sortBy('name')
+		const l = list([...data.start]).sortBy('name')
 
 		data.removals.forEach(({ item, result }) => {
 			l.remove(item)
@@ -204,7 +204,7 @@ describe('List Data', () => {
 
 	it('Should remove an item from grouped list', () => {
 		const data = context.remove
-		let l = list([...data.start]).groupBy('lookup_id', data.lookup)
+		const l = list([...data.start]).groupBy('lookup_id', data.lookup)
 
 		data.removals.forEach(({ item, result }) => {
 			l.remove(item)
@@ -215,7 +215,7 @@ describe('List Data', () => {
 
 	it('Should remove an item from sorted and grouped list', () => {
 		const data = context.remove
-		let l = list([...data.start])
+		const l = list([...data.start])
 			.groupBy('lookup_id', data.lookup)
 			.sortBy('name')
 
@@ -228,7 +228,7 @@ describe('List Data', () => {
 
 	it('Should modify an item in list', () => {
 		const data = context.modify
-		let l = list([...data.start])
+		const l = list([...data.start])
 
 		data.modifications.forEach(({ item, result }) => {
 			l.modify(item)
@@ -240,7 +240,7 @@ describe('List Data', () => {
 
 	it('Should modify an item in sorted list', () => {
 		const data = context.modify
-		let l = list([...data.start]).sortBy('name')
+		const l = list([...data.start]).sortBy('name')
 
 		data.modifications.forEach(({ item, result }) => {
 			l.modify(item)
@@ -251,7 +251,7 @@ describe('List Data', () => {
 
 	it('Should modify an item in grouped list', () => {
 		const data = context.modify
-		let l = list([...data.start]).groupBy('lookup_id', data.lookup)
+		const l = list([...data.start]).groupBy('lookup_id', data.lookup)
 
 		data.modifications.forEach(({ item, result }) => {
 			l.modify(item)
@@ -262,7 +262,7 @@ describe('List Data', () => {
 
 	it('Should modify an item in sorted and grouped list', () => {
 		const data = context.modify
-		let l = list([...data.start])
+		const l = list([...data.start])
 			.groupBy('lookup_id', data.lookup)
 			.sortBy('name')
 
@@ -276,7 +276,7 @@ describe('List Data', () => {
 	it('Should handle alternate key', () => {
 		const { start, actions } = context.altKey
 
-		let l = list([...start]).key('key')
+		const l = list([...start]).key('key')
 		l.add(actions.add.item)
 		expect(l.data).toEqual(actions.add.result)
 		l.remove(actions.remove.item)
@@ -288,14 +288,14 @@ describe('List Data', () => {
 	it('Should handle missing lookup', () => {
 		const { start, lookup } = context.altKey
 
-		let l = list([...start])
+		const l = list([...start])
 			.key('key')
 			.groupBy('lookup_key')
 		expect(l.lookup).toEqual(lookup)
 	})
 
 	it('Should sort by group first', () => {
-		let l = list([...context.sorting.items])
+		const l = list([...context.sorting.items])
 			.groupBy('lookup_id', context.sorting.lookup)
 			.sortBy('name')
 		l.data.sort((a, b) => compare(a, b, l))
@@ -315,14 +315,14 @@ describe('List Data', () => {
 		let delta = { name: 'delta' }
 		l.add(delta)
 		expect(l.data.length).toBe(4)
-		let beta = l.data.find(({ name }) => name === 'beta')
+		const beta = l.data.find(({ name }) => name === 'beta')
 
 		l.remove(beta)
 		expect(l.data.length).toEqual(3)
 		delta = { ...l.data.find(({ name }) => name === 'delta'), name: 'foxtrot' }
 		l.modify(delta)
 		expect(l.data.length).toBe(3)
-		let modifiedItem = l.data.find(({ key }) => key === delta.key)
+		const modifiedItem = l.data.find(({ key }) => key === delta.key)
 		expect(modifiedItem).toEqual({ key: delta.key, name: 'foxtrot' })
 	})
 })

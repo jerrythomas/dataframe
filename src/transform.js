@@ -8,7 +8,7 @@ export function tweenable() {
 	let groupBy = []
 	let valueField = null
 
-	let f = {
+	const f = {
 		key: (k) => {
 			nestBy = k
 			return f
@@ -34,7 +34,7 @@ export function tweenable() {
 			}
 
 			if (nestBy && valueField) {
-				let fields = [...groupBy, nestBy, valueField]
+				const fields = [...groupBy, nestBy, valueField]
 				const combinations = pipe(map(pick(groupBy)), uniq)(input)
 				const combiCounts = combinations
 					.map((d) => JSON.stringify(d))
@@ -99,7 +99,7 @@ function addHiddenValues(values, missingRows, counts, valueField, groupBy) {
 function flatObjectGroup(data, fields, y) {
 	const attr = fields.map((x) => (d) => d[x])
 	const keys = [...fields, y]
-	let grouped = flatGroup(data, ...attr)
+	const grouped = flatGroup(data, ...attr)
 		.map((x) => x.reduce((acc, item, index) => ({ ...acc, [keys[index]]: item }), {}))
 		.map((d) => ({
 			...d,
@@ -121,7 +121,7 @@ function spread(data, valueField) {
 
 	data.forEach((d) => {
 		if (Array.isArray(d[valueField])) {
-			let groups = omit([valueField], d)
+			const groups = omit([valueField], d)
 			result = [
 				...result,
 				...d[valueField].map((v) => ({
@@ -146,9 +146,9 @@ function spread(data, valueField) {
 function multiAttributeSorter(props) {
 	return function (a, b) {
 		for (let i = 0; i < props.length; i++) {
-			let prop = props[i]
-			let name = prop.name || prop
-			let reverse = prop.reverse || false
+			const prop = props[i]
+			const name = prop.name || prop
+			const reverse = prop.reverse || false
 			if (a[name] < b[name]) return reverse ? 1 : -1
 			if (a[name] > b[name]) return reverse ? -1 : 1
 		}

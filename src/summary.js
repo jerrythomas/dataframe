@@ -30,7 +30,7 @@ export function groupBy(data, by, opts = {}) {
 		const key = JSON.stringify(group)
 
 		// If filtering yielded properties, prepare them in an array; otherwise, use an empty array.
-		let _df = Object.keys(value).length > 0 ? [value] : []
+		const _df = Object.keys(value).length > 0 ? [value] : []
 
 		// If the group already exists, concate the new data; otherwise, create a new group.
 		if (key in acc) {
@@ -122,10 +122,10 @@ export function summarize(data, ...cols) {
  */
 export function getGeneratorForMissingRows(data, cols, opts = {}) {
 	// Determine the list of columns to use (either `opts.cols` or by inferring from the first data object).
-	let columns = opts.cols || Object.keys(data[0])
+	const columns = opts.cols || Object.keys(data[0])
 
 	// Extract columns not used for grouping and prepare an object with nulls for these remaining columns.
-	let remaining = columns
+	const remaining = columns
 		.filter((x) => !cols.includes(x))
 		.reduce((acc, x) => ({ ...acc, [x]: null }), {})
 
@@ -170,8 +170,7 @@ export function fillMissingGroups(data, cols, opts = {}) {
 			return d.map((x) => ({ ...x, _actual }))
 		}
 	}
-	let subset = data.map((d) => d._df).reduce((acc, x) => acc.concat(x), [])
-
+	const subset = data.map((d) => d._df).reduce((acc, x) => acc.concat(x), [])
 	const generateRows = getGeneratorForMissingRows(subset, cols, opts)
 
 	return data.map((d) => ({

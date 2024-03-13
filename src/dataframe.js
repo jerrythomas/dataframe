@@ -141,7 +141,7 @@ export class DataFrame {
 
 	distributeEvenlyInGroups(cols) {
 		if (this[__opts__].isGrouped) {
-			let opts = {
+			const opts = {
 				cols: Object.keys(this[__data__][0][this[__subdf__]][0]),
 				defaults: this[__defaults__],
 				addActualIndicator: this[__opts__].addActualIndicator

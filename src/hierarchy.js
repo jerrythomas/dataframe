@@ -64,7 +64,7 @@ export function deriveHierarchy(data, options) {
 	const { expanded, path, separator } = { ...defaultViewOptions, ...options }
 	if (!path) return data.map((row) => ({ depth: 0, row }))
 
-	let hierarchy = data.map((row) => {
+	const hierarchy = data.map((row) => {
 		const parts = row[path].split(separator).filter((part) => part.length > 0)
 		const depth = parts.length
 		const value = depth > 0 ? parts[depth - 1] : ''

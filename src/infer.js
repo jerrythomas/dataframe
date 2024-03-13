@@ -77,7 +77,7 @@ export function deriveColumns(data, options) {
  *                     being arrays of field names that correspond to that data type.
  */
 export function deriveDataTypes(data) {
-	let dataTypes = Object.keys(data[0])
+	const dataTypes = Object.keys(data[0])
 		.map((field) => ({
 			field,
 			type: data.map((d) => d[field]).some(isNaN) ? 'string' : 'number'

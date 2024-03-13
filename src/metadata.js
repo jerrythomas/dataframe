@@ -14,7 +14,7 @@ function mergeCurrencyAttributes(input, currencySuffix) {
 
 	currencyColumns = currencyColumns
 		.map((col) => {
-			let matched = columns.find((column) => column.name === col.name.replace(currencySuffix, ''))
+			const matched = columns.find((column) => column.name === col.name.replace(currencySuffix, ''))
 			if (matched) {
 				matched.fields.currency = col.name
 				matched.type = 'currency'

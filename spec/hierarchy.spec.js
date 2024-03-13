@@ -88,7 +88,7 @@ describe('hierarchy', () => {
 	})
 
 	describe('hierarchicalFilter', () => {
-		let nestedArray
+		let nestedArray = null
 
 		beforeEach(() => {
 			nestedArray = [
