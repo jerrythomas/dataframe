@@ -44,8 +44,6 @@ jobs:
         run: pnpm i
         env:
           NODE_OPTIONS: '--max_old_space_size=6144'
-      # - name: Run tests
-      #   run: pnpm test
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v5.0.0
         env:
@@ -54,3 +52,9 @@ jobs:
           coverageCommand: pnpm coverage
           debug: true
           coverageLocations: lcov.info:lcov
+      - name: Report results to DeepSource
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+        run: |
+          curl https://deepsource.io/cli | sh
+          ./bin/deepsource report --analyzer test-coverage --key javascript --value-file ./coverage/lcov.info

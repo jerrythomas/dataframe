@@ -17,3 +17,5 @@ packages/icons
 packages/vector
 .vercel
 .svelte-kit
+bin
+.env
