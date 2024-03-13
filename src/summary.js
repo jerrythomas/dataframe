@@ -28,7 +28,7 @@ export function summarize(data, ...cols) {
 	const opts = deriveAggregators(...cols)
 	const result = opts
 		.map((col) => {
-			const values = data.map((row) => +row[col.column])
+			const values = data.map((row) => Number(row[col.column]))
 			let result = col.aggregator(values)
 
 			if (typeof result === 'object') {
