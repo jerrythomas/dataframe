@@ -1,6 +1,5 @@
-import { flatGroup } from 'd3-array'
+import { flatGroup, ascending } from 'd3-array'
 import { nest } from 'd3-collection'
-import { ascending } from 'd3-array'
 import { pipe, map, pick, omit, uniq, mergeLeft, difference } from 'ramda'
 
 export function tweenable() {
