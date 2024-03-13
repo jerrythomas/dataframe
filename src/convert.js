@@ -19,7 +19,9 @@ export function fromArray(input) {
 
 		columns = [...columns, ...keys.filter((x) => !columns.includes(x))]
 
-		missing.map((key) => (data[key] = [...data[key], null]))
+		missing.forEach((key) => {
+			data[key] = [...data[key], null]
+		})
 		keys.forEach((key) => {
 			if (key in data) {
 				data[key] = [...data[key], items[key]]
