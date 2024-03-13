@@ -204,7 +204,7 @@ describe('dataframe', () => {
 		expect(df.data).toEqual(exp)
 		expect(df.columns).toEqual(['country', 'name', 'age', 'score', 'time', 'rank', 'level'])
 
-		let res = df.update((d) => ({ dbl: d.rank * 2 }))
+		const res = df.update((d) => ({ dbl: d.rank * 2 }))
 		exp = exp.map((d) => ({ ...d, dbl: d.rank * 2 }))
 		expect(res).toEqual(df)
 		expect(df.data).toEqual(exp)
