@@ -80,7 +80,7 @@ export function summarize(data, ...cols) {
 	const result = opts
 		.map((col) => {
 			// Extract the values for the specified column from the dataset.
-			const values = data.map((row) => +row[col.column])
+			const values = data.map((row) => Number(row[col.column]))
 			// Apply the aggregator function to the extracted values.
 			let result = col.aggregator(values)
 
