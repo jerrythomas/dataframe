@@ -45,8 +45,8 @@ export function sortByParts(a, b, separator = '-') {
 	const partsOfB = b.split(separator)
 
 	let result = compareStrings(partsOfA[0], partsOfB[0])
-	if (result == 0) result = partsOfA.length - partsOfB.length
-	if (result == 0) result = compareStrings(a, b)
+	if (result === 0) result = partsOfA.length - partsOfB.length
+	if (result === 0) result = compareStrings(a, b)
 	return result
 }
 

@@ -189,7 +189,7 @@ describe('dataframe', () => {
 		const df = dataframe(data)
 		expect(df.data.length).toEqual(12)
 		expect(df.data[0].age).toEqual(34)
-		df.update((d) => d.rank == 1, { age: 20 })
+		df.update((d) => d.rank === 1, { age: 20 })
 		expect(df.data[0].age).toEqual(20)
 
 		df.update((d) => ({ rank: d.rank * 2 }))

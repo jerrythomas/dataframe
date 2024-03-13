@@ -24,7 +24,7 @@ export class DataFrame {
 		this[__defaults__] = {}
 		this[__pkey__] = undefined
 		this[__opts__] = {
-			missingColumns: opts.missingColumns || this[__cols__].length == 0,
+			missingColumns: opts.missingColumns || this[__cols__].length === 0,
 			hasSurrogatePK: false,
 			keepGroupsInNestedData: false,
 			isGrouped: this[__cols__].includes(this[__subdf__])

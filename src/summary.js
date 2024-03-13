@@ -163,7 +163,7 @@ export function getGeneratorForMissingRows(data, cols, opts = {}) {
 export function fillMissingGroups(data, cols, opts = {}) {
 	let addAttr = (x) => x
 	if (!Array.isArray(cols)) throw new TypeError('cols must be an array of column names')
-	if (cols.length == 0) throw new Error('cols must contain at least one column')
+	if (cols.length === 0) throw new Error('cols must contain at least one column')
 
 	if (opts.addActualIndicator) {
 		addAttr = (d, _actual) => {

@@ -17,7 +17,7 @@ export function compare(a, b, list) {
 	if (list.groupKey) {
 		result = ascending(list.lookup[a[list.groupKey]], list.lookup[b[list.groupKey]])
 	}
-	if (result == 0) {
+	if (result === 0) {
 		result = ascending(a[list.sortKey], b[list.sortKey])
 	}
 	return result
@@ -93,7 +93,7 @@ export class List {
 
 	add(item) {
 		const index = this.data.findIndex((d) => d[this.primaryKey] === item[this.primaryKey])
-		if (index == -1) {
+		if (index === -1) {
 			if (!(this.primaryKey in item)) {
 				item[this.primaryKey] = uuid()
 			}
