@@ -148,10 +148,10 @@ function spread(data, valueField) {
  */
 function multiAttributeSorter(props) {
 	return function (a, b) {
-		for (var i = 0; i < props.length; i++) {
-			var prop = props[i]
-			var name = prop.name || prop
-			var reverse = prop.reverse || false
+		for (let i = 0; i < props.length; i++) {
+			let prop = props[i]
+			let name = prop.name || prop
+			let reverse = prop.reverse || false
 			if (a[name] < b[name]) return reverse ? 1 : -1
 			if (a[name] > b[name]) return reverse ? -1 : 1
 		}

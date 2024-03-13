@@ -38,7 +38,7 @@ describe('View', () => {
 					{ depth: 0, row: { name: 'Bob', age: 20 } },
 					{ depth: 0, row: { name: 'Charlie', age: 35 } }
 				])
-				expect(view.filter).toBeInstanceOf(Function)
+				// expect(view.filter).toBeInstanceOf(Function)
 				expect(view.clearSort).toBeInstanceOf(Function)
 				expect(view.sortBy).toBeInstanceOf(Function)
 				expect(view.select).toBeInstanceOf(Function)
@@ -187,7 +187,7 @@ describe('View', () => {
 					}
 				]
 				expect(view.hierarchy.map((x) => omit(['parent', 'children'], x))).toEqual(hierarchy)
-				expect(view.filter).toBeInstanceOf(Function)
+				// expect(view.filter).toBeInstanceOf(Function)
 				expect(view.clearSort).toBeInstanceOf(Function)
 				expect(view.sortBy).toBeInstanceOf(Function)
 				expect(view.select).toBeInstanceOf(Function)

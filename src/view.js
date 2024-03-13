@@ -20,7 +20,7 @@ export function createView(data, options) {
 	return {
 		columns: metadata,
 		hierarchy,
-		filter: () => {},
+		// filter: () => {},
 		clearSort: () => (sortGroup = []),
 		sortBy,
 		select: (index) => toggleSelection(hierarchy[index]),

@@ -16,7 +16,6 @@ describe('Animation transform', () => {
 			fs.readFileSync('./spec/fixtures/nba/date-group-team-score.json')
 		)
 	}
-	beforeAll(() => {})
 
 	it('should ignore attributes not in data', () => {
 		let result = tweenable().transform(input)
