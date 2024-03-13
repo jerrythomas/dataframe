@@ -200,36 +200,3 @@ export function deriveActions(columns, input) {
 		}))
 	return [...actionColumns, ...columns]
 }
-
-/**
- * Derives the hierarchy from the data.
- *
- * @param {Array} data - The data to derive the hierarchy from.
- * @param {string} path - The column name to be used as hierarchical path.
- * @param {string} separator - The separator to be used in the path.
- * @returns {Array<import('./types').Hierarchy>} - The derived hierarchy.
- */
-export function deriveHierarchy(data, options) {
-	const { expanded, path, separator } = { ...defaultViewOptions, ...options }
-	if (!path) return data.map((row) => ({ depth: 0, row }))
-
-	let hierarchy = data.map((row) => {
-		const parts = row[path].split(separator).filter((part) => part.length > 0)
-		const depth = parts.length
-		const value = depth > 0 ? parts[depth - 1] : ''
-		return { depth, value, path: row[path], row }
-	})
-
-	hierarchy.map((row) => {
-		row.children = hierarchy.filter(
-			(child) => child.path.startsWith(row.path) && row.depth === child.depth - 1
-		)
-
-		row.isParent = row.children.length > 0
-		row.children.map((child) => {
-			child.parent = row
-		})
-		if (row.isParent) row.isExpanded = expanded
-	})
-	return hierarchy
-}

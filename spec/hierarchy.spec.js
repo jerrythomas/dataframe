@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { removeChildren, flattenNestedChildren, hierarchicalFilter } from '../src/hierarchy'
+import {
+	removeChildren,
+	flattenNestedChildren,
+	hierarchicalFilter,
+	deriveHierarchy
+} from '../src/hierarchy'
 import { pick } from 'ramda'
 
 describe('hierarchy', () => {
@@ -157,6 +162,182 @@ describe('hierarchy', () => {
 			expect(arr[0].retainedByChild).toBeUndefined()
 			expect(arr[1].retainedByChild).toBeUndefined()
 			expect(arr[2].retainedByChild).toBeUndefined()
+		})
+	})
+
+	describe('deriveHierarchy', () => {
+		const data = [
+			{ id: 1, route: '/fruits' },
+			{ id: 2, route: '/fruits/apple' },
+			{ id: 3, route: '/fruits/banana' }
+		]
+
+		it('should derive hierarchy from data', () => {
+			const result = deriveHierarchy(data)
+			expect(result).toEqual([
+				{ depth: 0, row: data[0] },
+				{ depth: 0, row: data[1] },
+				{ depth: 0, row: data[2] }
+			])
+		})
+
+		it('should derive hierarchy from data with a custom path', () => {
+			const expected = [
+				{
+					depth: 1,
+					isExpanded: false,
+					isParent: true,
+					isHidden: false,
+					path: '/fruits',
+					value: 'fruits',
+					row: data[0]
+				},
+				{
+					depth: 2,
+					children: [],
+					isParent: false,
+					isHidden: true,
+					path: '/fruits/apple',
+					value: 'apple',
+					row: data[1]
+				},
+				{
+					depth: 2,
+					children: [],
+					isParent: false,
+					isHidden: true,
+					path: '/fruits/banana',
+					value: 'banana',
+					row: data[2]
+				}
+			]
+			expected[0].children = [expected[1], expected[2]]
+			expected[1].parent = expected[0]
+			expected[2].parent = expected[0]
+
+			const result = deriveHierarchy(data, { path: 'route' })
+			expect(result).toEqual(expected)
+		})
+
+		it('should derive hierarchy where root is empty', () => {
+			const data = [
+				{ id: 1, route: '/' },
+				{ id: 2, route: '/apple' },
+				{ id: 3, route: '/banana' }
+			]
+			const expected = [
+				{
+					depth: 0,
+					isExpanded: false,
+					isParent: true,
+					isHidden: false,
+					path: '/',
+					value: '',
+					row: data[0]
+				},
+				{
+					depth: 1,
+					children: [],
+					isParent: false,
+					isHidden: true,
+					path: '/apple',
+					value: 'apple',
+					row: data[1]
+				},
+				{
+					depth: 1,
+					children: [],
+					isParent: false,
+					isHidden: true,
+					path: '/banana',
+					value: 'banana',
+					row: data[2]
+				}
+			]
+			expected[0].children = [expected[1], expected[2]]
+			expected[1].parent = expected[0]
+			expected[2].parent = expected[0]
+
+			const result = deriveHierarchy(data, { path: 'route' })
+			expect(result).toEqual(expected)
+		})
+
+		it('should derive hierarchy from data with a custom path and separator', () => {
+			const input = data.map((x) => ({ ...x, route: x.route.replace(/\//g, '-').slice(1) }))
+
+			const expected = [
+				{
+					depth: 1,
+					isExpanded: false,
+					isParent: true,
+					isHidden: false,
+					path: 'fruits',
+					value: 'fruits',
+					row: input[0]
+				},
+				{
+					depth: 2,
+					children: [],
+					isParent: false,
+					isHidden: true,
+					path: 'fruits-apple',
+					value: 'apple',
+					row: input[1]
+				},
+				{
+					depth: 2,
+					children: [],
+					isParent: false,
+					isHidden: true,
+					path: 'fruits-banana',
+					value: 'banana',
+					row: input[2]
+				}
+			]
+			expected[0].children = [expected[1], expected[2]]
+			expected[1].parent = expected[0]
+			expected[2].parent = expected[0]
+
+			const result = deriveHierarchy(input, { path: 'route', separator: '-' })
+			expect(result).toEqual(expected)
+		})
+
+		it('should mark all parents as expanded', () => {
+			const expected = [
+				{
+					depth: 1,
+					row: data[0],
+					isExpanded: true,
+					isParent: true,
+					isHidden: false,
+					path: '/fruits',
+					value: 'fruits'
+				},
+				{
+					depth: 2,
+					row: data[1],
+					children: [],
+					isParent: false,
+					isHidden: false,
+					path: '/fruits/apple',
+					value: 'apple'
+				},
+				{
+					depth: 2,
+					row: data[2],
+					children: [],
+					isParent: false,
+					isHidden: false,
+					path: '/fruits/banana',
+					value: 'banana'
+				}
+			]
+			expected[0].children = [expected[1], expected[2]]
+			expected[1].parent = expected[0]
+			expected[2].parent = expected[0]
+
+			const result = deriveHierarchy(data, { path: 'route', expanded: true })
+			expect(result).toEqual(expected)
 		})
 	})
 })

@@ -1,9 +1,12 @@
-import { deriveMetadata, deriveHierarchy, deriveSortableColumns } from './infer'
-import { defaultViewOptions } from './constants'
-import { flattenNestedChildren, removeChildren } from './hierarchy'
+import { deriveMetadata, deriveSortableColumns } from './infer'
+import {
+	flattenNestedChildren,
+	removeChildren,
+	deriveHierarchy,
+	toggleExpansion
+} from './hierarchy'
 
 export function createView(data, options) {
-	const { path } = { ...defaultViewOptions, ...options }
 	let sortGroup = []
 
 	const metadata = deriveMetadata(data, options)
@@ -12,20 +15,25 @@ export function createView(data, options) {
 	const sortBy = (name, ascending = true) => {
 		sortGroup = [...sortGroup, [name, ascending]]
 		groupSort(hierarchy, sortGroup)
-		// console.log(hierarchy)
 	}
 
 	return {
 		columns: metadata,
 		hierarchy,
 		filter: () => {},
-		clearSort: () => (sortGroup = path ? [path] : []),
+		clearSort: () => (sortGroup = []),
 		sortBy,
 		select: (index) => toggleSelection(hierarchy[index]),
 		toggle: (index) => toggleExpansion(hierarchy[index])
 	}
 }
 
+/**
+ * Sorts a hierarchy based on a group of sorters.
+ *
+ * @param {Array<Object>} hierarchy - The hierarchy to sort.
+ * @param {Array<Array<string, boolean>>} sortGroup - The group of sorters to apply.
+ */
 export function groupSort(hierarchy, sortGroup) {
 	let group = deriveSortableColumns(...sortGroup).map(({ column, sorter }) => ({
 		column,
@@ -37,6 +45,11 @@ export function groupSort(hierarchy, sortGroup) {
 	flattenNestedChildren(hierarchy)
 }
 
+/**
+ * Sorts a nested array of objects based on a group of sorters.
+ *
+ * @param {Array<Object>} elements - The array of objects to sort.
+ */
 function sortNested(elements, group) {
 	elements
 		.sort((a, b) => {
@@ -53,6 +66,14 @@ function sortNested(elements, group) {
 		})
 }
 
+/**
+ * Toggles the selection state of a node in the hierarchy.
+ * Depending on whether the node to toggle is a parent or child,
+ * it will either select or deselect all children, or update the parent's selection state based on its children's states.
+ *
+ * @param {import('./types').Hierarchy} item - The node to toggle.
+ *
+ */
 export function toggleSelection(item) {
 	item.selected = item.selected === 'checked' ? 'unchecked' : 'checked'
 
@@ -108,23 +129,5 @@ function updateParents(item) {
 	while (parent) {
 		parent.selected = determineSelectedState(parent.children)
 		parent = parent.parent
-	}
-}
-
-function hideChildren(node) {
-	if (node.children) {
-		node.children.forEach((child) => {
-			child.isHidden = true
-			hideChildren(child)
-		})
-	}
-}
-function toggleExpansion(node) {
-	if (node.isParent) {
-		node.isExpanded = !node.isExpanded
-		node.children.forEach((child) => {
-			child.isHidden = !node.isExpanded
-			if (child.isHidden) hideChildren(child)
-		})
 	}
 }
