@@ -1,6 +1,9 @@
 version = 1
 
 [[analyzers]]
+name = "test-coverage"
+
+[[analyzers]]
 name = "javascript"
 
   [analyzers.meta]
@@ -9,3 +12,6 @@ name = "javascript"
     "vitest",
     "browser"
   ]
+
+[[transformers]]
+name = "prettier"
