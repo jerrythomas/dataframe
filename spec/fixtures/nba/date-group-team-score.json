@@ -1,0 +1,144 @@
+[
+  {
+    "key": "2020-01-01",
+    "value": [
+      {
+        "group": "Eastern Conference",
+        "team": "Boston Celtics",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Eastern Conference",
+        "team": "Miami Heat",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Eastern Conference",
+        "team": "Milwaukee Bucks",
+        "score": 112,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Eastern Conference",
+        "team": "Philadelphia 76ers",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Eastern Conference",
+        "team": "Toronto Raptors",
+        "score": 100,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Western Conference",
+        "team": "Denver Nuggets",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Western Conference",
+        "team": "Golden State Warriors",
+        "score": 105,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Western Conference",
+        "team": "Houston Rockets",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Western Conference",
+        "team": "Los Angeles Clippers",
+        "score": 108,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Western Conference",
+        "team": "Los Angeles Lakers",
+        "score": 110,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Western Conference",
+        "team": "Utah Jazz",
+        "score": 0,
+        "tweenVisibility": 0
+      }
+    ]
+  },
+  {
+    "key": "2020-02-01",
+    "value": [
+      {
+        "group": "Eastern Conference",
+        "team": "Boston Celtics",
+        "score": 115,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Eastern Conference",
+        "team": "Miami Heat",
+        "score": 110,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Eastern Conference",
+        "team": "Milwaukee Bucks",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Eastern Conference",
+        "team": "Philadelphia 76ers",
+        "score": 105,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Eastern Conference",
+        "team": "Toronto Raptors",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Western Conference",
+        "team": "Denver Nuggets",
+        "score": 112,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Western Conference",
+        "team": "Golden State Warriors",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Western Conference",
+        "team": "Houston Rockets",
+        "score": 107,
+        "tweenVisibility": 1
+      },
+      {
+        "group": "Western Conference",
+        "team": "Los Angeles Clippers",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Western Conference",
+        "team": "Los Angeles Lakers",
+        "score": 0,
+        "tweenVisibility": 0
+      },
+      {
+        "group": "Western Conference",
+        "team": "Utah Jazz",
+        "score": 106,
+        "tweenVisibility": 1
+      }
+    ]
+  }
+]

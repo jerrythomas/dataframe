@@ -2,46 +2,53 @@ import { identity } from 'ramda'
 
 /**
  * Creates a formatter function that formats a value according to the specified type and optional locale settings.
- * Supported types include 'default' (no formatting), 'integer', 'number', 'date', 'time', and 'currency'.
+ * Supported types include 'default' (no formatting), 'integer', 'number', 'date', 'time',, 'object', 'array', 'currency' & 'ellipsis''
  *
- * The function is curried, which means it can be partially applied with some arguments and reused
- * to format different values with the same settings.
- *
- * @param {string} type - The type of the formatter to use (e.g., 'integer', 'number', 'date', 'time', 'currency').
+ * @param {string} type               - The type of the formatter to use (e.g., 'integer', 'number', 'date', 'time', 'currency').
  * @param {string} [language='en-US'] - Optional IETF language tag used for locale-specific formatting.
- * @param {string} [currency='USD'] - Optional currency code which is relevant when the type is 'currency'.
- * @param {number} [decimalPlaces=2] - Optional number of decimal places to show with number and currency formatting.
- * @param {number|Date} value - The value to format, it should be of a type corresponding to the formatter type.
- * @returns {*} - The formatted value as a string or the original value if formatting is not applicable.
+ * @param {number} [decimalPlaces=2]  - Optional number of decimal places to show with number and currency formatting.
+ * @returns {*}                       - A format function that takes a value and returns a formatted string.
  */
-export function createFormatter(type, language = 'en-US', decimalPlaces = 2, currency) {
-	const formatWithLocaleOptions = (options, val) => val.toLocaleString(language, options)
-	const formatCurrency = (val, currency = 'USD') =>
+export function createFormatter(type, language = 'en-US', decimalPlaces = 2) {
+	switch (type) {
+		case 'currency':
+			return getCurrencyFormatter(language, decimalPlaces)
+		case 'integer':
+			return (val) => val.toLocaleString(language, { maximumFractionDigits: 0 })
+		case 'number':
+			return (val) =>
+				val.toLocaleString(language, {
+					minimumFractionDigits: decimalPlaces,
+					maximumFractionDigits: decimalPlaces
+				})
+		case 'date':
+			return (val) => val.toLocaleDateString(language)
+		case 'time':
+			return (val) => val.toLocaleTimeString(language)
+		case 'object':
+			return (val) => JSON.stringify(val)
+		case 'array':
+			return (val) => JSON.stringify(val)
+		case 'ellipsis':
+			return () => '...'
+		default:
+			return identity
+	}
+}
+
+/**
+ * Returns a currency formatter function that formats a value as a currency string.
+ * @param {string} language       - The IETF language tag used for locale-specific formatting.
+ * @param {number} decimalPlaces  - The number of decimal places to show with currency formatting.
+ * @returns {function}            - A currency formatter function that takes a value and returns a formatted string.
+ */
+function getCurrencyFormatter(language, decimalPlaces) {
+	const formatter = (val, currency = 'USD') =>
 		val.toLocaleString(language, {
 			style: 'currency',
 			currency,
 			minimumFractionDigits: decimalPlaces,
 			maximumFractionDigits: decimalPlaces
 		})
-
-	const formatters = {
-		integer: (val) => formatWithLocaleOptions({ maximumFractionDigits: 0 }, val), // Integer without decimals
-		number: (val) =>
-			formatWithLocaleOptions(
-				{
-					minimumFractionDigits: decimalPlaces,
-					maximumFractionDigits: decimalPlaces
-				},
-				val
-			), // Number with fixed decimal places
-		date: (val) => val.toLocaleDateString(language), // Locale-specific date format
-		time: (val) => val.toLocaleTimeString(language), // Locale-specific time format
-		currency: currency ? (val) => formatCurrency(val, currency) : formatCurrency
-		// Currency with fixed decimal places and currency symbol
-	}
-	if (type in formatters) return formatters[type]
-	return identity
-	// return propOr(identity, type, formatters)(value) // Apply the formatter based on the type
+	return formatter
 }
-
-// export

@@ -1,11 +1,17 @@
 import { identity } from 'ramda'
 
-export const defaultViewOptions = {
-	expanded: false,
+export const defaultPathOptions = {
 	path: null,
 	separator: '/',
+	currencySuffix: '_currency'
+}
+
+export const defaultViewOptions = {
+	...defaultPathOptions,
+	expanded: false,
 	actions: [],
-	language: 'en-US'
+	language: 'en-US',
+	scanMode: 'fast'
 }
 
 export const defaultActionOrder = {
@@ -20,9 +26,9 @@ export const filterOperations = {
 	'>': (value, pattern) => value > pattern,
 	'<=': (value, pattern) => value <= pattern,
 	'>=': (value, pattern) => value >= pattern,
-	'!=': (value, pattern) => value !== pattern,
 	'~*': (value, pattern) => pattern.test(value),
 	'~': (value, pattern) => pattern.test(value),
+	'!=': (value, pattern) => value !== pattern,
 	'!~*': (value, pattern) => !pattern.test(value),
 	'!~': (value, pattern) => !pattern.test(value)
 }

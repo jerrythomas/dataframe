@@ -2,25 +2,11 @@ import { ascending, descending } from 'd3-array'
 import { counter } from './aggregators'
 import { createFormatter } from './formatter'
 import { defaultViewOptions, defaultActionOrder } from './constants'
+import { compact } from './string'
+import { omit } from 'ramda'
+import { getType } from './utils'
+import { deriveColumnProperties } from './metadata'
 
-/**
- * Check if a value is a date string
- * @param {string} value
- * @returns {boolean}
- */
-function isDateString(value) {
-	return !isNaN(Date.parse(value))
-}
-
-/**
- * Derive the type of a value
- * @param {any} value
- * @returns {string}
- */
-function getType(value) {
-	let type = Array.isArray(value) ? 'array' : typeof value
-	return type === 'string' && isDateString(value) ? 'date' : type
-}
 /**
  *
  * @param  {...[string|[string, boolean]]} cols
@@ -54,6 +40,15 @@ export function deriveAggregators(...cols) {
 	})
 }
 
+function getDeepScanSample(data) {
+	return data.reduce(
+		(acc, cur) => ({
+			...acc,
+			...compact(omit(Object.keys(acc), cur))
+		}),
+		{}
+	)
+}
 /**
  * Derives a unique list of column names from an array of data objects.
  * Each data object represents a row and this function compiles a list of all unique property keys
@@ -62,10 +57,13 @@ export function deriveAggregators(...cols) {
  * @param {Object[]} data - The array of data objects to analyze for column names.
  * @returns {string[]} - An array of strings representing the unique column names found across all data objects.
  */
-export function deriveColumns(data, full = false) {
+export function deriveColumns(data, options) {
 	if (data.length === 0) return []
-	if (!full) Object.keys(data[0])
-	return Array.from(data.map((row) => Object.keys(row)).reduce((p, n) => new Set([...p, ...n])))
+
+	const { scanMode } = { ...defaultViewOptions, ...options }
+	const sample = scanMode === 'fast' ? data[0] : getDeepScanSample(data)
+
+	return deriveColumnProperties(sample, options)
 }
 
 /**
@@ -130,57 +128,37 @@ export function inferDataType(values) {
  * @param {Array} data - The data to derive column metadata from.
  * @returns {Array<import('./types').ColumnMetadata>} - The derived column metadata.
  */
-export function deriveColumnMetadata(dataArray, options = {}) {
-	if (dataArray.length === 0) return []
+export function deriveMetadata(dataArray, options = {}) {
+	let { columns = [] } = options
+	if (dataArray.length === 0) return columns
+	const { actions, language } = { ...defaultViewOptions, ...options }
 
-	const { path, separator, actions, language } = { ...defaultViewOptions, ...options }
-	const firstRow = dataArray[0]
-
-	let columns = []
-
-	for (const key in firstRow) {
-		const dataType = getType(firstRow[key])
-		const formatter = createFormatter(dataType, language)
-		const fields = { text: key }
-
-		if (key.endsWith('_currency')) {
-			deriveCurrencyAttribute(key, columns, language)
-		} else {
-			columns.push({
-				name: key,
-				dataType: dataType,
-				fields,
-				formatter
-			})
-		}
-	}
-	if (path) addPathAttribute(columns, path, separator)
+	if (columns.length === 0) columns = deriveColumns(dataArray, options)
+	columns = addFormatters(columns, language)
+	// if (path) addPathAttribute(columns, path, separator)
 	if (actions.length > 0) columns = deriveActions(columns, actions)
 
 	return columns
 }
 
 /**
- * Adds a currency attribute to the column metadata. This function updates the columns array in place.
+ * Adds a formatter function to each column in the array based on the column type. If a formatter
+ * function is already present, it will not be overwritten. The formatter is created based on the
+ * override formatter if present, or the column type and language.
  *
- * @param {string} key                                      - The key of the currency column.
- * @param {Array<import('./types').ColumnMetadata>} columns - The column metadata to update.
- * @param {string} language                                 - The language to use for formatting the currency.
+ * @param {Array<import('./types').ColumnMetadata>} columns - The array of column metadata to add formatters to.
+ * @param {string} language - The language to use for formatting.
+ * @returns {Array<import('./types').ColumnMetadata>} - The array of column metadata with formatters added.
  */
-function deriveCurrencyAttribute(key, columns, language) {
-	const currencyColumn = key
-	const baseColumn = key.replace(/_currency$/, '')
-
-	// Find the existing column and update its currency attribute
-	const existingColumn = columns.find((column) => column.name === baseColumn)
-	existingColumn.dataType = 'currency'
-	existingColumn.formatter = createFormatter('currency', language, 2)
-	if (existingColumn) {
-		existingColumn.fields = {
-			...existingColumn.fields,
-			currency: currencyColumn
+export function addFormatters(columns, language) {
+	return columns.map((column) => {
+		const formatter = column.formatter ?? column.type
+		if (typeof formatter !== 'function') {
+			const digits = column.digits ?? (['number', 'currency'].includes(column.type) ? 2 : 0)
+			column.formatter = createFormatter(formatter, language, digits)
 		}
-	}
+		return column
+	})
 }
 
 /**
@@ -221,55 +199,4 @@ export function deriveActions(columns, input) {
 			action: name
 		}))
 	return [...actionColumns, ...columns]
-}
-
-/**
- * Adds a hierarchical path column to the column metadata
- *
- * @param {Array<import('./types').ColumnMetadata>} columns - The column metadata to update.
- * @param {string} path - The column name to be used as hierarchical path.
- * @param {string} separator - The separator to be used in the path.
- * @returns {Array<import('./types').ColumnMetadata>} - The updated column metadata.
- */
-export function addPathAttribute(columns, path, separator) {
-	let pathColumn = columns.find(({ name }) => name === path)
-
-	if (pathColumn) {
-		pathColumn.path = true
-		pathColumn.separator = separator
-	}
-	return columns
-}
-
-/**
- * Derives the hierarchy from the data.
- *
- * @param {Array} data - The data to derive the hierarchy from.
- * @param {string} path - The column name to be used as hierarchical path.
- * @param {string} separator - The separator to be used in the path.
- * @returns {Array<import('./types').Hierarchy>} - The derived hierarchy.
- */
-export function deriveHierarchy(data, options) {
-	const { expanded, path, separator } = { ...defaultViewOptions, ...options }
-	if (!path) return data.map((row) => ({ depth: 0, row }))
-
-	let hierarchy = data.map((row) => {
-		const parts = row[path].split(separator).filter((part) => part.length > 0)
-		const depth = parts.length - 1
-		const value = parts[depth]
-		return { depth, value, path: row[path], row }
-	})
-
-	hierarchy.map((row) => {
-		row.children = hierarchy.filter(
-			(child) => child.path.startsWith(row.path) && row.depth === child.depth - 1
-		)
-
-		row.isParent = row.children.length > 0
-		row.children.map((child) => {
-			child.parent = row
-		})
-		if (row.isParent) row.isExpanded = expanded
-	})
-	return hierarchy
 }

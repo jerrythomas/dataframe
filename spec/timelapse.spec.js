@@ -1,30 +1,21 @@
-import { beforeAll, describe, expect, it } from 'vitest'
-import { dataframe } from '../src/dataframe'
-// import {
-// 	inferDataTypes,
-// 	getGeneratorForMissingRows
-// } from '../src/lib/timelapse'
+import { describe, expect, it } from 'vitest'
+import fs from 'fs'
 import { timelapse } from '../src/timelapse'
-// import { getSubscribedData } from './helpers'
 
 describe('Timelapse', () => {
-	beforeAll((suite) => {
-		suite.input = []
-		suite.byDate = []
-		suite.simulated = []
-		// suite.input = JSON.parse(fs.readFileSync('./spec/fixtures/table.json'))
-		// suite.byDate = JSON.parse(fs.readFileSync('./spec/fixtures/by-date.json'))
-		// suite.simulated = JSON.parse(fs.readFileSync('./spec/fixtures/data.json'))
-	})
+	const input = JSON.parse(fs.readFileSync('./spec/fixtures/nba/data.json'))
+	const byDate = JSON.parse(fs.readFileSync('./spec/fixtures/nba/by-date.json'))
+	// const simulated = JSON.parse(fs.readFileSync('./spec/fixtures/data.json'))
 
-	it('should generate timelapse groups', (context) => {
+	it('should generate timelapse groups', () => {
 		const result = timelapse('date')
 			.useDefaults({
 				score: 0,
 				pct: 0
 			})
 			.groupBy('group', 'team')
-			.transform(context.task.suite.input)
-		expect(result).toEqual(context.task.suite.byDate)
+			.transform(input)
+
+		expect(result).toEqual(byDate)
 	})
 })
