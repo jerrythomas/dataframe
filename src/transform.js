@@ -2,6 +2,12 @@ import { flatGroup, ascending } from 'd3-array'
 import { nest } from 'd3-collection'
 import { pipe, map, pick, omit, uniq, mergeLeft, difference } from 'ramda'
 
+/**
+ * Creates a tweenable object with methods for keying, sorting, grouping, and rolling up data,
+ * as well as a transform function to apply these operations.
+ *
+ * @returns {Object} An object that provides chaining methods for data transformation.
+ */
 export function tweenable() {
 	let nestBy = null
 	let sortOrder = ascending
@@ -9,22 +15,52 @@ export function tweenable() {
 	let valueField = null
 
 	const fns = {
+		/**
+		 * Sets the key function for nested grouping operations.
+		 *
+		 * @param {Function} k - The accessor function for the key.
+		 * @returns {Object} The tweenable object for method chaining.
+		 */
 		key: (k) => {
 			nestBy = k
 			return fns
 		},
+		/**
+		 * Sets the sort order function for sorting the nested groups.
+		 *
+		 * @param {Function} order - The sorting function.
+		 * @returns {Object} The tweenable object for method chaining.
+		 */
 		sort: (order) => {
 			sortOrder = order
 			return fns
 		},
+		/**
+		 * Sets the fields for grouping the data.
+		 *
+		 * @param {Array<string>} fields - The fields to group by.
+		 * @returns {Object} The tweenable object for method chaining.
+		 */
 		group: (fields) => {
 			groupBy = [...new Set(fields)]
 			return fns
 		},
+		/**
+		 * Sets the field for rolling up grouped values.
+		 *
+		 * @param {string} field - The field name to rollup.
+		 * @returns {Object} The tweenable object for method chaining.
+		 */
 		rollup: (field) => {
 			valueField = field
 			return fns
 		},
+		/**
+		 * Applies the configured tween operation on the input data.
+		 *
+		 * @param {Array<Object>} input - The data to transform.
+		 * @returns {Array<Object>} The transformed data.
+		 */
 		transform: (input) => {
 			let data = input
 
@@ -77,6 +113,16 @@ export function tweenable() {
 	return fns
 }
 
+/**
+ * Adds hidden values to align the count of items across group entries based on the maximum count.
+ *
+ * @param {Array<Object>} values - The arrays of grouped and rolled up values.
+ * @param {Function} missingRows - The function to identify and insert missing rows.
+ * @param {Object} counts - An object mapping groups to maximum number of items in that group.
+ * @param {string} valueField - The field holding the value array to add hidden values to.
+ * @param {Array<string>} groupBy - The fields that data is grouped by.
+ * @returns {Array<Object>} The values array with hidden values added.
+ */
 function addHiddenValues(values, missingRows, counts, valueField, groupBy) {
 	const dummy = { y: 0, tweenVisibility: 0 }
 	const sorter = multiAttributeSorter(groupBy)

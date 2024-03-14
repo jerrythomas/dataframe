@@ -22,6 +22,17 @@ export function filterObjectArray(data, options) {
 	return data.filter((row) => findMatchingRow(row, value, operator))
 }
 
+/**
+ * Checks if a row matches the given value based on the specified operator.
+ * Supports both standard and negated operators by checking the operator string
+ * for a leading '!' character, which indicates negation.
+ *
+ * @param {Object} row - The row object in which to search for the value match.
+ * @param {any} value - The value to match against the row's properties.
+ * @param {string} operator - The operator used to compare the row's properties to the value.
+ *                            When operator starts with '!', it negates the result of the comparison.
+ * @returns {boolean} - Returns true if the row matches the condition; otherwise, returns false.
+ */
 function findMatchingRow(row, value, operator) {
 	const op = operator.startsWith('!') ? operator.slice(1) : operator
 	const matched = Object.keys(row).some((key) => filterOperations[op](row[key], value))

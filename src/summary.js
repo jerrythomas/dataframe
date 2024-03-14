@@ -1,4 +1,4 @@
-import { omit, pick, mergeLeft, map, difference, uniq, pipe } from 'ramda'
+import { identity, omit, pick, mergeLeft, map, difference, uniq, pipe } from 'ramda'
 import { deriveAggregators } from './infer'
 
 /**
@@ -161,15 +161,12 @@ export function getGeneratorForMissingRows(data, cols, opts = {}) {
  * @throws {Error} If `cols` is an empty array.
  */
 export function fillMissingGroups(data, cols, opts = {}) {
-	let addAttr = (x) => x
 	if (!Array.isArray(cols)) throw new TypeError('cols must be an array of column names')
 	if (cols.length === 0) throw new Error('cols must contain at least one column')
+	const addAttr = !opts.addActualIndicator
+		? identity
+		: (d, _actual) => d.map((x) => ({ ...x, _actual }))
 
-	if (opts.addActualIndicator) {
-		addAttr = (d, _actual) => {
-			return d.map((x) => ({ ...x, _actual }))
-		}
-	}
 	const subset = data.map((d) => d._df).reduce((acc, x) => acc.concat(x), [])
 	const generateRows = getGeneratorForMissingRows(subset, cols, opts)
 

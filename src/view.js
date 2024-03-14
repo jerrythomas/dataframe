@@ -6,12 +6,26 @@ import {
 	toggleExpansion
 } from './hierarchy'
 
+/**
+ * Creates a view object for managing data presentation with metadata and hierarchy structures,
+ * as well as providing methods for sorting, selection, and toggling of data expansion.
+ *
+ * @param {Array<Object>} data - The source data array to be presented by the view.
+ * @param {Object} options - The configuration options used for deriving metadata and hierarchy from the data.
+ * @returns {Object} An object representing the view, providing methods to manipulate and query the presentation state.
+ */
 export function createView(data, options) {
 	let sortGroup = []
 
 	const metadata = deriveMetadata(data, options)
 	const hierarchy = deriveHierarchy(data, options)
 
+	/**
+	 * Sorts the hierarchy based on a specific field name and order.
+	 *
+	 * @param {string} name - The field name to sort by.
+	 * @param {boolean} [ascending=true] - Whether the sort should be in ascending order.
+	 */
 	const sortBy = (name, ascending = true) => {
 		sortGroup = [...sortGroup, [name, ascending]]
 		groupSort(hierarchy, sortGroup)
@@ -21,9 +35,22 @@ export function createView(data, options) {
 		columns: metadata,
 		hierarchy,
 		// filter: () => {},
+		/**
+		 * Clears the applied sort order from the hierarchy.
+		 */
 		clearSort: () => (sortGroup = []),
 		sortBy,
+		/**
+		 * Toggles the selection state of a data element at the specified index.
+		 *
+		 * @param {number} index - The index of the element in the hierarchy to select or deselect.
+		 */
 		select: (index) => toggleSelection(hierarchy[index]),
+		/**
+		 * Toggles the expansion state of a data element at the specified index.
+		 *
+		 * @param {number} index - The index of the element in the hierarchy to expand or collapse.
+		 */
 		toggle: (index) => toggleExpansion(hierarchy[index])
 	}
 }

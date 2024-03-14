@@ -89,6 +89,16 @@ export function deriveHierarchy(data, options) {
 	return hierarchy
 }
 
+/**
+ * Recursively sets the visibility of child nodes based on the hidden and expanded state
+ * of their parent node.
+ *
+ * @param {Object} node - The parent node whose children's visibility will be changed.
+ *                        The node is expected to have a 'children' property which is an
+ *                        array of child nodes, a 'isHidden' property indicating if the
+ *                        node is hidden, and a 'isExpanded' property indicating if the
+ *                        node is expanded.
+ */
 function changeVisibilityForChildren(node) {
 	if (node.children) {
 		node.children.forEach((child) => {
@@ -97,6 +107,17 @@ function changeVisibilityForChildren(node) {
 		})
 	}
 }
+
+/**
+ * Toggles the expansion state of a node and updates the visibility of its children accordingly.
+ * If the node is a parent (has child nodes), it will invert its 'isExpanded' property and call
+ * 'changeVisibilityForChildren' to reflect changes to its child nodes.
+ *
+ * @param {Object} node - The node to toggle expansion for. The node is expected to have an
+ *                        'isParent' property indicating if the node has children, an
+ *                        'isExpanded' property indicating if the node is expanded, and an array
+ *                        of child nodes under the 'children' property if it is a parent.
+ */
 export function toggleExpansion(node) {
 	if (node.isParent) {
 		node.isExpanded = !node.isExpanded

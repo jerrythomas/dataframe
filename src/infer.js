@@ -40,6 +40,13 @@ export function deriveAggregators(...cols) {
 	})
 }
 
+/**
+ * Creates a deep scan sample object that contains a union of all keys from all
+ * objects in the array, pulling the values from the last item that contains the key.
+ *
+ * @param {Array<Object>} data - An array of objects to deep scan and collect sample values.
+ * @returns {Object} A sample object consolidating all unique keys with their latest non-null values.
+ */
 function getDeepScanSample(data) {
 	return data.reduce(
 		(acc, cur) => ({
