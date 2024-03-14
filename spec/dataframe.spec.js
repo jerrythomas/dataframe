@@ -212,21 +212,21 @@ describe('dataframe', () => {
 	})
 
 	it('should join another dataframe', () => {
-		const A = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
-		const B = data.slice(0, 2).map((d) => pick(['age', 'rank'], d))
+		const dfA = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
+		const dfB = data.slice(0, 2).map((d) => pick(['age', 'rank'], d))
 		const AB = data.slice(0, 2).map((d) => pick(['name', 'age', 'rank'], d))
 
-		const res = dataframe(A).join(dataframe(B), (x, y) => x.rank === y.rank, 'inner')
+		const res = dataframe(dfA).join(dataframe(dfB), (x, y) => x.rank === y.rank, 'inner')
 		expect(res).toBeInstanceOf(DataFrame)
 		expect(res.data).toEqual(AB)
 	})
 
 	it('should join another data set', () => {
-		const A = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
-		const B = data.slice(0, 2).map((d) => pick(['age', 'rank'], d))
+		const dfA = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
+		const dfB = data.slice(0, 2).map((d) => pick(['age', 'rank'], d))
 		const AB = data.slice(0, 2).map((d) => pick(['name', 'age', 'rank'], d))
 
-		const res = dataframe(A).join(B, (x, y) => x.rank === y.rank, 'inner')
+		const res = dataframe(dfA).join(dfB, (x, y) => x.rank === y.rank, 'inner')
 		expect(res).toBeInstanceOf(DataFrame)
 		expect(res.data).toEqual(AB)
 	})
