@@ -22,15 +22,15 @@ describe('join', () => {
 	})
 
 	it('should join two data sets with matching rows', () => {
-		const A = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
-		const B = data.slice(0, 2).map((d) => pick(['age', 'rank'], d))
+		const dfA = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
+		const dfB = data.slice(0, 2).map((d) => pick(['age', 'rank'], d))
 		const AB = data.slice(0, 2).map((d) => pick(['name', 'age', 'rank'], d))
 
-		expect(innerJoin(A, B, byRank)).toEqual(AB)
-		expect(join(A, B, byRank)).toEqual(AB)
-		expect(join(A, B, byRank, { type: 'inner' })).toEqual(AB)
-		expect(outerJoin(A, B, byRank)).toEqual(AB)
-		expect(join(A, B, byRank, { type: 'outer' })).toEqual(AB)
+		expect(innerJoin(dfA, dfB, byRank)).toEqual(AB)
+		expect(join(dfA, dfB, byRank)).toEqual(AB)
+		expect(join(dfA, dfB, byRank, { type: 'inner' })).toEqual(AB)
+		expect(outerJoin(dfA, dfB, byRank)).toEqual(AB)
+		expect(join(dfA, dfB, byRank, { type: 'outer' })).toEqual(AB)
 	})
 
 	it('should throw error for invalid join type', () => {
@@ -40,46 +40,46 @@ describe('join', () => {
 	})
 
 	it('should multiply rows when joining', () => {
-		const A = data.slice(0, 2).map((d) => pick(['name', 'country'], d))
-		const B = data.map((d) => pick(['age', 'country'], d))
+		const dfA = data.slice(0, 2).map((d) => pick(['name', 'country'], d))
+		const dfB = data.map((d) => pick(['age', 'country'], d))
 		const AB = [
 			{ age: 34, country: 'South Korea', name: 'Heeyong Park' },
 			{ age: 33, country: 'South Korea', name: 'Heeyong Park' },
 			{ age: 18, country: 'Germany', name: 'Simon Brunner' },
 			{ age: 37, country: 'Germany', name: 'Simon Brunner' }
 		]
-		expect(innerJoin(A, B, byCountry)).toEqual(AB)
-		expect(outerJoin(A, B, byCountry)).toEqual(AB)
+		expect(innerJoin(dfA, dfB, byCountry)).toEqual(AB)
+		expect(outerJoin(dfA, dfB, byCountry)).toEqual(AB)
 	})
 
 	it('should drop unmatched rows when joining', () => {
-		const A = data.slice(0, 4).map((d) => pick(['name', 'rank'], d))
-		const B = data.slice(2).map((d) => pick(['age', 'rank'], d))
+		const dfA = data.slice(0, 4).map((d) => pick(['name', 'rank'], d))
+		const dfB = data.slice(2).map((d) => pick(['age', 'rank'], d))
 		const AB = data.slice(2, 4).map((d) => pick(['age', 'rank', 'name'], d))
 
-		expect(innerJoin(A, B, byRank)).toEqual(AB)
+		expect(innerJoin(dfA, dfB, byRank)).toEqual(AB)
 	})
 
 	it('should return first data set when no matches exist', () => {
-		const A = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
-		const B = []
+		const dfA = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
+		const dfB = []
 
-		expect(outerJoin(A, B, byRank)).toEqual(A)
+		expect(outerJoin(dfA, dfB, byRank)).toEqual(dfA)
 	})
 
 	it('should include unmatched rows when joining', () => {
-		const A = data.slice(0, 4).map((d) => pick(['name', 'rank'], d))
-		const B = data.slice(2).map((d) => pick(['age', 'rank'], d))
+		const dfA = data.slice(0, 4).map((d) => pick(['name', 'rank'], d))
+		const dfB = data.slice(2).map((d) => pick(['age', 'rank'], d))
 		const AB = data
 			.slice(0, 4)
 			.map((d, index) => (index < 2 ? pick(['rank', 'name'], d) : pick(['age', 'rank', 'name'], d)))
 
-		expect(outerJoin(A, B, byRank)).toEqual(AB)
+		expect(outerJoin(dfA, dfB, byRank)).toEqual(AB)
 	})
 
 	it('should include all rows from both sides', () => {
-		const A = data.slice(0, 4).map((d) => pick(['name', 'rank'], d))
-		const B = data.slice(2, 6).map((d) => pick(['age', 'rank'], d))
+		const dfA = data.slice(0, 4).map((d) => pick(['name', 'rank'], d))
+		const dfB = data.slice(2, 6).map((d) => pick(['age', 'rank'], d))
 		const AB = data
 			.slice(0, 6)
 			.map((d, index) =>
@@ -90,47 +90,47 @@ describe('join', () => {
 						: pick(['age', 'rank'], d)
 			)
 
-		expect(fullJoin(A, B, byRank)).toEqual(AB)
-		expect(join(A, B, byRank, { type: 'full' })).toEqual(AB)
+		expect(fullJoin(dfA, dfB, byRank)).toEqual(AB)
+		expect(join(dfA, dfB, byRank, { type: 'full' })).toEqual(AB)
 	})
 
 	it('should add prefix to columns when joining', () => {
-		const A = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
-		const B = data.slice(1, 3).map((d) => pick(['age', 'rank'], d))
+		const dfA = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
+		const dfB = data.slice(1, 3).map((d) => pick(['age', 'rank'], d))
 
 		let AB = [{ y_age: 18, y_rank: 2, name: 'Simon Brunner', rank: 2 }]
-		let res = innerJoin(A, B, byRank, { prefix: 'y' })
+		let res = innerJoin(dfA, dfB, byRank, { prefix: 'y' })
 		expect(res).toEqual(AB)
-		res = join(A, B, byRank, { prefix: 'y' })
+		res = join(dfA, dfB, byRank, { prefix: 'y' })
 		expect(res).toEqual(AB)
 
 		AB = [
 			{ name: 'Heeyong Park', rank: 1 },
 			{ y_age: 18, y_rank: 2, name: 'Simon Brunner', rank: 2 }
 		]
-		res = outerJoin(A, B, byRank, { prefix: 'y' })
+		res = outerJoin(dfA, dfB, byRank, { prefix: 'y' })
 		expect(res).toEqual(AB)
-		res = join(A, B, byRank, { type: 'outer', prefix: 'y' })
+		res = join(dfA, dfB, byRank, { type: 'outer', prefix: 'y' })
 		expect(res).toEqual(AB)
 	})
 
 	it('should add suffix to columns when joining', () => {
-		const A = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
-		const B = data.slice(1, 3).map((d) => pick(['age', 'rank'], d))
+		const dfA = data.slice(0, 2).map((d) => pick(['name', 'rank'], d))
+		const dfB = data.slice(1, 3).map((d) => pick(['age', 'rank'], d))
 
 		let AB = [{ age_b: 18, rank_b: 2, name: 'Simon Brunner', rank: 2 }]
-		let res = innerJoin(A, B, byRank, { suffix: 'b' })
+		let res = innerJoin(dfA, dfB, byRank, { suffix: 'b' })
 		expect(res).toEqual(AB)
-		res = join(A, B, byRank, { type: 'inner', suffix: 'b' })
+		res = join(dfA, dfB, byRank, { type: 'inner', suffix: 'b' })
 		expect(res).toEqual(AB)
 
 		AB = [
 			{ name: 'Heeyong Park', rank: 1 },
 			{ age_b: 18, rank_b: 2, name: 'Simon Brunner', rank: 2 }
 		]
-		res = outerJoin(A, B, byRank, { suffix: 'b' })
+		res = outerJoin(dfA, dfB, byRank, { suffix: 'b' })
 		expect(res).toEqual(AB)
-		res = join(A, B, byRank, { type: 'outer', suffix: 'b' })
+		res = join(dfA, dfB, byRank, { type: 'outer', suffix: 'b' })
 		expect(res).toEqual(AB)
 	})
 })
