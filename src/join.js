@@ -107,7 +107,22 @@ export function join(first, second, query, opts = {}) {
 			return outerJoin(first, second, query, opts)
 		case 'full':
 			return fullJoin(first, second, query, opts)
+		case 'nested':
+			return nestJoin(first, second, query, opts)
 		default:
 			throw new Error(`Unknown join type: ${type}`)
 	}
+}
+
+/**
+ * Nest children objects under parent objects based on a matching condition.
+ * @param {Array<Object>} child - Array of child objects.
+ * @param {Array<Object>} parent - Array of parent objects.
+ * @param {Function} using - Function to determine if a child matches a parent.
+ * @param {Object} [options={}] - Options object with default 'children' attribute name.
+ * @returns {Array<Object>} - New array of parent objects with children nested under them.
+ */
+export function nestJoin(child, parent, using, options = {}) {
+	const { children = 'children' } = options
+	return parent.map((p) => ({ ...p, [children]: child.filter((c) => using(c, p)) }))
 }

@@ -20,6 +20,13 @@ describe('df', () => {
 	})
 
 	describe('dataframe', () => {
+		const child = [
+			{ id: 1, parentId: 1 },
+			{ id: 2, parentId: 1 },
+			{ id: 3, parentId: 2 }
+		]
+
+		const parent = [{ id: 1 }, { id: 2 }, { id: 3 }]
 		it('should throw error if invalid data is provided', () => {
 			expect(() => dataframe()).toThrowError('data must be an array of objects')
 		})
@@ -143,6 +150,32 @@ describe('df', () => {
 			])
 		})
 
+		it('should join generating a nested dataframe', () => {
+			const childDF = dataframe(child)
+			const parentDF = dataframe(parent)
+			const using = (x, y) => x.parentId === y.id
+
+			const expected = [
+				{
+					id: 1,
+					children: [
+						{ id: 1, parentId: 1 },
+						{ id: 2, parentId: 1 }
+					]
+				},
+				{ id: 2, children: [{ id: 3, parentId: 2 }] },
+				{ id: 3, children: [] }
+			]
+
+			let nested = childDF.nestedJoin(parentDF, using)
+			expect(nested.data).toEqual(expected)
+			expect(parentDF.data).toEqual(parent)
+			expect(childDF.data).toEqual(child)
+
+			childDF.nestedJoin(parent, using)
+			expect(nested.data).toEqual(expected)
+			expect(childDF.data).toEqual(child)
+		})
 		// it('should group by a column', () => {
 		// 	const df = dataframe([...data])
 		// 	const grouped = df.groupBy('country', { include: ['name'] })

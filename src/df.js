@@ -1,6 +1,6 @@
 import { deriveSortableColumn } from './infer'
 import { getType } from './utils'
-import { join } from './join'
+import { fullJoin, join } from './join'
 import { pick, equals } from 'ramda'
 import { groupBy } from './summary'
 
@@ -23,6 +23,9 @@ export function isDataFrame(obj) {
 		groupBy: 'function',
 		where: 'function',
 		join: 'function',
+		outerJoin: 'function',
+		nestedJoin: 'function',
+		fullJoin: 'function',
 		select: 'function'
 	})
 }
@@ -117,6 +120,11 @@ export function dataframe(data, options = {}) {
 	df.groupBy = (by, opts = {}) => grouping(df, by, opts)
 	df.where = (condition) => where(df, condition)
 	df.join = (other, query, opts) => joinWith(df, other, query, opts)
+	df.nestedJoin = (other, query, opts) => joinWith(df, other, query, { ...opts, type: 'nested' })
+	df.outerJoin = (other, query, opts) => joinWith(df, other, query, { ...opts, type: 'outer' })
+	df.fullJoin = (other, query, opts) => joinWith(df, other, query, { ...opts, type: 'full' })
+
 	df.select = (...columns) => select(df, ...columns)
+
 	return df
 }
