@@ -9,16 +9,26 @@ import { deriveColumnProperties } from './metadata'
 
 /**
  *
- * @param  {...[string|[string, boolean]]} cols
+ * @param  {import('./types.js').SortableColumn} cols
  * @returns {Array<{import('./types.js').ColumnSorter}}>}
  */
-export function deriveSortableColumns(...cols) {
-	return cols.map((value) => {
-		if (Array.isArray(value)) {
-			return { column: value[0], sorter: value[1] ? ascending : descending }
-		}
-		return { column: value, sorter: ascending }
-	})
+export function deriveSortableColumn(value) {
+	const type = getType(value)
+
+	switch (type) {
+		case 'array':
+			if (value.length !== 2) throw new Error('Array should be a pair of name and boolean values')
+			return { name: value[0], sorter: value[1] ? ascending : descending }
+		case 'object':
+			if (!value.name) throw new Error('The property "name" is required')
+			if (value.sorter !== undefined && typeof value.sorter !== 'function')
+				throw new Error('Invalid: sorter should be a function')
+			return { name: value.name, sorter: value.sorter ?? ascending }
+		case 'string':
+			return { name: value, sorter: ascending }
+		default:
+			throw new Error(`Invalid value type: ${type}`)
+	}
 }
 
 /**
@@ -175,7 +185,7 @@ export function addFormatters(columns, language) {
  * @returns {Array<import('./types').Action>} - The converted actions.
  */
 export function convertToActions(input) {
-	if (!Array.isArray(input)) return []
+	if (!Array.isArray(input)) throw new Error('Actions must be an array')
 	const actions = input
 		.map((action) => {
 			if (typeof action === 'string') {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createView } from '../src/view'
+import { createView, determineSelectedState } from '../src/view'
 import { pick, omit } from 'ramda'
 
 describe('View', () => {
@@ -338,6 +338,23 @@ describe('View', () => {
 					{ path: '/Snow/Eve', isHidden: false }
 				])
 			})
+		})
+	})
+	describe('determineSelectedState', () => {
+		it('should return checked if all are checked', () => {
+			expect(determineSelectedState([{ selected: 'checked' }, { selected: 'checked' }])).toEqual(
+				'checked'
+			)
+		})
+		it('should return unchecked if all are unchecked', () => {
+			expect(
+				determineSelectedState([{ selected: 'unchecked' }, { selected: 'unchecked' }])
+			).toEqual('unchecked')
+		})
+		it('should return indeterminate if some are checked and some are unchecked', () => {
+			expect(determineSelectedState([{ selected: 'checked' }, { selected: 'unchecked' }])).toEqual(
+				'indeterminate'
+			)
 		})
 	})
 })

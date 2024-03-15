@@ -2,7 +2,7 @@ import { v4 as uuid } from '@lukeed/uuid'
 import { omit } from 'ramda'
 import { join } from './join'
 import { groupBy, summarize, fillMissingGroups } from './summary'
-import { deriveColumns, deriveSortableColumns } from './infer'
+import { deriveColumns, deriveSortableColumn } from './infer'
 import { __data__, __cols__, __opts__, __pkey__, __subdf__, __defaults__ } from './symbols'
 
 const defaultOpts = {
@@ -184,12 +184,13 @@ export class DataFrame {
 	 * @returns {DataFrame} The DataFrame instance for method chaining.
 	 */
 	sortBy(...cols) {
-		const opts = deriveSortableColumns(...cols)
+		const opts = cols.map(deriveSortableColumn)
 
 		this[__data__] = this.data.sort((a, b) => {
 			let result = 0
 			for (let i = 0; i < opts.length && result === 0; i++) {
-				result = opts[i].sorter(a[opts[i].column], b[opts[i].column])
+				const { name, sorter } = opts[i]
+				result = sorter(a[name], b[name])
 			}
 			return result
 		})
