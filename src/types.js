@@ -61,7 +61,7 @@
  * @typedef {Object} ColumnMetadata
  *
  * @property {string} name                    - The name of the column.
- * @property {string} dataType                - The data type of the column (e.g., "string", "number", "date").
+ * @property {string} type                - The data type of the column (e.g., "string", "number", "date").
  * @property {FieldMapping} [fields]          - Additional attributes for the column.
  * @property {number} [digits=0]              - The number of digits for numeric values (defaults to 0).
  * @property {Function} formatter             - A function to format the column value.
@@ -69,6 +69,14 @@
  * @property {SortOptions} [sortOrder]        - The sort order of the column.
  * @property {HorizontalAlignOptions} [align] - The alignment of the column content.
  * @property {ActionTypes} [action]           - Action attribute for action columns.
+ */
+
+/**
+ * @typedef {Array<ColumnMetadata>} Metadata
+ */
+
+/**
+ * @typedef {Object<string,number} ColumnIndexMap
  */
 
 /**
@@ -95,20 +103,39 @@
 
 /**
  * DataFrame-like object with data manipulation methods.
+ *
  * @typedef {Object} DataFrame
- * @property {Array<Object>} data    - Array of objects representing the rows of data.
- * @property {Array<string>} columns - Array of column names for the data.
- * @property {Function} sortBy       - Method to sort the DataFrame by specified columns.
- * @property {Function} groupBy      - Method to group the DataFrame by specified columns.
- * @property {Function} where        - Method to filter the DataFrame by a condition.
- * @property {Function} join         - Method to join the DataFrame with another DataFrame.
+ * @property {Array<Object>} data     - Array of objects representing the rows of data.
+ * @property {Metadata} metadata      - Array of column metadata for the data.
+ * @property {ColumnIndexMap} columns - A map of column names to their index in the metadata.
+ * @property {Function} [filter]      - Method to filter the DataFrame by a condition.
+ * @property {Function} sortBy        - Method to sort the DataFrame by specified columns.
+ * @property {Function} groupBy       - Method to group the DataFrame by specified columns.
+ * @property {Function} where         - Sets the filter function for the DataFrame
+ * @property {Function} join          - Method to join the DataFrame with another DataFrame.
+ * @property {Function} innerJoin     - Method to perform an inner join with another DataFrame.
+ * @property {Function} outerJoin     - Method to perform an outer join with another DataFrame.
+ * @property {Function} fullJoin      - Method to perform a full join with another DataFrame.
+ * @property {Function} nestedJoin    - Method to perform a nested join with another DataFrame.
+ * @property {Function} select        - Method to select the columns of the DataFrame.
+ * @property {Function} rename        - Method to rename the columns of the DataFrame.
+ * @property {Function} drop          - Method to drop the columns of the DataFrame.
+ * @property {Function} delete        - Method to delete the rows of the DataFrame.
+ * @property {Function} update        - Method to update the rows of the DataFrame.
+ * @property {Function} union         - Method to combine the rows of the DataFrame with another DataFrame.
+ * @property {Function} minus         - Method to remove the rows of the DataFrame which are present in another DataFrame.
+ * @property {Function} intersect     - Method to keep the rows of the DataFrame which are present in another DataFrame.
  */
 
+/**
+ * @typedef {inner|outer|full|nested} JoinType
+ */
 /**
  * Options for joining two data sets
  *
  * @typedef JoinOptions
- * @property {inner|outer|full} [type='inner] - The join type to use (inner, outer, full).
+ * @property {boolean} [inner]                - Flag indicating inner join
+ * @property {JoinType} [type='inner]         - The join type to use (inner, outer, full, nested).
  * @property {string} [prefix]                - prefix to be used for renaming keys in the second data set.
  * @property {string} [suffix]                - suffix to be used for renaming keys in the second data set.
  * @property {string} [separator='_']         - separator to be used for renaming keys in the second data set.

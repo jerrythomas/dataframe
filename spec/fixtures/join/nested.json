@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1,
+    "name": "John",
+    "age": 30,
+    "city": "New York",
+    "children": [{ "id": 1, "role": "Manager", "department": "Sales" }]
+  },
+  {
+    "id": 2,
+    "name": "Jane",
+    "age": 25,
+    "city": "Chicago",
+    "children": [{ "id": 2, "role": "Analyst", "department": "Marketing" }]
+  },
+  {
+    "id": 3,
+    "name": "Mike",
+    "age": 35,
+    "city": "Los Angeles",
+    "children": [{ "id": 3, "role": "Developer", "department": "Engineering" }]
+  },
+  { "id": 4, "name": "Emma", "age": 28, "city": "Miami", "children": [] },
+  { "id": 5, "name": "Lucas", "age": 22, "city": "Seattle", "children": [] }
+]

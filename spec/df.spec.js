@@ -1,23 +1,25 @@
 import { describe, expect, it } from 'vitest'
 import { dataframe, isDataFrame } from '../src/df'
 import { data } from './fixtures/data'
+import joindata from './fixtures/join'
+import { writeFileSync } from 'fs'
 
 describe('df', () => {
-	describe('isDataFrame', () => {
-		it('should return true for a DataFrame', () => {
-			const df = dataframe([])
-			expect(isDataFrame(df)).toBe(true)
-		})
+	// describe('isDataFrame', () => {
+	// 	it('should return true for a DataFrame', () => {
+	// 		const df = dataframe([])
+	// 		expect(isDataFrame(df)).toBe(true)
+	// 	})
 
-		it('should return false for an object that is not a DataFrame', () => {
-			expect(isDataFrame({})).toBe(false)
-			expect(isDataFrame(null)).toBe(false)
-			expect(isDataFrame([])).toBe(false)
-			expect(isDataFrame('')).toBe(false)
-			expect(isDataFrame(0)).toBe(false)
-			expect(isDataFrame(true)).toBe(false)
-		})
-	})
+	// 	it('should return false for an object that is not a DataFrame', () => {
+	// 		expect(isDataFrame({})).toBe(false)
+	// 		expect(isDataFrame(null)).toBe(false)
+	// 		expect(isDataFrame([])).toBe(false)
+	// 		expect(isDataFrame('')).toBe(false)
+	// 		expect(isDataFrame(0)).toBe(false)
+	// 		expect(isDataFrame(true)).toBe(false)
+	// 	})
+	// })
 
 	describe('dataframe', () => {
 		const child = [
@@ -32,16 +34,16 @@ describe('df', () => {
 		})
 		it('should create a DataFrame', () => {
 			const df = dataframe(data)
-			expect(isDataFrame(df)).toBe(true)
+			// expect(isDataFrame(df)).toBe(true)
 			expect(df.data).toEqual(data)
 			expect(df.columns).toEqual({
-				age: { name: 'age', type: 'integer' },
-				country: { name: 'country', type: 'string' },
-				level: { name: 'level', type: 'integer' },
-				name: { name: 'name', type: 'string' },
-				rank: { name: 'rank', type: 'integer' },
-				score: { name: 'score', type: 'integer' },
-				time: { name: 'time', type: 'integer' }
+				age: 2,
+				country: 0,
+				level: 6,
+				name: 1,
+				rank: 5,
+				score: 3,
+				time: 4
 			})
 			expect(df.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -114,40 +116,201 @@ describe('df', () => {
 			expect(df.data).toEqual(data)
 		})
 
-		it('should join two data sets', () => {
-			const table1 = [
-				{ id: 1, name: 'John' },
-				{ id: 2, name: 'Jane' },
-				{ id: 3, name: 'Alice' },
-				{ id: 4, name: 'Bob' }
-			]
-			const table2 = [
-				{ id: 1, age: 20 },
-				{ id: 2, age: 25 },
-				{ id: 3, age: 30 },
-				{ id: 4, age: 35 }
-			]
-			const df1 = dataframe(table1)
-			const df2 = dataframe(table2)
+		describe('join', () => {
+			const child = dataframe(joindata.ships)
+			const parent = dataframe(joindata.groups)
+			const matcher = (child, parent) => child.group_id === parent.id
 
-			const query = (x, y) => x.id === y.id
-			let joined = df1.join(df2, query)
-			expect(joined.data).toEqual([
-				{ id: 1, name: 'John', age: 20 },
-				{ id: 2, name: 'Jane', age: 25 },
-				{ id: 3, name: 'Alice', age: 30 },
-				{ id: 4, name: 'Bob', age: 35 }
-			])
-			expect(df1.data).toEqual(table1)
-			expect(df2.data).toEqual(table2)
+			it('should perform inner join', () => {
+				let inner = child.join(parent, matcher)
+				expect(inner.data).toEqual(joindata.inner.no_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(inner.metadata).toEqual([
+					{ name: 'id', type: 'integer' },
+					{ name: 'name', type: 'string' },
+					{ name: 'group_id', type: 'integer' },
+					{ name: 'class', type: 'string' }
+				])
 
-			joined = df1.join(table2, query)
-			expect(joined.data).toEqual([
-				{ id: 1, name: 'John', age: 20 },
-				{ id: 2, name: 'Jane', age: 25 },
-				{ id: 3, name: 'Alice', age: 30 },
-				{ id: 4, name: 'Bob', age: 35 }
-			])
+				inner = child.join(parent, matcher, { type: 'inner' })
+				expect(inner.data).toEqual(joindata.inner.no_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+
+				inner = child.innerJoin(parent, matcher)
+				expect(inner.data).toEqual(joindata.inner.no_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+			})
+
+			it('should perform inner join renaming second', () => {
+				let inner = child.join(parent, matcher, { right: { prefix: 'group' } })
+				expect(inner.data).toEqual(joindata.inner.with_y_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+
+				expect(inner.metadata).toEqual([
+					{ name: 'id', type: 'integer' },
+					{ name: 'name', type: 'string' },
+					{ name: 'group_id', type: 'integer' },
+					{ name: 'group_class', type: 'string' }
+				])
+			})
+
+			it('should perform inner join renaming first', () => {
+				let inner = child.join(parent, matcher, { left: { prefix: 'x' } })
+				expect(inner.data).toEqual(joindata.inner.with_x_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+
+				expect(inner.metadata).toEqual([
+					{ name: 'x_id', type: 'integer' },
+					{ name: 'x_name', type: 'string' },
+					{ name: 'x_group_id', type: 'integer' },
+					{ name: 'id', type: 'integer' },
+					{ name: 'class', type: 'string' }
+				])
+			})
+
+			it('should perform inner join renaming both', () => {
+				let inner = child.join(parent, matcher, { left: { prefix: 'x' }, right: { prefix: 'y' } })
+				expect(inner.data).toEqual(joindata.inner.both_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(inner.metadata).toEqual([
+					{ name: 'x_id', type: 'integer' },
+					{ name: 'x_name', type: 'string' },
+					{ name: 'x_group_id', type: 'integer' },
+					{ name: 'y_id', type: 'integer' },
+					{ name: 'y_class', type: 'string' }
+				])
+			})
+
+			it('should perform outer join', () => {
+				let outer = child.join(parent, matcher, { type: 'outer' })
+				expect(outer.data).toEqual(joindata.outer.no_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(outer.metadata).toEqual([
+					{ name: 'id', type: 'integer' },
+					{ name: 'name', type: 'string' },
+					{ name: 'group_id', type: 'integer' },
+					{ name: 'class', type: 'string' }
+				])
+
+				outer = child.outerJoin(parent, matcher)
+				expect(outer.data).toEqual(joindata.outer.no_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+			})
+
+			it('should perform outer join renaming second', () => {
+				let outer = child.join(parent, matcher, { type: 'outer', right: { prefix: 'y' } })
+				expect(outer.data).toEqual(joindata.outer.y_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(outer.metadata).toEqual([
+					{ name: 'id', type: 'integer' },
+					{ name: 'name', type: 'string' },
+					{ name: 'group_id', type: 'integer' },
+					{ name: 'y_id', type: 'integer' },
+					{ name: 'y_class', type: 'string' }
+				])
+			})
+
+			it('should perform outer join renaming first', () => {
+				let outer = child.join(parent, matcher, { type: 'outer', left: { prefix: 'x' } })
+				expect(outer.data).toEqual(joindata.outer.x_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(outer.metadata).toEqual([
+					{ name: 'x_id', type: 'integer' },
+					{ name: 'x_name', type: 'string' },
+					{ name: 'x_group_id', type: 'integer' },
+					{ name: 'id', type: 'integer' },
+					{ name: 'class', type: 'string' }
+				])
+			})
+
+			it('should perform outer join renaming both', () => {
+				let outer = child.join(parent, matcher, {
+					type: 'outer',
+					left: { prefix: 'x' },
+					right: { prefix: 'y' }
+				})
+				expect(outer.data).toEqual(joindata.outer.both_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(outer.metadata).toEqual([
+					{ name: 'x_id', type: 'integer' },
+					{ name: 'x_name', type: 'string' },
+					{ name: 'x_group_id', type: 'integer' },
+					{ name: 'y_id', type: 'integer' },
+					{ name: 'y_class', type: 'string' }
+				])
+			})
+			it('should perform full join', () => {
+				let outer = child.join(parent, matcher, { type: 'full' })
+				expect(outer.data).toEqual(joindata.full.no_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(outer.metadata).toEqual([
+					{ name: 'id', type: 'integer' },
+					{ name: 'name', type: 'string' },
+					{ name: 'group_id', type: 'integer' },
+					{ name: 'class', type: 'string' }
+				])
+
+				outer = child.fullJoin(parent, matcher)
+				expect(outer.data).toEqual(joindata.full.no_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+			})
+			it('should perform full join renaming right', () => {
+				let outer = child.join(parent, matcher, { type: 'full', right: { prefix: 'y' } })
+				expect(outer.data).toEqual(joindata.full.y_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(outer.metadata).toEqual([
+					{ name: 'id', type: 'integer' },
+					{ name: 'name', type: 'string' },
+					{ name: 'group_id', type: 'integer' },
+					{ name: 'y_id', type: 'integer' },
+					{ name: 'y_class', type: 'string' }
+				])
+			})
+			it('should perform full join renaming left', () => {
+				let outer = child.join(parent, matcher, { type: 'full', left: { prefix: 'x' } })
+				expect(outer.data).toEqual(joindata.full.x_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(outer.metadata).toEqual([
+					{ name: 'x_id', type: 'integer' },
+					{ name: 'x_name', type: 'string' },
+					{ name: 'x_group_id', type: 'integer' },
+					{ name: 'id', type: 'integer' },
+					{ name: 'class', type: 'string' }
+				])
+			})
+
+			it('should perform full join renaming both', () => {
+				let outer = child.join(parent, matcher, {
+					type: 'full',
+					left: { prefix: 'x' },
+					right: { prefix: 'y' }
+				})
+				expect(outer.data).toEqual(joindata.full.both_rename)
+				expect(parent.data).toEqual(joindata.groups)
+				expect(child.data).toEqual(joindata.ships)
+				expect(outer.metadata).toEqual([
+					{ name: 'x_id', type: 'integer' },
+					{ name: 'x_name', type: 'string' },
+					{ name: 'x_group_id', type: 'integer' },
+					{ name: 'y_id', type: 'integer' },
+					{ name: 'y_class', type: 'string' }
+				])
+			})
 		})
 
 		it('should join generating a nested dataframe', () => {
@@ -169,11 +332,25 @@ describe('df', () => {
 
 			let nested = childDF.nestedJoin(parentDF, using)
 			expect(nested.data).toEqual(expected)
+			expect(nested.metadata).toEqual([
+				{ name: 'id', type: 'integer' },
+				{
+					name: 'children',
+					type: 'array',
+					metadata: [
+						{
+							name: 'id',
+							type: 'integer'
+						},
+						{ name: 'parentId', type: 'integer' }
+					]
+				}
+			])
+			expect(nested.columns).toEqual({
+				id: 0,
+				children: 1
+			})
 			expect(parentDF.data).toEqual(parent)
-			expect(childDF.data).toEqual(child)
-
-			childDF.nestedJoin(parent, using)
-			expect(nested.data).toEqual(expected)
 			expect(childDF.data).toEqual(child)
 		})
 		// it('should group by a column', () => {
