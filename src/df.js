@@ -1,6 +1,7 @@
 import { pick, omit, equals, identity } from 'ramda'
 import { deriveSortableColumn, getDeepScanSample } from './infer'
 import { getType } from './utils'
+import { getAggregator } from './aggregators'
 
 /**
  * Generates a renamer function which adds a prefix or suffix to a string.
@@ -91,10 +92,53 @@ function sortBy(df, ...columns) {
  * @param {...string} columns              - The columns to group by.
  * @returns {import('./types').DataFrame} The grouped DataFrame object.
  */
-function grouping(df, by, opts = {}) {
+function groupBy(df, by, opts = {}) {
+	df.groups = Array.isArray(by) ? by : [by]
+
+	// split metadata into parent and children
 	return df
-	// const grouped = groupBy(df.data, by, opts)
-	// return dataframe(grouped)
+}
+
+/**
+ * Summarizes the DataFrame by the specified columns.
+ * @param {import('./types').DataFrame} df - The DataFrame object to summarize.
+ * @param {Array} columns                  - The columns to summarize.
+ *
+ * @returns {import('./types').DataFrame}  The summarized DataFrame object.
+ */
+function summarize(df, columns = []) {
+	if (columns.length === 0) {
+		if (!Array.isArray(df.groups) || df.groups.length === 0) {
+			throw new Error('No group columns specified')
+		}
+		const metadata = df.metadata.filter((col) => !df.groups.includes(col))
+		const keys = metadata.map((col) => col.name)
+		columns = [{ name: 'children', ...getAggregator(keys), metadata }]
+	}
+
+	const keys = pick(df.groups)
+	const value = columns.reduce((acc, { name }) => ({ ...acc, [name]: [] }))
+	const grouped = df.data.reduce((acc, row) => {
+		const key = JSON.stringify(keys(row))
+		if (!acc[key]) acc[key] = { ...keys(row), ...value }
+		columns.map(({ name, mapper }) => acc[key][name].push(mapper(row)))
+		return acc
+	}, {})
+
+	const data = grouped.values.map((row) => ({
+		...row,
+		...columns.reduce((acc, { name, reducer }) => ({ ...acc, [name]: reducer(row[name]) }), {})
+	}))
+	const metadata = df.metadata.filter((col) => df.cols.includes(col.name))
+	columns.map(({ name, metadata }) => {
+		const type = getType(data[0][name])
+		if (type === 'array') {
+			metadata.push({ name, type, metadata: deriveColumnMetadata(data[0][name], { metadata }) })
+		} else {
+			metadata.push({ name, type })
+		}
+	})
+	return dataframe(data, { metadata })
 }
 
 /**
@@ -165,31 +209,23 @@ function deleteRows(df) {
  * Updates the rows in the DataFrame that satisfy the condition specified by the filter function.
  *
  * @param {import('./types').DataFrame} df - The DataFrame object to update rows in.
- * @param {Object} data                    - The data to update the rows with.
+ * @param {Object} value                    - The data to update the rows with.
  *
  * @returns {import('./types').DataFrame} The DataFrame object with the rows updated.
  */
-function updateRows(df, data) {
-	if (typeof data !== 'object') throw 'data must be an object'
-	const attributes = Object.entries(data).map(([name, value]) => ({ name, type: getType(value) }))
+function updateRows(df, value) {
+	if (typeof value !== 'object') throw 'value must be an object'
+	const attributes = Object.entries(value).map(([name, value]) => ({ name, type: getType(value) }))
+	const names = attributes.map((attr) => attr.name)
+	const metadata = [...df.metadata.filter((col) => !names.includes(col.name)), ...attributes]
 
-	attributes.forEach((attr) => {
-		if (df.columns[attr.name] === undefined) {
-			df.metadata.push(attr)
-			df.columns[attr.name] = df.metadata.length - 1
-		}
-	})
-
-	if (df.filter) {
-		df.data.forEach((row) => {
-			if (df.filter(row)) row = { ...row, ...data }
-		})
-	} else {
-		df.data.forEach((row) => (row = { ...row, ...data }))
-	}
-
+	const filter = df.filter || identity
+	const data = df.data.map((row) => ({
+		...row,
+		...(filter(row) ? value : {})
+	}))
 	df.filter = null
-	return df
+	return dataframe(data, { metadata })
 }
 
 /**
@@ -232,10 +268,10 @@ function renameColumns(df, columns) {
  * @returns {import('./types').DataFrame} The DataFrame object with the columns dropped.
  */
 function dropColumns(df, ...columns) {
-	df.metadata = df.metadata.filter((col) => !columns.includes(col.name))
-	df.columns = deriveColumnIndex(df.metadata)
-	df.data = df.data.map((row) => omit(columns, row))
-	return df
+	const metadata = df.metadata.filter((col) => !columns.includes(col.name))
+	const data = df.data.map((row) => omit(columns, row))
+
+	return dataframe(data, { metadata })
 }
 
 /**
@@ -311,26 +347,27 @@ export function dataframe(data, options = {}) {
 		columns
 	}
 
-	df.sortBy = (...columns) => sortBy(df, ...columns)
-	df.groupBy = (by, opts = {}) => grouping(df, by, opts)
+	df.groupBy = (by, opts = {}) => groupBy(df, by, opts)
 	df.where = (condition) => where(df, condition)
 
+	// returns new data frames
 	df.join = (other, query, opts) => join(df, other, query, opts)
 	df.outerJoin = (other, query, opts) => outerJoin(df, other, query, opts)
 	df.innerJoin = (other, query, opts) => outerJoin(df, other, query, { ...opts, type: 'inner' })
 	df.fullJoin = (other, query, opts) => fullJoin(df, other, query, opts)
-	df.nestedJoin = (other, query, opts) => nestJoin(df, other, query, opts)
-
-	df.update = (data) => updateRows(df, data)
-	df.delete = () => deleteRows(df)
+	df.nestedJoin = (other, query, opts) => nestedJoin(df, other, query, opts)
 	df.select = (...columns) => select(df, ...columns)
-
-	df.rename = (columns) => renameColumns(df, columns)
-	df.drop = (...columns) => dropColumns(df, ...columns)
-
 	df.union = (other) => union(df, other)
 	df.minus = (other) => minus(df, other)
 	df.intersect = (other) => intersect(df, other)
+	df.summarize = (columns) => summarize(df, columns)
+	df.rename = (columns) => renameColumns(df, columns)
+	df.drop = (...columns) => dropColumns(df, ...columns)
+	df.update = (data) => updateRows(df, data)
+	df.delete = () => deleteRows(df)
+
+	// returns the same data frame with modifications
+	df.sortBy = (...columns) => sortBy(df, ...columns)
 
 	return df
 }
@@ -410,7 +447,7 @@ export function fullJoin(first, second, query, how = {}) {
  *
  * @returns {import('./types').DataFrame} - New DataFrame of parent objects with children nested under them.
  */
-export function nestJoin(child, parent, using, how = {}) {
+export function nestedJoin(child, parent, using, how = {}) {
 	const { children = 'children' } = how
 	const data = parent.data.map((p) => ({ ...p, [children]: child.data.filter((c) => using(c, p)) }))
 	const metadata = [...parent.metadata, { name: children, type: 'array', metadata: child.metadata }]
@@ -433,7 +470,7 @@ function join(df, other, query, options = {}) {
 		case 'full':
 			return fullJoin(df, other, query, options)
 		case 'nested':
-			return nestJoin(df, other, query, options)
+			return nestedJoin(df, other, query, options)
 		default:
 			return outerJoin(df, other, query, { ...options, type: 'inner' })
 	}

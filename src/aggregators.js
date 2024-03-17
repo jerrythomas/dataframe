@@ -1,5 +1,5 @@
 import { quantile } from 'd3-array'
-
+import { pick, identity } from 'ramda'
 /**
  * Counts the number of values in an array.
  *
@@ -24,4 +24,13 @@ export const quantiles = (values) => {
 	const iqr = q3 - q1
 
 	return { q1, q3, iqr, qr_min: q1 - 1.5 * iqr, qr_max: q1 + 1.5 * iqr }
+}
+
+export function getAggregator(keys, agg) {
+	const mapper = pick(Array.isArray ? keys : [keys])
+	const reducer = typeof agg === 'function' ? agg : identity
+	return {
+		mapper,
+		reducer
+	}
 }
