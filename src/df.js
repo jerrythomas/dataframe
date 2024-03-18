@@ -250,7 +250,7 @@ function summarize(df, columns = []) {
 		const initialValue = columns.reduce((res, { name }) => ({ ...res, [name]: [] }), {})
 		const key = JSON.stringify(keys(row))
 		if (!acc[key]) acc[key] = { ...keys(row), ...initialValue }
-		columns.map(({ name, mapper }) => acc[key][name].push(mapper(row)))
+		columns.forEach(({ name, mapper }) => acc[key][name].push(mapper(row)))
 		return acc
 	}, {})
 
