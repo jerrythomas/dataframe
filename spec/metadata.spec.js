@@ -152,16 +152,16 @@ describe('metadata', () => {
 		]
 
 		it('should return input as is when path is not provided', () => {
-			let result = addPathModifier(columns)
+			const result = addPathModifier(columns)
 			expect(result).toEqual(columns)
 		})
 		it('should return input as is when path is invalid', () => {
-			let result = addPathModifier(columns, 'age')
+			const result = addPathModifier(columns, 'age')
 			expect(result).toEqual(columns)
 		})
 
 		it('should add path modifier', () => {
-			let result = addPathModifier(columns, 'path')
+			const result = addPathModifier(columns, 'path')
 			expect(result).toEqual([
 				{ name: 'path', type: 'string', path: true },
 				{ name: 'name', type: 'string' }

@@ -21,13 +21,13 @@ import {
  * @returns {Object} A new DataFrame object with methods for data manipulation.
  */
 export function dataframe(data, options = {}) {
-	if (!Array.isArray(data)) throw 'data must be an array of objects'
+	if (!Array.isArray(data)) throw new Error('data must be an array of objects')
 
 	const metadata = deriveColumnMetadata(data, options)
 	// create a column dictionary for easy access
 	const columns = deriveColumnIndex(metadata)
 
-	let df = {
+	const df = {
 		data,
 		metadata,
 		columns
@@ -45,15 +45,15 @@ export function dataframe(data, options = {}) {
 	df.union = (other) => union(df, other)
 	df.minus = (other) => minus(df, other)
 	df.intersect = (other) => intersect(df, other)
-	df.summarize = (columns) => summarize(df, columns)
-	df.rename = (columns) => renameColumns(df, columns)
-	df.drop = (...columns) => dropColumns(df, ...columns)
+	df.summarize = (fields) => summarize(df, fields)
+	df.rename = (fields) => renameColumns(df, fields)
+	df.drop = (...fields) => dropColumns(df, ...fields)
 
 	// returns the same data frame with modifications
-	df.sortBy = (...columns) => sortBy(df, ...columns)
-	df.update = (data) => updateRows(df, data)
+	df.sortBy = (...fields) => sortBy(df, ...fields)
+	df.update = (value) => updateRows(df, value)
 	df.delete = () => deleteRows(df)
-	df.select = (...columns) => select(df, ...columns)
+	df.select = (...fields) => select(df, ...fields)
 
 	return df
 }
@@ -247,7 +247,7 @@ function summarize(df, columns = []) {
 
 	const keys = pick(df.groups)
 	const grouped = df.data.reduce((acc, row) => {
-		const initialValue = columns.reduce((acc, { name }) => ({ ...acc, [name]: [] }), {})
+		const initialValue = columns.reduce((res, { name }) => ({ ...res, [name]: [] }), {})
 		const key = JSON.stringify(keys(row))
 		if (!acc[key]) acc[key] = { ...keys(row), ...initialValue }
 		columns.map(({ name, mapper }) => acc[key][name].push(mapper(row)))
@@ -261,7 +261,7 @@ function summarize(df, columns = []) {
 
 	const metadata = df.metadata.filter((col) => df.groups.includes(col.name))
 
-	columns.map((col) => {
+	columns.forEach((col) => {
 		const type = getType(data[0][col.name])
 		if (type === 'array') {
 			metadata.push({
@@ -286,10 +286,12 @@ function summarize(df, columns = []) {
  */
 function renameColumns(df, columns) {
 	const existing = Object.values(columns).filter((value) => df.columns[value] !== undefined)
-	if (existing.length > 0) throw `Cannot rename to an existing column. [${existing.join(',')}]`
+	if (existing.length > 0)
+		throw new Error(`Cannot rename to an existing column. [${existing.join(',')}]`)
 
 	const exclude = Object.keys(columns).filter((key) => df.columns[key] === undefined)
-	if (exclude.length > 0) throw `Cannot rename non-existing column(s) [${exclude.join(',')}].`
+	if (exclude.length > 0)
+		throw new Error(`Cannot rename non-existing column(s) [${exclude.join(',')}].`)
 
 	const lookup = {}
 	const include = []
@@ -354,12 +356,12 @@ function sortBy(df, ...columns) {
  * @returns {import('./types').DataFrame} The DataFrame object with the rows updated.
  */
 function updateRows(df, value) {
-	if (typeof value !== 'object') throw 'value must be an object'
+	if (typeof value !== 'object') throw new Error('value must be an object')
 
 	const filter = df.filter || includeAll
 	df.data.forEach((row) => {
 		if (filter(row)) {
-			Object.entries(value).forEach(([key, value]) => (row[key] = value))
+			Object.entries(value).forEach(([k, v]) => (row[k] = v))
 		}
 	})
 	df.filter = null

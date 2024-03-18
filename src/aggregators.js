@@ -26,6 +26,13 @@ export const quantiles = (values) => {
 	return { q1, q3, iqr, qr_min: q1 - 1.5 * iqr, qr_max: q1 + 1.5 * iqr }
 }
 
+/**
+ * Returns an aggregator object with a mapper and reducer function.
+ *
+ * @param {string|string[]} keys - The key or keys to aggregate.
+ * @param {Function} agg - The aggregation function.
+ * @returns {Object} - An object with a mapper and reducer function.
+ */
 export function getAggregator(keys, agg) {
 	const mapper = pick(Array.isArray ? keys : [keys])
 	const reducer = typeof agg === 'function' ? agg : identity

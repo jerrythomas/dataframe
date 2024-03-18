@@ -12,13 +12,13 @@ import { getType } from './utils'
  */
 export function combineMetadata(first, second, overwrite = false) {
 	const metadata = [...first]
-	second.map(({ name, type }) => {
+	second.forEach(({ name, type }) => {
 		const existing = metadata.find((x) => x.name === name)
 		if (existing) {
 			if (overwrite) {
 				existing.type = type
 			} else if (existing.type !== type) {
-				throw 'Metadata conflict: ' + name + ' has conflicting types'
+				throw new Error(`Metadata conflict: ${name} has conflicting types`)
 			}
 		} else {
 			metadata.push({ name, type })
@@ -74,10 +74,17 @@ export function getAttributeRenamer(options) {
 	return rename
 }
 
+/**
+ * Returns a function that renames all the keys of an object using a lookup object
+ *
+ * @param {Object} lookup - An object that maps old keys to new keys.
+ * @returns {Function}    - A function that takes an object and returns a new object with renamed properties.
+ */
 export function getRenamerUsingLookup(lookup) {
 	return (row) =>
 		Object.entries(row).reduce((acc, [key, value]) => ({ ...acc, [lookup[key]]: value }), {})
 }
+
 /**
  * Returns a function that renames all the keys of an object using a renamer function
  *

@@ -32,7 +32,7 @@ describe('join', () => {
 		})
 
 		it('should perform inner join renaming second', () => {
-			let inner = child.join(parent, matcher, { right: { prefix: 'group' } })
+			const inner = child.join(parent, matcher, { right: { prefix: 'group' } })
 			expect(inner.data).toEqual(joindata.inner.with_y_rename)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(child.data).toEqual(joindata.ships)
@@ -46,7 +46,7 @@ describe('join', () => {
 		})
 
 		it('should perform inner join renaming first', () => {
-			let inner = child.join(parent, matcher, { left: { prefix: 'x' } })
+			const inner = child.join(parent, matcher, { left: { prefix: 'x' } })
 			expect(inner.data).toEqual(joindata.inner.with_x_rename)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(child.data).toEqual(joindata.ships)
@@ -61,7 +61,7 @@ describe('join', () => {
 		})
 
 		it('should perform inner join renaming both', () => {
-			let inner = child.join(parent, matcher, { left: { prefix: 'x' }, right: { prefix: 'y' } })
+			const inner = child.join(parent, matcher, { left: { prefix: 'x' }, right: { prefix: 'y' } })
 			expect(inner.data).toEqual(joindata.inner.both_rename)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(child.data).toEqual(joindata.ships)
@@ -95,7 +95,7 @@ describe('join', () => {
 		})
 
 		it('should perform outer join renaming second', () => {
-			let outer = child.join(parent, matcher, { type: 'outer', right: { prefix: 'y' } })
+			const outer = child.join(parent, matcher, { type: 'outer', right: { prefix: 'y' } })
 			expect(outer.data).toEqual(joindata.outer.y_rename)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(child.data).toEqual(joindata.ships)
@@ -109,7 +109,7 @@ describe('join', () => {
 		})
 
 		it('should perform outer join renaming first', () => {
-			let outer = child.join(parent, matcher, { type: 'outer', left: { prefix: 'x' } })
+			const outer = child.join(parent, matcher, { type: 'outer', left: { prefix: 'x' } })
 			expect(outer.data).toEqual(joindata.outer.x_rename)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(child.data).toEqual(joindata.ships)
@@ -123,7 +123,7 @@ describe('join', () => {
 		})
 
 		it('should perform outer join renaming both', () => {
-			let outer = child.join(parent, matcher, {
+			const outer = child.join(parent, matcher, {
 				type: 'outer',
 				left: { prefix: 'x' },
 				right: { prefix: 'y' }
@@ -160,7 +160,7 @@ describe('join', () => {
 			expect(child.data).toEqual(joindata.ships)
 		})
 		it('should perform full join renaming right', () => {
-			let outer = child.join(parent, matcher, { type: 'full', right: { prefix: 'y' } })
+			const outer = child.join(parent, matcher, { type: 'full', right: { prefix: 'y' } })
 			expect(outer.data).toEqual(joindata.full.y_rename)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(child.data).toEqual(joindata.ships)
@@ -173,7 +173,7 @@ describe('join', () => {
 			])
 		})
 		it('should perform full join renaming left', () => {
-			let outer = child.join(parent, matcher, { type: 'full', left: { prefix: 'x' } })
+			const outer = child.join(parent, matcher, { type: 'full', left: { prefix: 'x' } })
 			expect(outer.data).toEqual(joindata.full.x_rename)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(child.data).toEqual(joindata.ships)
@@ -187,7 +187,7 @@ describe('join', () => {
 		})
 
 		it('should perform full join renaming both', () => {
-			let outer = child.join(parent, matcher, {
+			const outer = child.join(parent, matcher, {
 				type: 'full',
 				left: { prefix: 'x' },
 				right: { prefix: 'y' }
