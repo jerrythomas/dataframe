@@ -57,7 +57,7 @@ export function deriveAggregators(...cols) {
  * @param {Array<Object>} data - An array of objects to deep scan and collect sample values.
  * @returns {Object} A sample object consolidating all unique keys with their latest non-null values.
  */
-function getDeepScanSample(data) {
+export function getDeepScanSample(data) {
 	return data.reduce(
 		(acc, cur) => ({
 			...acc,

@@ -38,6 +38,15 @@ describe('set operations', () => {
 				{ name: 'c', type: 'integer' }
 			])
 		})
+
+		it('should throw error for mixed types', () => {
+			const df1 = dataframe([
+				{ a: 1, b: 2 },
+				{ a: 2, b: 3 }
+			])
+			const df2 = dataframe([{ b: 'alpha' }])
+			expect(() => df1.union(df2)).toThrow('Metadata conflict: b has conflicting types')
+		})
 	})
 	describe('minus', () => {
 		it('should remove common values', () => {

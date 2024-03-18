@@ -206,6 +206,26 @@ describe('join', () => {
 	})
 
 	describe('nested', () => {
+		it('should perform nested join using `nestedJoin`', () => {
+			const nested = child.nestedJoin(parent, matcher)
+			expect(nested.data).toEqual(joindata.nested)
+			expect(child.data).toEqual(joindata.ships)
+			expect(parent.data).toEqual(joindata.groups)
+			expect(nested.metadata).toEqual([
+				{ name: 'id', type: 'integer' },
+				{ name: 'class', type: 'string' },
+				{
+					metadata: [
+						{ name: 'id', type: 'integer' },
+						{ name: 'name', type: 'string' },
+						{ name: 'group_id', type: 'integer' }
+					],
+					name: 'children',
+					type: 'array'
+				}
+			])
+		})
+
 		it('should join generating a nested dataframe', () => {
 			const nested = child.join(parent, matcher, { type: 'nested' })
 			expect(nested.data).toEqual(joindata.nested)
@@ -226,45 +246,4 @@ describe('join', () => {
 			])
 		})
 	})
-
-	// it('should join generating a nested dataframe', () => {
-	// 	const childDF = dataframe(child)
-	// 	const parentDF = dataframe(parent)
-	// 	const using = (x, y) => x.parentId === y.id
-
-	// 	const expected = [
-	// 		{
-	// 			id: 1,
-	// 			children: [
-	// 				{ id: 1, parentId: 1 },
-	// 				{ id: 2, parentId: 1 }
-	// 			]
-	// 		},
-	// 		{ id: 2, children: [{ id: 3, parentId: 2 }] },
-	// 		{ id: 3, children: [] }
-	// 	]
-
-	// 	let nested = childDF.nestedJoin(parentDF, using)
-	// 	expect(nested.data).toEqual(expected)
-	// 	expect(nested.metadata).toEqual([
-	// 		{ name: 'id', type: 'integer' },
-	// 		{
-	// 			name: 'children',
-	// 			type: 'array',
-	// 			metadata: [
-	// 				{
-	// 					name: 'id',
-	// 					type: 'integer'
-	// 				},
-	// 				{ name: 'parentId', type: 'integer' }
-	// 			]
-	// 		}
-	// 	])
-	// 	expect(nested.columns).toEqual({
-	// 		id: 0,
-	// 		children: 1
-	// 	})
-	// 	expect(parentDF.data).toEqual(parent)
-	// 	expect(childDF.data).toEqual(child)
-	// })
 })
