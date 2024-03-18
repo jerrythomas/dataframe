@@ -3,6 +3,20 @@ import { deriveSortableColumn, getDeepScanSample } from './infer'
 import { getType } from './utils'
 import { getAggregator } from './aggregators'
 
+const includeAll = () => true
+
+function updateMetadata(first, second) {
+	const metadata = [...first]
+	second.map(({ name, type }) => {
+		const existing = metadata.find((x) => x.name === name)
+		if (existing) {
+			existing.type = type
+		} else {
+			metadata.push({ name, type })
+		}
+	})
+	return metadata
+}
 /**
  * Generates a renamer function which adds a prefix or suffix to a string.
  *
@@ -92,10 +106,8 @@ function sortBy(df, ...columns) {
  * @param {...string} columns              - The columns to group by.
  * @returns {import('./types').DataFrame} The grouped DataFrame object.
  */
-function groupBy(df, by, opts = {}) {
-	df.groups = Array.isArray(by) ? by : [by]
-
-	// split metadata into parent and children
+function groupBy(df, ...by) {
+	df.groups = by
 	return df
 }
 
@@ -164,8 +176,8 @@ function where(df, condition) {
  *
  * @returns {import('./types').Metadata} The derived column metadata.
  */
-function deriveColumnMetadata(data, options) {
-	const { metadata, deepScan = false } = options
+function deriveColumnMetadata(data, options = {}) {
+	const { metadata, deepScan = false } = options ?? {}
 	if (Array.isArray(metadata) && metadata.length > 0) return metadata
 	if (data.length === 0) return []
 	const sample = deepScan ? getDeepScanSample(data) : data[0]
@@ -193,20 +205,27 @@ function select(df, ...columns) {
 
 /**
  * Deletes the rows from the DataFrame that satisfy the condition specified by the filter function.
+ * - Does not change the metadata of the DataFrame.
+ * - Modifies the DataFrame in place.
  *
  * @param {import('./types').DataFrame} df - The DataFrame object to delete rows from
  *.
  * @returns {import('./types').DataFrame} The DataFrame object with the rows deleted.
  */
 function deleteRows(df) {
-	if (df.filter) df.data = df.data.filter(df.filter)
-	df.data = []
+	const filter = df.filter || includeAll
+
+	for (let i = df.data.length - 1; i >= 0; i--) {
+		if (filter(df.data[i])) df.data.splice(i, 1)
+	}
+
 	df.filter = null
 	return df
 }
 
 /**
  * Updates the rows in the DataFrame that satisfy the condition specified by the filter function.
+ * - Modifies the DataFrame in place.
  *
  * @param {import('./types').DataFrame} df - The DataFrame object to update rows in.
  * @param {Object} value                    - The data to update the rows with.
@@ -215,17 +234,17 @@ function deleteRows(df) {
  */
 function updateRows(df, value) {
 	if (typeof value !== 'object') throw 'value must be an object'
-	const attributes = Object.entries(value).map(([name, value]) => ({ name, type: getType(value) }))
-	const names = attributes.map((attr) => attr.name)
-	const metadata = [...df.metadata.filter((col) => !names.includes(col.name)), ...attributes]
 
-	const filter = df.filter || identity
-	const data = df.data.map((row) => ({
-		...row,
-		...(filter(row) ? value : {})
-	}))
+	const filter = df.filter || includeAll
+	df.data.forEach((row) => {
+		if (filter(row)) {
+			Object.entries(value).forEach(([key, value]) => (row[key] = value))
+		}
+	})
 	df.filter = null
-	return dataframe(data, { metadata })
+	df.metadata = updateMetadata(df.metadata, deriveColumnMetadata([value]))
+	df.columns = df.metadata.reduce((acc, col, index) => ({ ...acc, [col.name]: index }), {})
+	return df
 }
 
 /**
@@ -347,7 +366,7 @@ export function dataframe(data, options = {}) {
 		columns
 	}
 
-	df.groupBy = (by, opts = {}) => groupBy(df, by, opts)
+	df.groupBy = (...by) => groupBy(df, ...by)
 	df.where = (condition) => where(df, condition)
 
 	// returns new data frames
@@ -363,11 +382,11 @@ export function dataframe(data, options = {}) {
 	df.summarize = (columns) => summarize(df, columns)
 	df.rename = (columns) => renameColumns(df, columns)
 	df.drop = (...columns) => dropColumns(df, ...columns)
-	df.update = (data) => updateRows(df, data)
-	df.delete = () => deleteRows(df)
 
 	// returns the same data frame with modifications
 	df.sortBy = (...columns) => sortBy(df, ...columns)
+	df.update = (data) => updateRows(df, data)
+	df.delete = () => deleteRows(df)
 
 	return df
 }
