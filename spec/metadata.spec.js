@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { deriveColumnProperties } from '../src/metadata'
+import { deriveColumnProperties, addPathModifier } from '../src/metadata'
 
 describe('metadata', () => {
 	describe('deriveColumnProperties', () => {
@@ -141,6 +141,30 @@ describe('metadata', () => {
 					filterable: true,
 					sorted: 'none'
 				}
+			])
+		})
+	})
+
+	describe('addPathModifier', () => {
+		const columns = [
+			{ name: 'name', type: 'string' },
+			{ name: 'path', type: 'string' }
+		]
+
+		it('should return input as is when path is not provided', () => {
+			let result = addPathModifier(columns)
+			expect(result).toEqual(columns)
+		})
+		it('should return input as is when path is invalid', () => {
+			let result = addPathModifier(columns, 'age')
+			expect(result).toEqual(columns)
+		})
+
+		it('should add path modifier', () => {
+			let result = addPathModifier(columns, 'path')
+			expect(result).toEqual([
+				{ name: 'path', type: 'string', path: true },
+				{ name: 'name', type: 'string' }
 			])
 		})
 	})
