@@ -51,32 +51,6 @@ function getDataRenamer(keyNamer, keys) {
 	// return (row) =>
 	// 	Object.entries(row).reduce((acc, [key, value]) => ({ ...acc, [lookup[key]]: value }), {})
 }
-/**
- * Check if an object is a DataFrame.
- * @param {any} obj - The object to check.
- * @returns {boolean} True if the object is a DataFrame, false otherwise.
- */
-export function isDataFrame(obj) {
-	if (obj === null || typeof obj !== 'object') return false
-	const attributes = Object.entries(obj).reduce(
-		(cur, [key, value]) => ({ ...cur, [key]: getType(value) }),
-		{}
-	)
-	return equals(attributes, {
-		data: 'array',
-		metadata: 'array',
-		columns: 'object',
-		sortBy: 'function',
-		groupBy: 'function',
-		where: 'function',
-		join: 'function',
-		innerJoin: 'function',
-		outerJoin: 'function',
-		nestedJoin: 'function',
-		fullJoin: 'function',
-		select: 'function'
-	})
-}
 
 /**
  * Sorts the DataFrame by the specified columns.
@@ -121,33 +95,39 @@ function groupBy(df, ...by) {
 function summarize(df, columns = []) {
 	if (columns.length === 0) {
 		if (!Array.isArray(df.groups) || df.groups.length === 0) {
-			throw new Error('No group columns specified')
+			throw new Error('Summary requires at least one group column or aggregation')
 		}
-		const metadata = df.metadata.filter((col) => !df.groups.includes(col))
+		const metadata = df.metadata.filter((col) => !df.groups.includes(col.name))
 		const keys = metadata.map((col) => col.name)
 		columns = [{ name: 'children', ...getAggregator(keys), metadata }]
 	}
 
 	const keys = pick(df.groups)
-	const value = columns.reduce((acc, { name }) => ({ ...acc, [name]: [] }))
 	const grouped = df.data.reduce((acc, row) => {
+		const initialValue = columns.reduce((acc, { name }) => ({ ...acc, [name]: [] }), {})
 		const key = JSON.stringify(keys(row))
-		if (!acc[key]) acc[key] = { ...keys(row), ...value }
+		if (!acc[key]) acc[key] = { ...keys(row), ...initialValue }
 		columns.map(({ name, mapper }) => acc[key][name].push(mapper(row)))
 		return acc
 	}, {})
 
-	const data = grouped.values.map((row) => ({
+	const data = Object.values(grouped).map((row) => ({
 		...row,
 		...columns.reduce((acc, { name, reducer }) => ({ ...acc, [name]: reducer(row[name]) }), {})
 	}))
-	const metadata = df.metadata.filter((col) => df.cols.includes(col.name))
-	columns.map(({ name, metadata }) => {
-		const type = getType(data[0][name])
+
+	const metadata = df.metadata.filter((col) => df.groups.includes(col.name))
+
+	columns.map((col) => {
+		const type = getType(data[0][col.name])
 		if (type === 'array') {
-			metadata.push({ name, type, metadata: deriveColumnMetadata(data[0][name], { metadata }) })
+			metadata.push({
+				name: col.name,
+				type,
+				metadata: deriveColumnMetadata(data[0][col.name], pick(['metadata'], col))
+			})
 		} else {
-			metadata.push({ name, type })
+			metadata.push({ name: col.name, type })
 		}
 	})
 	return dataframe(data, { metadata })
@@ -256,11 +236,11 @@ function updateRows(df, value) {
  * @returns {import('./types').DataFrame} The DataFrame object with the columns renamed.
  */
 function renameColumns(df, columns) {
-	const isExisting = Object.values(columns).some((value) => df.columns[value] !== undefined)
-	if (isExisting) throw 'Cannot rename to an existing column name'
+	const existing = Object.values(columns).filter((value) => df.columns[value] !== undefined)
+	if (existing.length > 0) throw `Cannot rename to an existing column. [${existing.join(',')}]`
 
-	const exclude = Object.keys(columns).filter((key) => df.columns[key] !== undefined)
-	if (exclude.length > 0) throw 'Cannot rename columns that do not exist.'
+	const exclude = Object.keys(columns).filter((key) => df.columns[key] === undefined)
+	if (exclude.length > 0) throw `Cannot rename non-existing column(s) [${exclude.join(',')}].`
 
 	const lookup = {}
 	const include = []
