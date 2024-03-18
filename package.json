@@ -21,8 +21,7 @@
     "test:ui": "vitest --ui",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "release:next": "bumpp --preid=next && pnpm publish --access=public --tag=next",
-    "upgrade": "pnpm upgrade"
+    "release:next": "bumpp --preid=next && pnpm publish --access=public --tag=next"
   },
   "exports": {
     "./package.json": "./package.json",

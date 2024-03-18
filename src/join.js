@@ -5,7 +5,7 @@
  * @returns {Function} - A function that takes an object and returns a new object with renamed properties.
  */
 export function renameUsing(opts = {}) {
-	const { prefix, suffix, separator } = { separator: '_', ...opts }
+	const { prefix, suffix, separator = '_' } = opts
 	let rename = (x) => x
 	if (prefix) {
 		rename = (x) => [prefix, x].join(separator)
@@ -30,7 +30,7 @@ export function renameUsing(opts = {}) {
  * @returns {Array} - The result of the left join operation. If inner is true, entries from the first array without a match are excluded.
  */
 function leftJoin(a, b, query, opts = {}) {
-	const { inner } = { inner: true, ...opts }
+	const { inner = false } = { ...opts }
 	const rename = renameUsing(opts)
 	return a
 		.map((x) => {
@@ -50,7 +50,7 @@ function leftJoin(a, b, query, opts = {}) {
  * @returns {Array} - The result of the inner join operation.
  */
 export function innerJoin(a, b, query, opts = {}) {
-	return leftJoin(a, b, query, opts)
+	return leftJoin(a, b, query, { ...opts, inner: true })
 }
 
 /**
@@ -90,24 +90,39 @@ export function fullJoin(a, b, query, opts) {
 /**
  * Joins two input arrays (a and b) based on a specified query condition, with support for various join types.
  *
- * @param {Array} a - The first array to join.
- * @param {Array} b - The second array to join.
- * @param {Function} query - A callback function that defines the join condition.
- * @param {Object} [opts] - Optional parameters to control the join behavior.
+ * @param {Array} first                - The first array to join.
+ * @param {Array} second               - The second array to join.
+ * @param {Function} query             - A callback function that defines the join condition.
+ * @param {Object} [opts]              - Optional parameters to control the join behavior.
  * @param {string} [opts.type='inner'] - The type of join operation: 'inner', 'outer', or 'full'.
  * @returns {Array} - The result of the join operation.
  * @throws {Error} - Throws an error if an unknown join type is specified.
  */
-export function join(a, b, query, opts = {}) {
-	const { type } = { type: 'inner', ...opts }
+export function join(first, second, query, opts = {}) {
+	const { type = 'inner' } = opts
 	switch (type) {
 		case 'inner':
-			return innerJoin(a, b, query, opts)
+			return innerJoin(first, second, query, opts)
 		case 'outer':
-			return outerJoin(a, b, query, opts)
+			return outerJoin(first, second, query, opts)
 		case 'full':
-			return fullJoin(a, b, query, opts)
+			return fullJoin(first, second, query, opts)
+		case 'nested':
+			return nestJoin(first, second, query, opts)
 		default:
 			throw new Error(`Unknown join type: ${type}`)
 	}
+}
+
+/**
+ * Nest children objects under parent objects based on a matching condition.
+ * @param {Array<Object>} child - Array of child objects.
+ * @param {Array<Object>} parent - Array of parent objects.
+ * @param {Function} using - Function to determine if a child matches a parent.
+ * @param {Object} [options={}] - Options object with default 'children' attribute name.
+ * @returns {Array<Object>} - New array of parent objects with children nested under them.
+ */
+export function nestJoin(child, parent, using, options = {}) {
+	const { children = 'children' } = options
+	return parent.map((p) => ({ ...p, [children]: child.filter((c) => using(c, p)) }))
 }

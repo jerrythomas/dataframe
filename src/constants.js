@@ -40,3 +40,8 @@ export const typeConverters = {
 	date: (value) => new Date(value),
 	mixed: identity
 }
+
+/**
+ * A filter function that includes all rows.
+ */
+export const includeAll = () => true

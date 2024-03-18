@@ -6,7 +6,7 @@ import { ascending, descending } from 'd3-array'
 import {
 	deriveColumns,
 	deriveAggregators,
-	deriveSortableColumns,
+	deriveSortableColumn,
 	deriveDataTypes,
 	inferDataType,
 	deriveActions,
@@ -73,21 +73,40 @@ describe('infer', () => {
 		})
 	})
 
-	describe('deriveSortableColumns', () => {
-		it('should derive sorted columns', () => {
-			expect(deriveSortableColumns('name')).toEqual([{ column: 'name', sorter: ascending }])
-			expect(deriveSortableColumns('city', 'name')).toEqual([
-				{ column: 'city', sorter: ascending },
-				{ column: 'name', sorter: ascending }
-			])
-			expect(deriveSortableColumns(['city', false], 'name')).toEqual([
-				{ column: 'city', sorter: descending },
-				{ column: 'name', sorter: ascending }
-			])
-			expect(deriveSortableColumns(['city', true], ['name', false])).toEqual([
-				{ column: 'city', sorter: ascending },
-				{ column: 'name', sorter: descending }
-			])
+	describe('deriveSortableColumn', () => {
+		it('should derive sortable column from string', () => {
+			expect(deriveSortableColumn('name')).toEqual({ name: 'name', sorter: ascending })
+		})
+
+		it('should derive sortable column from array', () => {
+			expect(deriveSortableColumn(['city', true])).toEqual({ name: 'city', sorter: ascending })
+			expect(deriveSortableColumn(['city', false])).toEqual({ name: 'city', sorter: descending })
+		})
+
+		it('should derive sortable column from object', () => {
+			expect(deriveSortableColumn({ name: 'city' })).toEqual({ name: 'city', sorter: ascending })
+			expect(deriveSortableColumn({ name: 'city', sorter: descending })).toEqual({
+				name: 'city',
+				sorter: descending
+			})
+		})
+
+		it('should throw error for invalid type', () => {
+			expect(() => deriveSortableColumn(1)).toThrow('Invalid value type: integer')
+		})
+
+		it('should throw error for invalid array input', () => {
+			const message = 'Array should be a pair of name and boolean values'
+			expect(() => deriveSortableColumn([])).toThrow(message)
+			expect(() => deriveSortableColumn(['name'])).toThrow(message)
+			expect(() => deriveSortableColumn(['name', true, false])).toThrow(message)
+		})
+
+		it('should throw error for invalid object input', () => {
+			expect(() => deriveSortableColumn({})).toThrow('The property "name" is required')
+			expect(() => deriveSortableColumn({ name: 'a', sorter: false })).toThrow(
+				'Invalid: sorter should be a function'
+			)
 		})
 	})
 
@@ -159,6 +178,10 @@ describe('infer', () => {
 				{ name: 'edit', label: 'Edit', order: 1 },
 				{ name: 'delete', label: 'Delete', order: 2 }
 			])
+		})
+
+		it('should throw an error for invaid input', () => {
+			expect(() => convertToActions({})).toThrow('Actions must be an array')
 		})
 	})
 

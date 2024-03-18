@@ -1,4 +1,4 @@
-import { deriveMetadata, deriveSortableColumns } from './infer'
+import { deriveMetadata, deriveSortableColumn } from './infer'
 import {
 	flattenNestedChildren,
 	removeChildren,
@@ -62,9 +62,9 @@ export function createView(data, options) {
  * @param {Array<Array<string, boolean>>} sortGroup - The group of sorters to apply.
  */
 export function groupSort(hierarchy, sortGroup) {
-	const group = deriveSortableColumns(...sortGroup).map(({ column, sorter }) => ({
-		column,
-		sorter: (a, b) => sorter(a.row[column], b.row[column])
+	const group = sortGroup.map(deriveSortableColumn).map(({ name, sorter }) => ({
+		name,
+		sorter: (a, b) => sorter(a.row[name], b.row[name])
 	}))
 
 	removeChildren(hierarchy)
@@ -80,11 +80,11 @@ export function groupSort(hierarchy, sortGroup) {
 function sortNested(elements, group) {
 	elements
 		.sort((a, b) => {
-			for (const item of group) {
-				const result = item.sorter(a, b)
-				if (result !== 0) return result
+			let result = 0
+			for (let i = 0; i < group.length && result === 0; i++) {
+				result = group[i].sorter(a, b)
 			}
-			return 0
+			return result
 		})
 		.forEach((x) => {
 			if (Array.isArray(x.children) && x.children.length > 0) {
@@ -132,7 +132,7 @@ function updateChildren(item) {
  * @param {Array<Object>} children - The array of child objects with a 'selected' property.
  * @returns {string} The determined selected state: 'checked', 'unchecked', or 'indeterminate'.
  */
-function determineSelectedState(children) {
+export function determineSelectedState(children) {
 	const allChecked = children.every((child) => child.selected === 'checked')
 	const allUnchecked =
 		!allChecked && children.every((child) => !child.selected || child.selected === 'unchecked')
