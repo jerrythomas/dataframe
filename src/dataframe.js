@@ -144,7 +144,7 @@ function groupBy(df, ...fields) {
  * @param {import('./types'.JoinOptions)} opts - The join options.
  */
 function join(df, other, query, options = {}) {
-	let type = ['inner', 'left', 'right', 'full', 'nested'].includes(options.type)
+	const type = ['inner', 'left', 'right', 'full', 'nested'].includes(options.type)
 		? options.type
 		: 'inner'
 
@@ -181,11 +181,11 @@ function joinDataFrame(df, other, query, opts = {}) {
 	const leftRenameRow = getDataRenamer(leftRename, Object.keys(df.columns))
 	const rightRenameRow = getDataRenamer(rightRename, Object.keys(other.columns))
 
-	let combinedData = []
+	const combinedData = []
 
 	// Process rows from the left DataFrame
 	df.data.forEach((x) => {
-		let matches = other.data
+		const matches = other.data
 			.filter((y) => query(x, y))
 			.map((y) => ({ ...rightRenameRow(y), ...leftRenameRow(x) }))
 		if (matches.length === 0 && ['left', 'full'].includes(type)) {

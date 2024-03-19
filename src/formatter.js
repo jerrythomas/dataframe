@@ -43,6 +43,13 @@ export function createFormatter(type, language = 'en-US', decimalPlaces = 2) {
  * @returns {function}            - A currency formatter function that takes a value and returns a formatted string.
  */
 function getCurrencyFormatter(language, decimalPlaces) {
+	/**
+	 * Formats a value as a currency string with the desired decimal places.
+	 *
+	 * @param {number} val              - The value to format as a currency string.
+	 * @param {string} [currency='USD'] - The currency code to use for formatting.
+	 * @returns {string}                - The formatted currency string.
+	 */
 	const formatter = (val, currency = 'USD') =>
 		val.toLocaleString(language, {
 			style: 'currency',

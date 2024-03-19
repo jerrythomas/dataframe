@@ -74,9 +74,8 @@ export function summarize(data, ...cols) {
  */
 export function getAlignGenerator(data, config) {
 	const { align_by, group_by, actual_flag } = config
-
-	const template = omit([...align_by, ...group_by], config.template)
-	template[actual_flag] = 0
+	const template = { ...omit([...align_by, ...group_by], config.template), [actual_flag]: 0 }
 	const subset = pipe(map(pick(align_by)), uniq)(data)
+
 	return pipe(map(pick(align_by)), uniq, difference(subset), map(mergeLeft(template)))
 }
