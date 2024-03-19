@@ -1,4 +1,5 @@
-import { dataframe } from './dataframe'
+// import { dataframe } from './dataframe'
+import { dataframe } from './df'
 
 /**
  * Creates a timelapse transformation that sorts, groups, and distributes data evenly
@@ -20,13 +21,14 @@ export function timelapse(by) {
 	 * @returns {Array<Object>} The transformed dataset.
 	 */
 	const transform = (data) => {
-		const df = dataframe(data)
+		return dataframe(data)
 			.sortBy(...groupColumns)
 			.groupBy(by)
-			.useDefaults(defaults)
-			.distributeEvenlyInGroups(groupColumns)
+			.using(defaults)
+			.align(...groupColumns)
+			.rollup()
 			.sortBy(by)
-		return df.data
+			.select()
 	}
 
 	/**

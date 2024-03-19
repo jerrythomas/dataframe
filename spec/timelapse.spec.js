@@ -1,12 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import fs from 'fs'
+// import fs from 'fs'
 import { timelapse } from '../src/timelapse'
+import fixture from './fixtures/rollup'
 
 describe('Timelapse', () => {
-	const input = JSON.parse(fs.readFileSync('./spec/fixtures/nba/data.json'))
-	const byDate = JSON.parse(fs.readFileSync('./spec/fixtures/nba/by-date.json'))
-	// const simulated = JSON.parse(fs.readFileSync('./spec/fixtures/data.json'))
-
 	it('should generate timelapse groups', () => {
 		const result = timelapse('date')
 			.useDefaults({
@@ -14,8 +11,8 @@ describe('Timelapse', () => {
 				pct: 0
 			})
 			.groupBy('group', 'team')
-			.transform(input)
+			.transform(fixture.nba)
 
-		expect(result).toEqual(byDate)
+		expect(result).toEqual(fixture.nba_by_date)
 	})
 })

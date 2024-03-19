@@ -1,7 +1,7 @@
 import './types'
 export * from './string'
 export * from './utils'
-export { dataframe } from './dataframe'
+export { dataframe } from './df'
 export { tweenable } from './transform'
 export { timelapse } from './timelapse'
 export { createView } from './view'

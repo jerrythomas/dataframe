@@ -1,7 +1,7 @@
 import { pick, omit, equals } from 'ramda'
 import { deriveSortableColumn } from './infer'
 import { getType } from './utils'
-import { defaultAggregator, getAggregator } from './aggregators'
+import { defaultAggregator } from './aggregators'
 import { includeAll, defaultConfig, pickAllowedConfig } from './constants'
 import {
 	combineMetadata,
