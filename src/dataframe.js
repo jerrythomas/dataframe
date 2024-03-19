@@ -37,7 +37,7 @@ export function dataframe(data, options = {}) {
 	}
 
 	// configure behaviour
-	df.override = (config) => overrideConfig(df, config)
+	df.override = (props) => overrideConfig(df, props)
 	df.where = (condition) => where(df, condition)
 	df.groupBy = (...by) => groupBy(df, ...by)
 	df.align = (...fields) => alignColumns(df, ...fields)
@@ -350,7 +350,7 @@ function rollup(df, summaries = []) {
 		const { actual_flag, children } = df.config
 		groupedArray.forEach((row) => {
 			row[children] = [
-				...row[children].map((row) => ({ ...row, [actual_flag]: 1 })),
+				...row[children].map((value) => ({ ...value, [actual_flag]: 1 })),
 				...fillRows(row[df.config.children])
 			]
 		})
