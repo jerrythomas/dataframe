@@ -1,7 +1,7 @@
 import { pick, omit, equals } from 'ramda'
 import { deriveSortableColumn } from './infer'
 import { getType } from './utils'
-import { getAggregator } from './aggregators'
+import { defaultAggregator, getAggregator } from './aggregators'
 import { includeAll, defaultConfig, pickAllowedConfig } from './constants'
 import {
 	combineMetadata,
@@ -11,6 +11,7 @@ import {
 	getDataRenamer,
 	getRenamerUsingLookup
 } from './df-metadata'
+import { getAlignGenerator } from './summary'
 
 /**
  * Creates a new DataFrame object.
@@ -96,7 +97,7 @@ function overrideConfig(df, config = {}) {
  * @returns {import('./types').DataFrame}    The aligned DataFrame object.
  */
 function alignColumns(df, ...fields) {
-	df.config.align = excludeInvalidFields(fields, df.columns)
+	df.config.align_by = excludeInvalidFields(fields, df.columns)
 	return df
 }
 
@@ -320,37 +321,48 @@ function dropColumns(df, ...columns) {
 /**
  * Summarizes the DataFrame by the specified columns.
  * @param {import('./types').DataFrame} df - The DataFrame object to summarize.
- * @param {Array} columns                  - The columns to summarize.
+ * @param {Array} summaries                  - The columns to summarize.
  *
  * @returns {import('./types').DataFrame}  The summarized DataFrame object.
  */
-function rollup(df, columns = []) {
-	if (columns.length === 0) {
-		if (!Array.isArray(df.config.group_by) || df.config.group_by.length === 0) {
-			throw new Error('Rollup requires at least one group column or aggregation')
-		}
-		const metadata = df.metadata.filter((col) => !df.config.group_by.includes(col.name))
-		const keys = metadata.map((col) => col.name)
-		columns = [{ name: df.config.children, ...getAggregator(keys), metadata }]
+function rollup(df, summaries = []) {
+	let fillRows = null
+	if (df.config.group_by.length === 0)
+		throw new Error('Use groupBy to specify the columns to group by.')
+
+	if (summaries.length === 0) {
+		if (df.config.align_by.length > 0) fillRows = getAlignGenerator(df.data, df.config)
+		summaries.push(defaultAggregator(df.metadata, df.config))
 	}
 
 	const keys = pick(df.config.group_by)
 	const grouped = df.data.reduce((acc, row) => {
-		const initialValue = columns.reduce((res, { name }) => ({ ...res, [name]: [] }), {})
+		const initialValue = summaries.reduce((res, { name }) => ({ ...res, [name]: [] }), {})
 		const key = JSON.stringify(keys(row))
 		if (!acc[key]) acc[key] = { ...keys(row), ...initialValue }
-		columns.forEach(({ name, mapper }) => acc[key][name].push(mapper(row)))
+		summaries.forEach(({ name, mapper }) => acc[key][name].push(mapper(row)))
 		return acc
 	}, {})
 
-	const data = Object.values(grouped).map((row) => ({
+	const groupedArray = Object.values(grouped)
+
+	if (fillRows) {
+		const { actual_flag, children } = df.config
+		groupedArray.forEach((row) => {
+			row[children] = [
+				...row[children].map((row) => ({ ...row, [actual_flag]: 1 })),
+				...fillRows(row[df.config.children])
+			]
+		})
+	}
+	const data = groupedArray.map((row) => ({
 		...row,
-		...columns.reduce((acc, { name, reducer }) => ({ ...acc, [name]: reducer(row[name]) }), {})
+		...summaries.reduce((acc, { name, reducer }) => ({ ...acc, [name]: reducer(row[name]) }), {})
 	}))
 
 	const metadata = df.metadata.filter((col) => df.config.group_by.includes(col.name))
 
-	columns.forEach((col) => {
+	summaries.forEach((col) => {
 		const type = getType(data[0][col.name])
 		if (type === 'array') {
 			metadata.push({

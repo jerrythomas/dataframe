@@ -41,3 +41,17 @@ export function getAggregator(keys, agg) {
 		reducer
 	}
 }
+
+/**
+ * Returns the default aggregator which rolls up the columns other than the group_by columns into a single object.
+ *
+ * @param {import('./types').Metadata} metadata - The metadata for the columns to be aggregated.
+ * @param {Object} config                       - The configuration used to build the aggregator.
+ *
+ * @returns {Object} An object containing the default aggregator for the specified metadata and configuration.
+ */
+export function defaultAggregator(metadata, config) {
+	const child = metadata.filter((col) => !config.group_by.includes(col.name))
+	const keys = child.map((col) => col.name)
+	return { name: config.children, ...getAggregator(keys), metadata: child }
+}

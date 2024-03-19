@@ -3,6 +3,7 @@ import { dataframe } from '../src/df'
 import fixture from './fixtures/group'
 import { counter, getAggregator } from '../src/aggregators'
 import { mean, quantile } from 'd3-array'
+import groupData from './fixtures/rollup'
 
 describe('structure', () => {
 	describe('rename', () => {
@@ -55,12 +56,12 @@ describe('structure', () => {
 	})
 
 	describe('rollup', () => {
-		it('should throw error if not grouping or summary columns are provided', () => {
+		it('should throw error if group_by is not specified', () => {
 			const df = dataframe([
 				{ a: 1, b: 2 },
 				{ a: 2, b: 3 }
 			])
-			expect(() => df.rollup()).toThrow('Rollup requires at least one group column or aggregation')
+			expect(() => df.rollup()).toThrow('Use groupBy to specify the columns to group by.')
 		})
 
 		it('should group by a column', () => {
@@ -141,6 +142,20 @@ describe('structure', () => {
 				{ name: 'cost_q1', type: 'number' },
 				{ name: 'cost_q3', type: 'number' }
 			])
+		})
+
+		it('should align subgroups during rollup', () => {
+			const result = dataframe(groupData.data).groupBy('date').align('team').rollup()
+			expect(result.data).toEqual(groupData.with_align)
+		})
+
+		it('should align subgroups using template during rollup', () => {
+			const result = dataframe(groupData.data)
+				.groupBy('date')
+				.align('team')
+				.using({ score: 0, pct: 0, rank: 999 })
+				.rollup()
+			expect(result.data).toEqual(groupData.align_using)
 		})
 	})
 })

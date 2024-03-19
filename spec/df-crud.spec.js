@@ -9,14 +9,14 @@ describe('crud operations', () => {
 		it('should exclude invalid fields while configuring alignment', () => {
 			const df = dataframe([])
 			const updated = df.align('a', 'b')
-			expect(updated.config.align).toEqual([])
+			expect(updated.config.align_by).toEqual([])
 			expect(updated).toBe(df)
 		})
 
 		it('should set the alignment configuration', () => {
 			const df = dataframe(data)
 			const updated = df.align('a', 'b')
-			expect(updated.config.align).toEqual(['a', 'b'])
+			expect(updated.config.align_by).toEqual(['a', 'b'])
 			expect(updated).toBe(df)
 		})
 

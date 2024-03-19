@@ -6,7 +6,8 @@ export const defaultConfig = {
 	children: 'children',
 	actual_flag: 'actual_flag',
 	group_by: [],
-	align: []
+	align_by: [],
+	template: {}
 }
 
 export const defaultPathOptions = {
