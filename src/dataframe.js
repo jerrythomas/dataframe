@@ -10,7 +10,7 @@ import {
 	getAttributeRenamer,
 	getDataRenamer,
 	getRenamerUsingLookup
-} from './df-metadata'
+} from './metadata'
 import { getAlignGenerator } from './summary'
 
 /**

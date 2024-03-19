@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dataframe } from '../src/df'
+import { dataframe } from '../src/dataframe'
 import { data } from './fixtures/data'
 
 describe('dataframe', () => {

@@ -1,5 +1,4 @@
-// import { dataframe } from './dataframe'
-import { dataframe } from './df'
+import { dataframe } from './dataframe'
 
 /**
  * Creates a timelapse transformation that sorts, groups, and distributes data evenly

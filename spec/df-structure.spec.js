@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dataframe } from '../src/df'
+import { dataframe } from '../src/dataframe'
 import fixture from './fixtures/group'
 import { counter, getAggregator } from '../src/aggregators'
 import { mean, quantile } from 'd3-array'

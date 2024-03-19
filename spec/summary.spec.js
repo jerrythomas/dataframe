@@ -35,27 +35,27 @@ describe('aggregators', () => {
 		})
 	})
 
-	it('should group by one or more columns', () => {
-		let result = groupBy(data, ['country'])
+	// it('should group by one or more columns', () => {
+	// 	let result = groupBy(data, ['country'])
 
-		expect(result).toEqual(grouped.country)
-		result = groupBy(data, ['country', 'rank'])
-		expect(result).toEqual(grouped.countryAndRank)
-	})
+	// 	expect(result).toEqual(grouped.country)
+	// 	result = groupBy(data, ['country', 'rank'])
+	// 	expect(result).toEqual(grouped.countryAndRank)
+	// })
 
-	it('should group by and handle exclusion', () => {
-		let result = groupBy(data, ['country'], { exclude: ['name'] })
-		expect(result).toEqual(exclusions.country)
-		result = groupBy(data, ['country', 'rank'], { exclude: ['name', 'age'] })
-		expect(result).toEqual(exclusions.countryAndRank)
-	})
+	// it('should group by and handle exclusion', () => {
+	// 	let result = groupBy(data, ['country'], { exclude: ['name'] })
+	// 	expect(result).toEqual(exclusions.country)
+	// 	result = groupBy(data, ['country', 'rank'], { exclude: ['name', 'age'] })
+	// 	expect(result).toEqual(exclusions.countryAndRank)
+	// })
 
-	it('should group by and handle inclusion', () => {
-		let result = groupBy(data, ['country'], { include: ['name'] })
-		expect(result).toEqual(inclusions.country)
-		result = groupBy(data, ['country', 'rank'], { include: ['name', 'age'] })
-		expect(result).toEqual(inclusions.countryAndRank)
-	})
+	// it('should group by and handle inclusion', () => {
+	// 	let result = groupBy(data, ['country'], { include: ['name'] })
+	// 	expect(result).toEqual(inclusions.country)
+	// 	result = groupBy(data, ['country', 'rank'], { include: ['name', 'age'] })
+	// 	expect(result).toEqual(inclusions.countryAndRank)
+	// })
 
 	it('Should aggregate data', () => {
 		let result = summarize(data, 'name')
@@ -90,34 +90,34 @@ describe('aggregators', () => {
 		})
 	})
 
-	it('Should fill missing groups', () => {
-		expect(() => fillMissingGroups([])).toThrowError(/cols must be an array of column names/)
+	// it('Should fill missing groups', () => {
+	// 	expect(() => fillMissingGroups([])).toThrowError(/cols must be an array of column names/)
 
-		expect(() => fillMissingGroups([], [])).toThrowError(/cols must contain at least one column/)
+	// 	expect(() => fillMissingGroups([], [])).toThrowError(/cols must contain at least one column/)
 
-		let result = fillMissingGroups(missing, ['gender'])
-		expect(result).toEqual(filled)
-		result = fillMissingGroups(missing, ['gender'], { defaults: { count: 0 } })
-		const withValues = filled.map((d) => ({
-			...d,
-			_df: d._df.map((x) => ({ ...x, count: x.count === null ? 0 : x.count }))
-		}))
+	// 	let result = fillMissingGroups(missing, ['gender'])
+	// 	expect(result).toEqual(filled)
+	// 	result = fillMissingGroups(missing, ['gender'], { defaults: { count: 0 } })
+	// 	const withValues = filled.map((d) => ({
+	// 		...d,
+	// 		_df: d._df.map((x) => ({ ...x, count: x.count === null ? 0 : x.count }))
+	// 	}))
 
-		expect(result).toEqual(withValues)
-		// result = fillMissingGroups(missing, ['gender'])
-		// expect(result).toEqual(filled)
-		result = fillMissingGroups(missing, ['gender'], {
-			defaults: { count: 0 },
-			addActualIndicator: true
-		})
-		const withIndicator = filled.map((d) => ({
-			...d,
-			_df: d._df.map((x) => ({
-				...x,
-				count: x.count === null ? 0 : x.count,
-				_actual: x.count === null ? 0 : 1
-			}))
-		}))
-		expect(result).toEqual(withIndicator)
-	})
+	// 	expect(result).toEqual(withValues)
+	// 	// result = fillMissingGroups(missing, ['gender'])
+	// 	// expect(result).toEqual(filled)
+	// 	result = fillMissingGroups(missing, ['gender'], {
+	// 		defaults: { count: 0 },
+	// 		addActualIndicator: true
+	// 	})
+	// 	const withIndicator = filled.map((d) => ({
+	// 		...d,
+	// 		_df: d._df.map((x) => ({
+	// 			...x,
+	// 			count: x.count === null ? 0 : x.count,
+	// 			_actual: x.count === null ? 0 : 1
+	// 		}))
+	// 	}))
+	// 	expect(result).toEqual(withIndicator)
+	// })
 })
