@@ -2,6 +2,49 @@ import { describe, expect, it } from 'vitest'
 import { dataframe } from '../src/df'
 
 describe('crud operations', () => {
+	describe('configurations', () => {
+		const data = [{ a: 1, b: '2' }]
+
+		it('should exclude invalid fields while configuring alignment', () => {
+			const df = dataframe([])
+			const updated = df.align('a', 'b')
+			expect(updated.config.align).toEqual([])
+			expect(updated).toBe(df)
+		})
+
+		it('should set the alignment configuration', () => {
+			const df = dataframe(data)
+			const updated = df.align('a', 'b')
+			expect(updated.config.align).toEqual(['a', 'b'])
+			expect(updated).toBe(df)
+		})
+
+		it('should override actual_flag', () => {
+			const df = dataframe([])
+
+			expect(df.config).toEqual({ actual_flag: 'actual_flag', children: 'children' })
+			const updated = df.override({ actual_flag: 'x' })
+			expect(updated.config.actual_flag).toBe('x')
+			expect(updated).toBe(df)
+		})
+
+		it('should override children field', () => {
+			const df = dataframe([])
+			expect(df.config).toEqual({ actual_flag: 'actual_flag', children: 'children' })
+			const updated = df.override({ children: '_x' })
+			expect(updated.config.children).toBe('_x')
+			expect(updated).toBe(df)
+		})
+
+		it('should override multiple configurations', () => {
+			const df = dataframe([])
+			expect(df.config).toEqual({ actual_flag: 'actual_flag', children: 'children' })
+			const updated = df.override({ children: '_child', actual_flag: '_actual' })
+			expect(updated.config.children).toBe('_child')
+			expect(updated.config.actual_flag).toBe('_actual')
+			expect(updated).toBe(df)
+		})
+	})
 	describe('update', () => {
 		it('should throw error when input is not object', () => {
 			const df = dataframe([
@@ -57,7 +100,7 @@ describe('crud operations', () => {
 			])
 			const matcher = (row) => row.a === 2
 			const updated = df.where(matcher).update({ a: 9 })
-			expect(df.filter).toBeNull()
+			expect(df.config.filter).toBeNull()
 			expect(updated.data).toEqual([
 				{ a: 1, b: 2 },
 				{ a: 9, b: 3 },
@@ -72,6 +115,35 @@ describe('crud operations', () => {
 		})
 	})
 
+	describe('fillMissing', () => {
+		it('should fill missing values', () => {
+			const df = dataframe([{ a: 1, b: 2 }, { b: 3 }, { a: 4 }])
+			df.fillMissing({ a: null, b: null })
+			expect(df.data).toEqual([
+				{ a: 1, b: 2 },
+				{ a: null, b: 3 },
+				{ a: 4, b: null }
+			])
+		})
+
+		it('should fill missing values with a value', () => {
+			const df = dataframe([{ a: 1, b: 2 }, { b: 3 }, { a: 4 }])
+			df.fillMissing({ a: -1, b: 0 })
+			expect(df.data).toEqual([
+				{ a: 1, b: 2 },
+				{ a: -1, b: 3 },
+				{ a: 4, b: 0 }
+			])
+		})
+	})
+
+	describe('fillNull', () => {
+		it('should fill null values', () => {
+			const df = dataframe([{ a: 1, b: 2 }, { a: null, b: null }, { a: 4 }])
+			df.fillNull({ a: 0, b: 0 })
+			expect(df.data).toEqual([{ a: 1, b: 2 }, { a: 0, b: 0 }, { a: 4 }])
+		})
+	})
 	describe('delete', () => {
 		it('should delete all rows', () => {
 			const data = [

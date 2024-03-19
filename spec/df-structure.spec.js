@@ -54,20 +54,18 @@ describe('structure', () => {
 		})
 	})
 
-	describe('summarize', () => {
+	describe('rollup', () => {
 		it('should throw error if not grouping or summary columns are provided', () => {
 			const df = dataframe([
 				{ a: 1, b: 2 },
 				{ a: 2, b: 3 }
 			])
-			expect(() => df.summarize()).toThrow(
-				'Summary requires at least one group column or aggregation'
-			)
+			expect(() => df.rollup()).toThrow('Rollup requires at least one group column or aggregation')
 		})
 
 		it('should group by a column', () => {
 			const df = dataframe(fixture.simple)
-			const grouped = df.groupBy('country').summarize()
+			const grouped = df.groupBy('country').rollup()
 			expect(grouped.data).toEqual(fixture.list_by_country)
 			expect(grouped.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -81,7 +79,7 @@ describe('structure', () => {
 
 		it('should group by multiple columns', () => {
 			const df = dataframe(fixture.airports)
-			const grouped = df.groupBy('country', 'state').summarize()
+			const grouped = df.groupBy('country', 'state').rollup()
 			expect(grouped.data).toEqual(fixture.list_by_country_state)
 			expect(grouped.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -97,10 +95,10 @@ describe('structure', () => {
 			])
 		})
 
-		it('should summarize counts grouping by country', () => {
+		it('should rollup counts grouping by country', () => {
 			const df = dataframe(fixture.airports)
 			const operators = [{ name: 'count', ...getAggregator(['name'], counter) }]
-			const grouped = df.groupBy('country').summarize(operators)
+			const grouped = df.groupBy('country').rollup(operators)
 			expect(grouped.data).toEqual(fixture.count_by_country)
 			expect(grouped.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -108,10 +106,10 @@ describe('structure', () => {
 			])
 		})
 
-		it('should summarize counts grouping by country and state', () => {
+		it('should rollup counts grouping by country and state', () => {
 			const df = dataframe(fixture.airports)
 			const operators = [{ name: 'count', ...getAggregator(['name'], counter) }]
-			const grouped = df.groupBy('country', 'state').summarize(operators)
+			const grouped = df.groupBy('country', 'state').rollup(operators)
 			expect(grouped.data).toEqual(fixture.count_by_country_state)
 			expect(grouped.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -120,7 +118,7 @@ describe('structure', () => {
 			])
 		})
 
-		it('should summarize using custom aggregations', () => {
+		it('should rollup using custom aggregations', () => {
 			const df = dataframe(fixture.items)
 			const operators = [
 				{ name: 'avg_cost', mapper: (row) => row.price * row.quantity, reducer: mean },
@@ -135,7 +133,7 @@ describe('structure', () => {
 					reducer: (v) => quantile(v, 0.75)
 				}
 			]
-			const grouped = df.groupBy('category').summarize(operators)
+			const grouped = df.groupBy('category').rollup(operators)
 			expect(grouped.data).toEqual(fixture.cost_by_category)
 			expect(grouped.metadata).toEqual([
 				{ name: 'category', type: 'string' },

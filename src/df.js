@@ -2,7 +2,7 @@ import { pick, omit, equals } from 'ramda'
 import { deriveSortableColumn } from './infer'
 import { getType } from './utils'
 import { getAggregator } from './aggregators'
-import { includeAll } from './constants'
+import { includeAll, defaultConfig, pickAllowedConfig } from './constants'
 import {
 	combineMetadata,
 	deriveColumnMetadata,
@@ -26,15 +26,19 @@ export function dataframe(data, options = {}) {
 	const metadata = deriveColumnMetadata(data, options)
 	// create a column dictionary for easy access
 	const columns = deriveColumnIndex(metadata)
+	const config = { ...defaultConfig, ...pickAllowedConfig(options) }
 
 	const df = {
 		data,
 		metadata,
-		columns
+		columns,
+		config
 	}
 
+	df.override = (config) => overrideConfig(df, config)
 	df.where = (condition) => where(df, condition)
 	df.groupBy = (...by) => groupBy(df, ...by)
+	df.align = (...fields) => alignColumns(df, ...fields)
 
 	// returns new data frames
 	df.join = (other, query, opts) => join(df, other, query, opts)
@@ -45,16 +49,51 @@ export function dataframe(data, options = {}) {
 	df.union = (other) => union(df, other)
 	df.minus = (other) => minus(df, other)
 	df.intersect = (other) => intersect(df, other)
-	df.summarize = (fields) => summarize(df, fields)
+	df.rollup = (fields) => rollup(df, fields)
 	df.rename = (fields) => renameColumns(df, fields)
 	df.drop = (...fields) => dropColumns(df, ...fields)
-
 	// returns the same data frame with modifications
+
 	df.sortBy = (...fields) => sortBy(df, ...fields)
+	df.fillMissing = (value) => fill(df, value)
+	df.fillNull = (value) => fill(df, value, null)
 	df.update = (value) => updateRows(df, value)
 	df.delete = () => deleteRows(df)
 	df.select = (...fields) => select(df, ...fields)
 
+	return df
+}
+
+/**
+ * Exclude invalid fields from the input array
+ * @param {Array} fields - The fields to exclude
+ * @param {Object} columns - The columns to check against
+ * @returns {Array} The valid fields
+ */
+
+function excludeInvalidFields(fields, columns) {
+	return fields.filter((name) => columns[name] !== undefined)
+}
+/**
+ * Overrides the configuration of the DataFrame object.
+ * @param {import('./types').DataFrame} df - The DataFrame object to override.
+ * @param {Object} config                  - The configuration to override.
+ * @returns {import('./types').DataFrame}    The aligned DataFrame object.
+ */
+function overrideConfig(df, config = {}) {
+	df.config = { ...df.config, ...pickAllowedConfig(config) }
+	return df
+}
+
+/**
+ * Aligns the columns of the DataFrame using the provided fields.
+ *
+ * @param {import('./types').DataFrame} df - The DataFrame object to align.
+ * @param {...string} fields               - The fields to align.
+ * @returns {import('./types').DataFrame}    The aligned DataFrame object.
+ */
+function alignColumns(df, ...fields) {
+	df.config.align = excludeInvalidFields(fields, df.columns)
 	return df
 }
 
@@ -67,18 +106,18 @@ export function dataframe(data, options = {}) {
  * @returns {import('./types').DataFrame}    The DataFrame object.
  */
 function where(df, condition) {
-	df.filter = condition
+	df.config.filter = condition
 	return df
 }
 
 /**
  * Groups the DataFrame by the specified columns.
  * @param {import('./types').DataFrame} df - The DataFrame object to group.
- * @param {...string} columns              - The columns to group by.
+ * @param {...string} fields              - The columns to group by.
  * @returns {import('./types').DataFrame} The grouped DataFrame object.
  */
-function groupBy(df, ...by) {
-	df.groups = by
+function groupBy(df, ...fields) {
+	df.config.group_by = excludeInvalidFields(fields, df.columns)
 	return df
 }
 
@@ -235,17 +274,17 @@ function intersect(df, other) {
  *
  * @returns {import('./types').DataFrame}  The summarized DataFrame object.
  */
-function summarize(df, columns = []) {
+function rollup(df, columns = []) {
 	if (columns.length === 0) {
-		if (!Array.isArray(df.groups) || df.groups.length === 0) {
-			throw new Error('Summary requires at least one group column or aggregation')
+		if (!Array.isArray(df.config.group_by) || df.config.group_by.length === 0) {
+			throw new Error('Rollup requires at least one group column or aggregation')
 		}
-		const metadata = df.metadata.filter((col) => !df.groups.includes(col.name))
+		const metadata = df.metadata.filter((col) => !df.config.group_by.includes(col.name))
 		const keys = metadata.map((col) => col.name)
 		columns = [{ name: 'children', ...getAggregator(keys), metadata }]
 	}
 
-	const keys = pick(df.groups)
+	const keys = pick(df.config.group_by)
 	const grouped = df.data.reduce((acc, row) => {
 		const initialValue = columns.reduce((res, { name }) => ({ ...res, [name]: [] }), {})
 		const key = JSON.stringify(keys(row))
@@ -259,7 +298,7 @@ function summarize(df, columns = []) {
 		...columns.reduce((acc, { name, reducer }) => ({ ...acc, [name]: reducer(row[name]) }), {})
 	}))
 
-	const metadata = df.metadata.filter((col) => df.groups.includes(col.name))
+	const metadata = df.metadata.filter((col) => df.config.group_by.includes(col.name))
 
 	columns.forEach((col) => {
 		const type = getType(data[0][col.name])
@@ -273,6 +312,8 @@ function summarize(df, columns = []) {
 			metadata.push({ name: col.name, type })
 		}
 	})
+
+	df.config.group_by = []
 	return dataframe(data, { metadata })
 }
 
@@ -358,13 +399,13 @@ function sortBy(df, ...columns) {
 function updateRows(df, value) {
 	if (typeof value !== 'object') throw new Error('value must be an object')
 
-	const filter = df.filter || includeAll
+	const filter = df.config.filter || includeAll
 	df.data.forEach((row) => {
 		if (filter(row)) {
 			Object.entries(value).forEach(([k, v]) => (row[k] = v))
 		}
 	})
-	df.filter = null
+	df.config.filter = null
 	df.metadata = combineMetadata(df.metadata, deriveColumnMetadata([value]), true)
 	df.columns = deriveColumnIndex(df.metadata)
 	return df
@@ -380,13 +421,32 @@ function updateRows(df, value) {
  * @returns {import('./types').DataFrame} The DataFrame object with the rows deleted.
  */
 function deleteRows(df) {
-	const filter = df.filter || includeAll
+	const filter = df.config.filter || includeAll
 
 	for (let i = df.data.length - 1; i >= 0; i--) {
 		if (filter(df.data[i])) df.data.splice(i, 1)
 	}
 
-	df.filter = null
+	df.config.filter = null
+	return df
+}
+
+/**
+ * Fills the missing values in the DataFrame with the specified values.
+ * - Modifies the DataFrame in place.
+ *
+ * @param {import('./types').DataFrame} df - The DataFrame object to fill missing values in.
+ * @param {Object} values                  - The values to fill the missing values with.
+ * @param {any} [original]                 - The original value to be replaced. Defaults to undefined
+ *
+ * @returns {import('./types').DataFrame} The DataFrame object with the missing values filled.
+ */
+function fill(df, values, original = undefined) {
+	df.data.forEach((row) => {
+		Object.entries(values).forEach(([k, v]) => {
+			if (row[k] === original) row[k] = v
+		})
+	})
 	return df
 }
 
@@ -403,8 +463,8 @@ function select(df, ...columns) {
 	if (Array.isArray(columns) && columns.length > 0) {
 		result = df.data.map((row) => pick(columns, row))
 	}
-	if (df.filter) result = result.filter(df.filter)
+	if (df.config.filter) result = result.filter(df.config.filter)
 
-	df.filter = null
+	df.config.filter = null
 	return result
 }

@@ -1,4 +1,11 @@
-import { identity } from 'ramda'
+import { identity, pick } from 'ramda'
+
+export const pickAllowedConfig = pick(['children', 'actual_flag'])
+
+export const defaultConfig = {
+	children: 'children',
+	actual_flag: 'actual_flag'
+}
 
 export const defaultPathOptions = {
 	path: null,
