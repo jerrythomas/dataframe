@@ -44,7 +44,8 @@ export function dataframe(data, options = {}) {
 
 	// returns new data frames
 	df.join = (other, query, opts) => join(df, other, query, opts)
-	df.outerJoin = (other, query, opts) => joinDataFrame(df, other, query, opts)
+	df.leftJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'left' })
+	df.rightJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'right' })
 	df.innerJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'inner' })
 	df.fullJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'full' })
 	df.nestedJoin = (other, query, opts) => nestedJoin(df, other, query, opts)
@@ -142,30 +143,33 @@ function groupBy(df, ...fields) {
  * @param {import('./types'.JoinOptions)} opts - The join options.
  */
 function join(df, other, query, options = {}) {
-	const { type } = options
+	let type = ['inner', 'left', 'right', 'full', 'nested'].includes(options.type)
+		? options.type
+		: 'inner'
 
-	switch (type) {
-		case 'outer':
-			return joinDataFrame(df, other, query, options)
-		case 'full':
-			return joinDataFrame(df, other, query, options)
-		case 'nested':
-			return nestedJoin(df, other, query, options)
-		default:
-			return joinDataFrame(df, other, query, { ...options, type: 'inner' })
-	}
+	if (type === 'nested') return nestedJoin(df, other, query, options)
+	return joinDataFrame(df, other, query, { ...options, type })
 }
 
 /**
- * Performs a left join operation on two arrays based on the provided query condition. This will return all records from
- * the first array (a) and the matched records from the second array (b). If there is no match, the result is null (if inner is true)
- * or the record from the first array (if inner is false).
+ * Performs a join operation on two arrays based on the provided query condition.
  *
- * @param {import('./types').DataFrame} df - The first array to join, considered as the "left" side of the join.
- * @param {import('./types').DataFrame} other - The second array to join, considered as the "right" side of the join.
- * @param {Function} query - A callback function that defines the join condition. Should return true for items to be joined, false otherwise.
- * @param {Object} [opts] - Optional parameters to control the join behavior.
- * @param {boolean} [opts.inner=true] - Determines if the join is an inner left join (false will include all of the "left" side even with no match).
+ * The join operation results in the following three results
+ *
+ * a) When a row is matched with one or more row in the second data set, attributes from both rows are combined. Result number of rows is equal to the number of matches.
+ * b) When there is no match for a row in the second data set, only attributes from the first data set are included.
+ * c) When there is no match for a row in the first data set, only attributes from the second data set are included.
+ *
+ * Based on the type of join, the result includes one or more of the above cases.
+ *
+ * - inner: Only includes case (a)
+ * - outer: Includes case (a) & (b)
+ * - full: Includes case (a), (b) & (c)
+ *
+ * @param {import('./types').DataFrame} df       - The first array to join, considered as the "left" side of the join.
+ * @param {import('./types').DataFrame} other    - The second array to join, considered as the "right" side of the join.
+ * @param {Function} query                       - A callback function that defines the join condition. Should return true for items to be joined, false otherwise.
+ * @param {import('./types').JoinOptions} [opts] - Optional parameters to control the join behavior.
  * @returns {import('./types').DataFrame} - The result of the left join operation. If inner is true, entries from the first array without a match are excluded.
  */
 function joinDataFrame(df, other, query, opts = {}) {
@@ -183,14 +187,14 @@ function joinDataFrame(df, other, query, opts = {}) {
 		let matches = other.data
 			.filter((y) => query(x, y))
 			.map((y) => ({ ...rightRenameRow(y), ...leftRenameRow(x) }))
-		if (matches.length === 0 && type !== 'inner') {
+		if (matches.length === 0 && ['left', 'full'].includes(type)) {
 			matches.push(leftRenameRow(x))
 		}
 		combinedData.push(...matches)
 	})
 
 	// Process rows from the right DataFrame for full outer join
-	if (type === 'full') {
+	if (['full', 'right'].includes(type)) {
 		other.data.forEach((y) => {
 			if (!df.data.some((x) => query(x, y))) {
 				combinedData.push(rightRenameRow(y))
