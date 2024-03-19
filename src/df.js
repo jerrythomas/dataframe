@@ -35,16 +35,18 @@ export function dataframe(data, options = {}) {
 		config
 	}
 
+	// configure behaviour
 	df.override = (config) => overrideConfig(df, config)
 	df.where = (condition) => where(df, condition)
 	df.groupBy = (...by) => groupBy(df, ...by)
 	df.align = (...fields) => alignColumns(df, ...fields)
+	df.using = (template) => usingTemplate(df, template)
 
 	// returns new data frames
 	df.join = (other, query, opts) => join(df, other, query, opts)
-	df.outerJoin = (other, query, opts) => outerJoin(df, other, query, opts)
-	df.innerJoin = (other, query, opts) => outerJoin(df, other, query, { ...opts, type: 'inner' })
-	df.fullJoin = (other, query, opts) => fullJoin(df, other, query, opts)
+	df.outerJoin = (other, query, opts) => joinDataFrame(df, other, query, opts)
+	df.innerJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'inner' })
+	df.fullJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'full' })
 	df.nestedJoin = (other, query, opts) => nestedJoin(df, other, query, opts)
 	df.union = (other) => union(df, other)
 	df.minus = (other) => minus(df, other)
@@ -52,8 +54,8 @@ export function dataframe(data, options = {}) {
 	df.rollup = (fields) => rollup(df, fields)
 	df.rename = (fields) => renameColumns(df, fields)
 	df.drop = (...fields) => dropColumns(df, ...fields)
-	// returns the same data frame with modifications
 
+	// returns the same data frame with modifications
 	df.sortBy = (...fields) => sortBy(df, ...fields)
 	df.fillMissing = (value) => fill(df, value)
 	df.fillNull = (value) => fill(df, value, null)
@@ -70,10 +72,10 @@ export function dataframe(data, options = {}) {
  * @param {Object} columns - The columns to check against
  * @returns {Array} The valid fields
  */
-
 function excludeInvalidFields(fields, columns) {
 	return fields.filter((name) => columns[name] !== undefined)
 }
+
 /**
  * Overrides the configuration of the DataFrame object.
  * @param {import('./types').DataFrame} df - The DataFrame object to override.
@@ -94,6 +96,17 @@ function overrideConfig(df, config = {}) {
  */
 function alignColumns(df, ...fields) {
 	df.config.align = excludeInvalidFields(fields, df.columns)
+	return df
+}
+
+/**
+ * Sets the template for adding empty rows in the DataFrame.
+ * @param {import('./types').DataFrame} df - The DataFrame object to set the template for.
+ * @param {Object} template                - The template to use for adding empty rows.
+ * @returns {import('./types').DataFrame}    The DataFrame object.
+ */
+function usingTemplate(df, template) {
+	df.config.template = template
 	return df
 }
 
@@ -133,13 +146,13 @@ function join(df, other, query, options = {}) {
 
 	switch (type) {
 		case 'outer':
-			return outerJoin(df, other, query, options)
+			return joinDataFrame(df, other, query, options)
 		case 'full':
-			return fullJoin(df, other, query, options)
+			return joinDataFrame(df, other, query, options)
 		case 'nested':
 			return nestedJoin(df, other, query, options)
 		default:
-			return outerJoin(df, other, query, { ...options, type: 'inner' })
+			return joinDataFrame(df, other, query, { ...options, type: 'inner' })
 	}
 }
 
@@ -155,57 +168,42 @@ function join(df, other, query, options = {}) {
  * @param {boolean} [opts.inner=true] - Determines if the join is an inner left join (false will include all of the "left" side even with no match).
  * @returns {import('./types').DataFrame} - The result of the left join operation. If inner is true, entries from the first array without a match are excluded.
  */
-function outerJoin(df, other, query, opts = {}) {
-	const { type = 'outer', left = {}, right = {} } = opts
+function joinDataFrame(df, other, query, opts = {}) {
+	const { type = 'outer' } = opts
 
-	const renameX = getAttributeRenamer(left)
-	const renameY = getAttributeRenamer(right)
-	const renameRowForX = getDataRenamer(renameX, Object.keys(df.columns))
-	const renameRowForY = getDataRenamer(renameY, Object.keys(other.columns))
+	const leftRename = getAttributeRenamer(opts.left || {})
+	const rightRename = getAttributeRenamer(opts.right || {})
+	const leftRenameRow = getDataRenamer(leftRename, Object.keys(df.columns))
+	const rightRenameRow = getDataRenamer(rightRename, Object.keys(other.columns))
 
-	const combined = df.data
-		.map((x) => {
-			const matched = other.data
-				.filter((y) => query(x, y))
-				.map((y) => ({ ...renameRowForY(y), ...renameRowForX(x) }))
-			return matched.length ? matched : type === 'inner' ? [] : [renameRowForX(x)]
+	let combinedData = []
+
+	// Process rows from the left DataFrame
+	df.data.forEach((x) => {
+		let matches = other.data
+			.filter((y) => query(x, y))
+			.map((y) => ({ ...rightRenameRow(y), ...leftRenameRow(x) }))
+		if (matches.length === 0 && type !== 'inner') {
+			matches.push(leftRenameRow(x))
+		}
+		combinedData.push(...matches)
+	})
+
+	// Process rows from the right DataFrame for full outer join
+	if (type === 'full') {
+		other.data.forEach((y) => {
+			if (!df.data.some((x) => query(x, y))) {
+				combinedData.push(rightRenameRow(y))
+			}
 		})
-		.flat()
+	}
 
-	const metadata = {}
+	const leftMetadata = df.metadata.map((x) => ({ ...x, name: leftRename(x.name) }))
+	const rightMetadata = other.metadata
+		.map((y) => ({ ...y, name: rightRename(y.name) }))
+		.filter((y) => !leftMetadata.some((x) => x.name === y.name))
 
-	metadata.left = df.metadata.map((x) => ({ ...x, name: renameX(x.name) }))
-	metadata.columns = metadata.left.map((x) => x.name)
-	metadata.right = other.metadata
-		.map((y) => ({ ...y, name: renameY(y.name) }))
-		.filter((y) => !metadata.columns.includes(y.name))
-
-	return dataframe(combined, { metadata: combineMetadata(metadata.left, metadata.right) })
-}
-
-/**
- * Performs a full join operation on two arrays based on the provided query condition.
- *
- * @param {import('./types').DataFrame} first  - The first array to join.
- * @param {import('./types').DataFrame} second - The second array to join.
- * @param {Function} query                     - A callback function that defines the join condition.
- * @param {import('./types').JoinOptions} how  - Parameters to control the join behavior and rename unmatched elements in the second array.
- *
- * @returns {import('./types').DataFrame} - The result of the full join operation.
- */
-export function fullJoin(first, second, query, how = {}) {
-	const renameY = getAttributeRenamer(how.right || {})
-	const renameRowForY = getDataRenamer(renameY, Object.keys(second.columns))
-
-	const res1 = outerJoin(first, second, query, omit(['type'], how))
-	const res2 = second.data
-		.map((y) => {
-			const res = first.data.filter((x) => query(x, y))
-			return res.length === 0 ? [renameRowForY(y)] : []
-		})
-		.flat()
-
-	return dataframe([...res1.data, ...res2], { metadata: res1.metadata })
+	return dataframe(combinedData, { metadata: leftMetadata.concat(rightMetadata) })
 }
 
 /**

@@ -19,6 +19,12 @@ describe('crud operations', () => {
 			expect(updated).toBe(df)
 		})
 
+		it('should set the template', () => {
+			const df = dataframe(data)
+			const updated = df.using({ a: 1 })
+			expect(updated.config.template).toEqual({ a: 1 })
+			expect(updated).toBe(df)
+		})
 		it('should override actual_flag', () => {
 			const df = dataframe([])
 
