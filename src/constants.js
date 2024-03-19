@@ -4,7 +4,9 @@ export const pickAllowedConfig = pick(['children', 'actual_flag'])
 
 export const defaultConfig = {
 	children: 'children',
-	actual_flag: 'actual_flag'
+	actual_flag: 'actual_flag',
+	group_by: [],
+	align: []
 }
 
 export const defaultPathOptions = {

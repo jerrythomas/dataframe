@@ -52,9 +52,9 @@ export function dataframe(data, options = {}) {
 	df.union = (other) => union(df, other)
 	df.minus = (other) => minus(df, other)
 	df.intersect = (other) => intersect(df, other)
-	df.rollup = (fields) => rollup(df, fields)
 	df.rename = (fields) => renameColumns(df, fields)
 	df.drop = (...fields) => dropColumns(df, ...fields)
+	df.rollup = (fields) => rollup(df, fields)
 
 	// returns the same data frame with modifications
 	df.sortBy = (...fields) => sortBy(df, ...fields)
@@ -270,56 +270,6 @@ function intersect(df, other) {
 }
 
 /**
- * Summarizes the DataFrame by the specified columns.
- * @param {import('./types').DataFrame} df - The DataFrame object to summarize.
- * @param {Array} columns                  - The columns to summarize.
- *
- * @returns {import('./types').DataFrame}  The summarized DataFrame object.
- */
-function rollup(df, columns = []) {
-	if (columns.length === 0) {
-		if (!Array.isArray(df.config.group_by) || df.config.group_by.length === 0) {
-			throw new Error('Rollup requires at least one group column or aggregation')
-		}
-		const metadata = df.metadata.filter((col) => !df.config.group_by.includes(col.name))
-		const keys = metadata.map((col) => col.name)
-		columns = [{ name: 'children', ...getAggregator(keys), metadata }]
-	}
-
-	const keys = pick(df.config.group_by)
-	const grouped = df.data.reduce((acc, row) => {
-		const initialValue = columns.reduce((res, { name }) => ({ ...res, [name]: [] }), {})
-		const key = JSON.stringify(keys(row))
-		if (!acc[key]) acc[key] = { ...keys(row), ...initialValue }
-		columns.forEach(({ name, mapper }) => acc[key][name].push(mapper(row)))
-		return acc
-	}, {})
-
-	const data = Object.values(grouped).map((row) => ({
-		...row,
-		...columns.reduce((acc, { name, reducer }) => ({ ...acc, [name]: reducer(row[name]) }), {})
-	}))
-
-	const metadata = df.metadata.filter((col) => df.config.group_by.includes(col.name))
-
-	columns.forEach((col) => {
-		const type = getType(data[0][col.name])
-		if (type === 'array') {
-			metadata.push({
-				name: col.name,
-				type,
-				metadata: deriveColumnMetadata(data[0][col.name], pick(['metadata'], col))
-			})
-		} else {
-			metadata.push({ name: col.name, type })
-		}
-	})
-
-	df.config.group_by = []
-	return dataframe(data, { metadata })
-}
-
-/**
  * Renames the columns in the DataFrame.
  *
  * @param {import('./types').DataFrame} df - The DataFrame object to rename columns in.
@@ -364,6 +314,56 @@ function dropColumns(df, ...columns) {
 	const metadata = df.metadata.filter((col) => !columns.includes(col.name))
 	const data = df.data.map((row) => omit(columns, row))
 
+	return dataframe(data, { metadata })
+}
+
+/**
+ * Summarizes the DataFrame by the specified columns.
+ * @param {import('./types').DataFrame} df - The DataFrame object to summarize.
+ * @param {Array} columns                  - The columns to summarize.
+ *
+ * @returns {import('./types').DataFrame}  The summarized DataFrame object.
+ */
+function rollup(df, columns = []) {
+	if (columns.length === 0) {
+		if (!Array.isArray(df.config.group_by) || df.config.group_by.length === 0) {
+			throw new Error('Rollup requires at least one group column or aggregation')
+		}
+		const metadata = df.metadata.filter((col) => !df.config.group_by.includes(col.name))
+		const keys = metadata.map((col) => col.name)
+		columns = [{ name: df.config.children, ...getAggregator(keys), metadata }]
+	}
+
+	const keys = pick(df.config.group_by)
+	const grouped = df.data.reduce((acc, row) => {
+		const initialValue = columns.reduce((res, { name }) => ({ ...res, [name]: [] }), {})
+		const key = JSON.stringify(keys(row))
+		if (!acc[key]) acc[key] = { ...keys(row), ...initialValue }
+		columns.forEach(({ name, mapper }) => acc[key][name].push(mapper(row)))
+		return acc
+	}, {})
+
+	const data = Object.values(grouped).map((row) => ({
+		...row,
+		...columns.reduce((acc, { name, reducer }) => ({ ...acc, [name]: reducer(row[name]) }), {})
+	}))
+
+	const metadata = df.metadata.filter((col) => df.config.group_by.includes(col.name))
+
+	columns.forEach((col) => {
+		const type = getType(data[0][col.name])
+		if (type === 'array') {
+			metadata.push({
+				name: col.name,
+				type,
+				metadata: deriveColumnMetadata(data[0][col.name], pick(['metadata'], col))
+			})
+		} else {
+			metadata.push({ name: col.name, type })
+		}
+	})
+
+	df.config.group_by = []
 	return dataframe(data, { metadata })
 }
 

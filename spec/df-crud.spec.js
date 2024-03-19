@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { dataframe } from '../src/df'
+import { defaultConfig } from '../src/constants'
 
 describe('crud operations', () => {
 	describe('configurations', () => {
@@ -28,7 +29,7 @@ describe('crud operations', () => {
 		it('should override actual_flag', () => {
 			const df = dataframe([])
 
-			expect(df.config).toEqual({ actual_flag: 'actual_flag', children: 'children' })
+			expect(df.config).toEqual(defaultConfig)
 			const updated = df.override({ actual_flag: 'x' })
 			expect(updated.config.actual_flag).toBe('x')
 			expect(updated).toBe(df)
@@ -36,7 +37,7 @@ describe('crud operations', () => {
 
 		it('should override children field', () => {
 			const df = dataframe([])
-			expect(df.config).toEqual({ actual_flag: 'actual_flag', children: 'children' })
+			expect(df.config).toEqual(defaultConfig)
 			const updated = df.override({ children: '_x' })
 			expect(updated.config.children).toBe('_x')
 			expect(updated).toBe(df)
@@ -44,7 +45,7 @@ describe('crud operations', () => {
 
 		it('should override multiple configurations', () => {
 			const df = dataframe([])
-			expect(df.config).toEqual({ actual_flag: 'actual_flag', children: 'children' })
+			expect(df.config).toEqual(defaultConfig)
 			const updated = df.override({ children: '_child', actual_flag: '_actual' })
 			expect(updated.config.children).toBe('_child')
 			expect(updated.config.actual_flag).toBe('_actual')
