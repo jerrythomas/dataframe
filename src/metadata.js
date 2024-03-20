@@ -1,4 +1,4 @@
-import { identity } from 'ramda'
+import { identity, pick } from 'ramda'
 import { defaultPathOptions } from './constants'
 import { getDeepScanSample } from './infer'
 import { getType } from './utils'
@@ -169,4 +169,30 @@ export function getDataRenamer(keyNamer, keys) {
 	if (keyNamer === identity) return identity
 	const lookup = keys.reduce((acc, key) => ({ ...acc, [key]: keyNamer(key) }), {})
 	return getRenamerUsingLookup(lookup)
+}
+
+/**
+ * Creates metadata for aggregated data based on original metadata and group by keys.
+ *
+ * @param {Array} data - The aggregated data array.
+ * @param {Array} oldMetadata - Original metadata.
+ * @param {Array} groupByKeys - The keys used for grouping.
+ * @param {Array} summaries - The summaries to include in the metadata.
+ * @returns {Array} An array of updated metadata objects.
+ */
+export function buildMetadata(data, oldMetadata, groupByKeys, summaries) {
+	const metadata = oldMetadata.filter((col) => groupByKeys.includes(col.name))
+	summaries.forEach(({ name }) => {
+		const type = getType(data[0][name])
+		if (type === 'array') {
+			metadata.push({
+				name: name,
+				type: type,
+				metadata: deriveColumnMetadata(data[0][name], pick(['metadata']))
+			})
+		} else {
+			metadata.push({ name, type })
+		}
+	})
+	return metadata
 }

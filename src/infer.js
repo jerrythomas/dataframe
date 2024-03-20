@@ -8,26 +8,85 @@ import { getType } from './utils'
 import { deriveColumnProperties } from './metadata'
 
 /**
+ * Derives the sorting information for a column based on the type of the input value.
  *
- * @param  {import('./types.js').SortableColumn} cols
- * @returns {Array<{import('./types.js').ColumnSorter}}>}
+ * @param {import('./types').SortableColumn} value - The value that determines the sorting behavior of the column.
+ * @returns {import('./types').ColumnSorter}         An object containing the 'name' of the column and a 'sorter' function.
+ * @throws {Error} Throws an error if the value type is not supported or the value format is invalid.
  */
 export function deriveSortableColumn(value) {
 	const type = getType(value)
 
-	switch (type) {
-		case 'array':
-			if (value.length !== 2) throw new Error('Array should be a pair of name and boolean values')
-			return { name: value[0], sorter: value[1] ? ascending : descending }
-		case 'object':
-			if (!value.name) throw new Error('The property "name" is required')
-			if (value.sorter !== undefined && typeof value.sorter !== 'function')
-				throw new Error('Invalid: sorter should be a function')
-			return { name: value.name, sorter: value.sorter ?? ascending }
-		case 'string':
-			return { name: value, sorter: ascending }
-		default:
-			throw new Error(`Invalid value type: ${type}`)
+	const configGenerators = {
+		array: arrayConfigGenerator,
+		object: objectConfigGenerator,
+		string: stringConfigGenerator
+	}
+
+	const configGenerator = configGenerators[type]
+	if (!configGenerator) {
+		throw new Error(`Invalid value type: ${type}`)
+	}
+
+	return configGenerator(value)
+}
+
+/**
+ * Generates a sorting configuration for an array value.
+ *
+ * @param {Array} value - The array from which to derive a sorting configuration.
+ * @returns {Object} A validated sorting configuration based on the array.
+ */
+function arrayConfigGenerator(value) {
+	arrayValidator(value)
+	return { name: value[0], sorter: value[1] ? ascending : descending }
+}
+
+/**
+ * Generates a sorting configuration for an object value.
+ *
+ * @param {Object} value - The object from which to derive a sorting configuration.
+ * @returns {Object} A validated sorting configuration based on the object.
+ */
+function objectConfigGenerator(value) {
+	objectValidator(value)
+	return { name: value.name, sorter: value.sorter ?? ascending }
+}
+
+/**
+ * Generates a sorting configuration for a string value.
+ *
+ * @param {string} value - The string from which to derive a sorting configuration.
+ * @returns {Object} A sorting configuration using the string name and ascending sort function.
+ */
+function stringConfigGenerator(value) {
+	return { name: value, sorter: ascending }
+}
+
+/**
+ * Validates an array to ensure it can be used to create a sorting configuration.
+ *
+ * @param {Array} value - The array to validate.
+ * @throws {Error} Throws an error if the array does not correspond to a [string, boolean] pair.
+ */
+function arrayValidator(value) {
+	if (value.length !== 2 || typeof value[0] !== 'string' || typeof value[1] !== 'boolean') {
+		throw new Error('Array should be a pair of [string, boolean]')
+	}
+}
+
+/**
+ * Validates an object to ensure it has the necessary properties for creating a sorting configuration.
+ *
+ * @param {Object} value - The object to validate.
+ * @throws {Error} Throws an error if the object does not have a 'name' property or has an invalid 'sorter'.
+ */
+function objectValidator(value) {
+	if (typeof value.name !== 'string') {
+		throw new Error('The property "name" is required and must be a string')
+	}
+	if (value.sorter !== undefined && typeof value.sorter !== 'function') {
+		throw new Error('Sorter should be a function')
 	}
 }
 

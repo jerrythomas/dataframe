@@ -96,7 +96,7 @@ describe('infer', () => {
 		})
 
 		it('should throw error for invalid array input', () => {
-			const message = 'Array should be a pair of name and boolean values'
+			const message = 'Array should be a pair of [string, boolean]'
 			expect(() => deriveSortableColumn([])).toThrow(message)
 			expect(() => deriveSortableColumn(['name'])).toThrow(message)
 			expect(() => deriveSortableColumn(['name', true, false])).toThrow(message)
@@ -105,7 +105,7 @@ describe('infer', () => {
 		it('should throw error for invalid object input', () => {
 			expect(() => deriveSortableColumn({})).toThrow('The property "name" is required')
 			expect(() => deriveSortableColumn({ name: 'a', sorter: false })).toThrow(
-				'Invalid: sorter should be a function'
+				'Sorter should be a function'
 			)
 		})
 	})

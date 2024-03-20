@@ -1,4 +1,3 @@
-import { omit, pick, mergeLeft, map, difference, uniq, pipe } from 'ramda'
 import { deriveAggregators } from './infer'
 
 /**
@@ -60,22 +59,4 @@ export function summarize(data, ...cols) {
 		.reduce((acc, curr) => ({ ...acc, ...curr }), {})
 
 	return result
-}
-
-/**
- * Creates a generator that produces missing rows in a dataset based on specified columns.
- * The function determines all unique combinations of the specified columns in config.align_by
- * and returns a generator function to create the missing combinations, potentially with default
- * values for other columns.
- * @param {Array<Object>} data - The array of objects representing the dataset.
- * @param {Object} config - The configuration object.
- *
- * @returns {Function} A generator function that when called, produces the missing rows.
- */
-export function getAlignGenerator(data, config) {
-	const { align_by, group_by, actual_flag } = config
-	const template = { ...omit([...align_by, ...group_by], config.template), [actual_flag]: 0 }
-	const subset = pipe(map(pick(align_by)), uniq)(data)
-
-	return pipe(map(pick(align_by)), uniq, difference(subset), map(mergeLeft(template)))
 }
