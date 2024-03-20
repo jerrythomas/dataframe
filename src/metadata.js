@@ -174,10 +174,10 @@ export function getDataRenamer(keyNamer, keys) {
 /**
  * Creates metadata for aggregated data based on original metadata and group by keys.
  *
- * @param {Array} data - The aggregated data array.
+ * @param {Array} data        - The aggregated data array.
  * @param {Array} oldMetadata - Original metadata.
  * @param {Array} groupByKeys - The keys used for grouping.
- * @param {Array} summaries - The summaries to include in the metadata.
+ * @param {Array} summaries   - The summaries to include in the metadata.
  * @returns {Array} An array of updated metadata objects.
  */
 export function buildMetadata(data, oldMetadata, groupByKeys, summaries) {
@@ -185,11 +185,7 @@ export function buildMetadata(data, oldMetadata, groupByKeys, summaries) {
 	summaries.forEach(({ name }) => {
 		const type = getType(data[0][name])
 		if (type === 'array') {
-			metadata.push({
-				name: name,
-				type: type,
-				metadata: deriveColumnMetadata(data[0][name], pick(['metadata']))
-			})
+			metadata.push({ name, type, metadata: deriveColumnMetadata(data[0][name]) })
 		} else {
 			metadata.push({ name, type })
 		}
