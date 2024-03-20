@@ -5,7 +5,7 @@ import { counter, getAggregator } from '../src/aggregators'
 import { mean, quantile } from 'd3-array'
 import groupData from './fixtures/rollup'
 
-describe('structure', () => {
+describe('dataframe -> alter structure', () => {
 	describe('rename', () => {
 		const data = [{ country: 'USA', name: 'Bob' }]
 
@@ -34,7 +34,6 @@ describe('structure', () => {
 			expect(renamed.data).not.toBe(df.data)
 		})
 	})
-
 	describe('drop', () => {
 		it('should drop column', () => {
 			const df = dataframe([{ a: 1, b: 2 }])
@@ -54,7 +53,6 @@ describe('structure', () => {
 			expect(dropped.data).not.toBe(df.data)
 		})
 	})
-
 	describe('rollup', () => {
 		it('should throw error if group_by is not specified', () => {
 			const df = dataframe([

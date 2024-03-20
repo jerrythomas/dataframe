@@ -1,52 +1,38 @@
 import { describe, expect, it } from 'vitest'
 import { tweenable } from '../src/transform'
-import fs from 'fs'
+import fixture from './fixtures/nba'
 
 describe('Animation transform', () => {
-	const input = JSON.parse(fs.readFileSync('./spec/fixtures/nba/data.json'))
-	const groups = {
-		team: JSON.parse(fs.readFileSync('./spec/fixtures/nba/team-score.json')),
-		group: JSON.parse(fs.readFileSync('./spec/fixtures/nba/group-score.json')),
-		'group-team': JSON.parse(fs.readFileSync('./spec/fixtures/nba/group-team-score.json')),
-		'group-team-pct': JSON.parse(fs.readFileSync('./spec/fixtures/nba/group-team-pct.json'))
-	}
-	const nested = {
-		'date-team-score': JSON.parse(fs.readFileSync('./spec/fixtures/nba/date-team-score.json')),
-		'date-group-team-score': JSON.parse(
-			fs.readFileSync('./spec/fixtures/nba/date-group-team-score.json')
-		)
-	}
-
 	it('should ignore attributes not in data', () => {
-		let result = tweenable().transform(input)
-		expect(result).toEqual(input)
-		result = tweenable().group(['name']).transform(input)
-		expect(result).toEqual(input)
-		result = tweenable().key('name').transform(input)
-		expect(result).toEqual(input)
-		result = tweenable().key('name').sort().group(['country']).transform(input)
-		expect(result).toEqual(input)
+		let result = tweenable().transform(fixture.nba)
+		expect(result).toEqual(fixture.nba)
+		result = tweenable().group(['name']).transform(fixture.nba)
+		expect(result).toEqual(fixture.nba)
+		result = tweenable().key('name').transform(fixture.nba)
+		expect(result).toEqual(fixture.nba)
+		result = tweenable().key('name').sort().group(['country']).transform(fixture.nba)
+		expect(result).toEqual(fixture.nba)
 	})
 
 	it('should create flat groups', () => {
-		let result = tweenable().rollup('score').group(['team']).transform(input)
-		expect(result).toEqual(groups.team)
+		let result = tweenable().rollup('score').group(['team']).transform(fixture.nba)
+		expect(result).toEqual(fixture.team_score)
 
-		result = tweenable().rollup('score').group(['group']).transform(input)
-		expect(result).toEqual(groups.group)
+		result = tweenable().rollup('score').group(['group']).transform(fixture.nba)
+		expect(result).toEqual(fixture.group_score)
 
-		result = tweenable().rollup('score').group(['group', 'team']).transform(input)
-		expect(result).toEqual(groups['group-team'])
+		result = tweenable().rollup('score').group(['group', 'team']).transform(fixture.nba)
+		expect(result).toEqual(fixture.group_team_score)
 
-		result = tweenable().rollup('pct').group(['group', 'team']).transform(input)
-		expect(result).toEqual(groups['group-team-pct'])
+		result = tweenable().rollup('pct').group(['group', 'team']).transform(fixture.nba)
+		expect(result).toEqual(fixture.group_team_pct)
 	})
 
 	it('should create nested arrays', () => {
-		let result = tweenable().rollup('score').group(['team']).key('date').transform(input)
-		expect(result).toEqual(nested['date-team-score'])
+		let result = tweenable().rollup('score').group(['team']).key('date').transform(fixture.nba)
+		expect(result).toEqual(fixture.date_team_score)
 
-		result = tweenable().rollup('score').group(['group', 'team']).key('date').transform(input)
-		expect(result).toEqual(nested['date-group-team-score'])
+		result = tweenable().rollup('score').group(['group', 'team']).key('date').transform(fixture.nba)
+		expect(result).toEqual(fixture.date_group_team_score)
 	})
 })

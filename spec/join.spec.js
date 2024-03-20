@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { dataframe } from '../src/dataframe'
 import joindata from './fixtures/join'
 
-describe('join', () => {
+describe('dataframe -> join operations', () => {
 	const child = dataframe([...joindata.ships])
 	const parent = dataframe([...joindata.groups])
 	const matcher = (child, parent) => child.group_id === parent.id
 
-	describe('inner', () => {
+	describe('inner join', () => {
 		it('should perform inner join', () => {
 			let result = child.join(parent, matcher)
 			expect(result.data).toEqual(joindata.inner.no_rename)
@@ -75,7 +75,7 @@ describe('join', () => {
 		})
 	})
 
-	describe('left', () => {
+	describe('left join', () => {
 		it('should perform left join', () => {
 			let result = child.join(parent, matcher, { type: 'left' })
 			expect(result.data).toEqual(joindata.left.no_rename)
@@ -141,7 +141,7 @@ describe('join', () => {
 		})
 	})
 
-	describe('right', () => {
+	describe('right join', () => {
 		it('should perform right join', () => {
 			let result = child.join(parent, matcher, { type: 'right' })
 			expect(result.data).toEqual(joindata.right.no_rename)
@@ -206,7 +206,8 @@ describe('join', () => {
 			])
 		})
 	})
-	describe('full', () => {
+
+	describe('full join', () => {
 		it('should perform full join', () => {
 			let result = child.join(parent, matcher, { type: 'full' })
 			expect(result.data).toEqual(joindata.full.no_rename)
@@ -237,6 +238,7 @@ describe('join', () => {
 				{ name: 'y_class', type: 'string' }
 			])
 		})
+
 		it('should perform full join renaming left', () => {
 			const result = child.join(parent, matcher, { type: 'full', left: { prefix: 'x' } })
 			expect(result.data).toEqual(joindata.full.x_rename)
@@ -270,7 +272,7 @@ describe('join', () => {
 		})
 	})
 
-	describe('nested', () => {
+	describe('nested join', () => {
 		it('should perform nested join using `nestedJoin`', () => {
 			const result = child.nestedJoin(parent, matcher)
 			expect(result.data).toEqual(joindata.nested)

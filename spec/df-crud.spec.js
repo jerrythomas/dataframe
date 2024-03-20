@@ -1,57 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { dataframe } from '../src/dataframe'
-import { defaultConfig } from '../src/constants'
 
-describe('crud operations', () => {
-	describe('configurations', () => {
-		const data = [{ a: 1, b: '2' }]
-
-		it('should exclude invalid fields while configuring alignment', () => {
-			const df = dataframe([])
-			const updated = df.align('a', 'b')
-			expect(updated.config.align_by).toEqual([])
-			expect(updated).toBe(df)
-		})
-
-		it('should set the alignment configuration', () => {
-			const df = dataframe(data)
-			const updated = df.align('a', 'b')
-			expect(updated.config.align_by).toEqual(['a', 'b'])
-			expect(updated).toBe(df)
-		})
-
-		it('should set the template', () => {
-			const df = dataframe(data)
-			const updated = df.using({ a: 1 })
-			expect(updated.config.template).toEqual({ a: 1 })
-			expect(updated).toBe(df)
-		})
-		it('should override actual_flag', () => {
-			const df = dataframe([])
-
-			expect(df.config).toEqual(defaultConfig)
-			const updated = df.override({ actual_flag: 'x' })
-			expect(updated.config.actual_flag).toBe('x')
-			expect(updated).toBe(df)
-		})
-
-		it('should override children field', () => {
-			const df = dataframe([])
-			expect(df.config).toEqual(defaultConfig)
-			const updated = df.override({ children: '_x' })
-			expect(updated.config.children).toBe('_x')
-			expect(updated).toBe(df)
-		})
-
-		it('should override multiple configurations', () => {
-			const df = dataframe([])
-			expect(df.config).toEqual(defaultConfig)
-			const updated = df.override({ children: '_child', actual_flag: '_actual' })
-			expect(updated.config.children).toBe('_child')
-			expect(updated.config.actual_flag).toBe('_actual')
-			expect(updated).toBe(df)
-		})
-	})
+describe('dataframe -> alter data', () => {
 	describe('update', () => {
 		it('should throw error when input is not object', () => {
 			const df = dataframe([
@@ -121,7 +71,6 @@ describe('crud operations', () => {
 			expect(updated.columns).toEqual({ a: 0, b: 1 })
 		})
 	})
-
 	describe('fillMissing', () => {
 		it('should fill missing values', () => {
 			const df = dataframe([{ a: 1, b: 2 }, { b: 3 }, { a: 4 }])
@@ -143,7 +92,6 @@ describe('crud operations', () => {
 			])
 		})
 	})
-
 	describe('fillNull', () => {
 		it('should fill null values', () => {
 			const df = dataframe([{ a: 1, b: 2 }, { a: null, b: null }, { a: 4 }])

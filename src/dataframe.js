@@ -24,17 +24,11 @@ import { groupDataByKeys, fillAlignedData, getAlignGenerator, aggregateData } fr
 export function dataframe(data, options = {}) {
 	if (!Array.isArray(data)) throw new Error('data must be an array of objects')
 
-	const metadata = deriveColumnMetadata(data, options)
-	// create a column dictionary for easy access
-	const columns = deriveColumnIndex(metadata)
-	const config = { ...defaultConfig, ...pickAllowedConfig(options) }
+	const df = { data }
 
-	const df = {
-		data,
-		metadata,
-		columns,
-		config
-	}
+	df.metadata = deriveColumnMetadata(data, options)
+	df.columns = deriveColumnIndex(df.metadata)
+	df.config = { ...defaultConfig, ...pickAllowedConfig(options) }
 
 	// configure behaviour
 	df.override = (props) => overrideConfig(df, props)
@@ -43,26 +37,34 @@ export function dataframe(data, options = {}) {
 	df.align = (...fields) => alignColumns(df, ...fields)
 	df.using = (template) => usingTemplate(df, template)
 
-	// returns new data frames
+	// join operations
 	df.join = (other, query, opts) => join(df, other, query, opts)
 	df.leftJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'left' })
 	df.rightJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'right' })
 	df.innerJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'inner' })
 	df.fullJoin = (other, query, opts) => joinDataFrame(df, other, query, { ...opts, type: 'full' })
 	df.nestedJoin = (other, query, opts) => nestedJoin(df, other, query, opts)
+
+	// set operations
 	df.union = (other) => union(df, other)
 	df.minus = (other) => minus(df, other)
 	df.intersect = (other) => intersect(df, other)
+
+	// alter structure
 	df.rename = (fields) => renameColumns(df, fields)
 	df.drop = (...fields) => dropColumns(df, ...fields)
-	df.rollup = (fields) => rollup(df, fields)
 
-	// returns the same data frame with modifications
+	// alter data
 	df.sortBy = (...fields) => sortBy(df, ...fields)
 	df.fillMissing = (value) => fill(df, value)
 	df.fillNull = (value) => fill(df, value, null)
 	df.update = (value) => updateRows(df, value)
 	df.delete = () => deleteRows(df)
+
+	// transform data
+	df.rollup = (fields) => rollup(df, fields)
+	df.apply = (fn) => applyFn(df, fn)
+
 	df.select = (...fields) => select(df, ...fields)
 
 	return df
@@ -307,49 +309,17 @@ function renameColumns(df, columns) {
  * Drops the specified columns from the DataFrame.
  *
  * @param {import('./types').DataFrame} df - The DataFrame object to drop columns from.
- * @param {...string} [columns]            - The columns to drop.
+ * @param {...string} [fields]            - The columns to drop.
  *
  * @returns {import('./types').DataFrame} The DataFrame object with the columns dropped.
  */
-function dropColumns(df, ...columns) {
-	const metadata = df.metadata.filter((col) => !columns.includes(col.name))
-	const data = df.data.map((row) => omit(columns, row))
+function dropColumns(df, ...fields) {
+	const metadata = df.metadata.filter((col) => !fields.includes(col.name))
+	const data = df.data.map((row) => omit(fields, row))
 
 	return dataframe(data, { metadata })
 }
 
-/**
- * Summarizes the DataFrame by the specified columns.
- * @param {import('./types').DataFrame} df - The DataFrame object to summarize.
- * @param {Array} summaries                  - The columns to summarize.
- *
- * @returns {import('./types').DataFrame}  The summarized DataFrame object.
- */
-function rollup(df, summaries = []) {
-	if (df.config.group_by.length === 0) {
-		throw new Error('Use groupBy to specify the columns to group by.')
-	}
-
-	const hasAlignBy = df.config.align_by.length > 0
-	if (summaries.length === 0) {
-		summaries.push(defaultAggregator(df.metadata, df.config))
-	}
-
-	const groupedData = groupDataByKeys(df.data, df.config.group_by, summaries)
-	let alignedData = Object.values(groupedData)
-
-	if (hasAlignBy) {
-		const fillRows = getAlignGenerator(df.data, df.config)
-		alignedData = fillAlignedData(alignedData, df.config, fillRows)
-	}
-
-	const aggregatedData = aggregateData(alignedData, summaries)
-	const newMetadata = buildMetadata(aggregatedData, df.metadata, df.config.group_by, summaries)
-
-	// Reset config group_by after rollup operation.
-	df.config.group_by = []
-	return dataframe(aggregatedData, { metadata: newMetadata })
-}
 /**
  * Sorts the DataFrame by the specified columns.
  *
@@ -358,8 +328,8 @@ function rollup(df, summaries = []) {
  *
  * @returns {Object}  The sorted DataFrame object.
  */
-function sortBy(df, ...columns) {
-	const sorters = columns.map(deriveSortableColumn)
+function sortBy(df, ...fields) {
+	const sorters = fields.map(deriveSortableColumn)
 
 	df.data.sort((a, b) => {
 		let result = 0
@@ -433,6 +403,52 @@ function fill(df, values, original = undefined) {
 		})
 	})
 	return df
+}
+
+/**
+ * Summarizes the DataFrame by the specified columns.
+ * @param {import('./types').DataFrame} df - The DataFrame object to summarize.
+ * @param {Array} summaries                  - The columns to summarize.
+ *
+ * @returns {import('./types').DataFrame}  The summarized DataFrame object.
+ */
+function rollup(df, summaries = []) {
+	if (df.config.group_by.length === 0) {
+		throw new Error('Use groupBy to specify the columns to group by.')
+	}
+
+	const hasAlignBy = df.config.align_by.length > 0
+	if (summaries.length === 0) {
+		summaries.push(defaultAggregator(df.metadata, df.config))
+	}
+
+	const groupedData = groupDataByKeys(df.data, df.config.group_by, summaries)
+	let alignedData = Object.values(groupedData)
+
+	if (hasAlignBy) {
+		const fillRows = getAlignGenerator(df.data, df.config)
+		alignedData = fillAlignedData(alignedData, df.config, fillRows)
+	}
+
+	const aggregatedData = aggregateData(alignedData, summaries)
+	const newMetadata = buildMetadata(aggregatedData, df.metadata, df.config.group_by, summaries)
+
+	// Reset config group_by after rollup operation.
+	df.config.group_by = []
+	return dataframe(aggregatedData, { metadata: newMetadata })
+}
+
+/**
+ * Applies the specified function to the DataFrame returning a new DataFrame.
+ *
+ * @param {import('./types').DataFrame} df - The DataFrame object to apply the function to.
+ * @param {function} fn                    - The function to apply to the DataFrame. Function applies row-wise.
+ *
+ * @returns {import('./types').DataFrame}  - The DataFrame object with the function applied.
+ */
+function applyFn(df, fn) {
+	if (df.config.filter) return df.data.filter(df.config.filter).map(fn)
+	return df.data.map(fn)
 }
 
 /**

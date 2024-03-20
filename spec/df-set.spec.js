@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { dataframe } from '../src/dataframe'
 
-describe('set operations', () => {
+describe('dataframe -> set operations', () => {
 	describe('union', () => {
 		it('should perform union on similar data set', () => {
 			const df1 = dataframe([
@@ -38,7 +38,6 @@ describe('set operations', () => {
 				{ name: 'c', type: 'integer' }
 			])
 		})
-
 		it('should throw error for mixed types', () => {
 			const df1 = dataframe([
 				{ a: 1, b: 2 },
@@ -65,7 +64,6 @@ describe('set operations', () => {
 				{ name: 'b', type: 'integer' }
 			])
 		})
-
 		it('should return first set when attributes differ', () => {
 			const df1 = dataframe([
 				{ a: 1, b: 2 },
