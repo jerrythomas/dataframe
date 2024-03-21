@@ -8,7 +8,7 @@ import { dataframe } from './dataframe'
  * @param {string} by - The primary attribute by which the data will be grouped.
  * @returns {Object} An object with configuration methods for setting up the transformation.
  */
-export function timelapse(by) {
+export function tweenable(by) {
 	let defaults = {}
 	let groupColumns = []
 

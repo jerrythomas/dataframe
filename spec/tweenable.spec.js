@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest'
-// import fs from 'fs'
-import { timelapse } from '../src/timelapse'
+import { tweenable } from '../src/tweenable'
 import fixture from './fixtures/rollup'
 
-describe('Timelapse', () => {
+describe('tweenable', () => {
 	it('should generate timelapse groups', () => {
-		const result = timelapse('date')
+		const result = tweenable('date')
 			.useDefaults({
 				score: 0,
 				pct: 0

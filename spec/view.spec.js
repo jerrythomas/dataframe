@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { createView, determineSelectedState } from '../src/view'
+import { dataview, determineSelectedState } from '../src/view'
 import { pick, omit } from 'ramda'
 
-describe('View', () => {
-	describe('createView', () => {
+describe('view', () => {
+	describe('dataview', () => {
 		describe('flat', () => {
 			const data = [
 				{ name: 'Alice', age: 25 },
@@ -11,7 +11,7 @@ describe('View', () => {
 				{ name: 'Charlie', age: 35 }
 			]
 			it('should create a view', () => {
-				const view = createView(data)
+				const view = dataview(data)
 
 				expect(view.columns).toEqual([
 					{
@@ -46,7 +46,7 @@ describe('View', () => {
 			})
 
 			it('should sort by a column', () => {
-				const view = createView(data)
+				const view = dataview(data)
 				view.sortBy('age')
 				expect(view.hierarchy).toEqual([
 					{ depth: 0, row: { name: 'Bob', age: 20 } },
@@ -56,7 +56,7 @@ describe('View', () => {
 			})
 
 			it('should sort by a column in descending order', () => {
-				const view = createView(data)
+				const view = dataview(data)
 				view.sortBy('age', false)
 				expect(view.hierarchy).toEqual([
 					{ depth: 0, row: { name: 'Charlie', age: 35 } },
@@ -66,7 +66,7 @@ describe('View', () => {
 			})
 
 			it('should select a row', () => {
-				const view = createView(data)
+				const view = dataview(data)
 				view.select(0)
 				expect(view.hierarchy[0].selected).toBe('checked')
 			})
@@ -84,7 +84,7 @@ describe('View', () => {
 			]
 
 			it('should create a view', () => {
-				const view = createView(data, { path: 'lineage' })
+				const view = dataview(data, { path: 'lineage' })
 
 				expect(view.columns).toEqual([
 					{
@@ -195,7 +195,7 @@ describe('View', () => {
 			})
 
 			it('should sort by a column', () => {
-				const view = createView(data, { path: 'lineage' })
+				const view = dataview(data, { path: 'lineage' })
 				view.sortBy('age')
 				expect(view.hierarchy.map(({ row }) => row)).toEqual([
 					{ name: 'Snow', lineage: '/Snow', age: 80 },
@@ -234,7 +234,7 @@ describe('View', () => {
 			})
 
 			it('should select/deselect a child row', () => {
-				const view = createView(data, { path: 'lineage' })
+				const view = dataview(data, { path: 'lineage' })
 				view.select(3)
 				expect(view.hierarchy.map((x) => pick(['path', 'selected'], x))).toEqual([
 					{ path: '/Smith', selected: 'indeterminate' },
@@ -261,7 +261,7 @@ describe('View', () => {
 			})
 
 			it('should select/deselect a parent row', () => {
-				const view = createView(data, { path: 'lineage' })
+				const view = dataview(data, { path: 'lineage' })
 				view.select(0)
 				expect(view.hierarchy.map((x) => pick(['path', 'selected'], x))).toEqual([
 					{ path: '/Smith', selected: 'checked' },
@@ -288,7 +288,7 @@ describe('View', () => {
 			})
 
 			it('should collapse/expand a node', () => {
-				const view = createView(data, { path: 'lineage' })
+				const view = dataview(data, { path: 'lineage' })
 				view.toggle(0)
 				expect(view.hierarchy.map((x) => pick(['path', 'isExpanded', 'isHidden'], x))).toEqual([
 					{ path: '/Smith', isHidden: false, isExpanded: true },
@@ -314,7 +314,7 @@ describe('View', () => {
 			})
 
 			it('should collapse/expand a node with all expanded at start', () => {
-				const view = createView(data, { path: 'lineage', expanded: true })
+				const view = dataview(data, { path: 'lineage', expanded: true })
 				view.toggle(0)
 				expect(view.hierarchy.map((x) => pick(['path', 'isExpanded', 'isHidden'], x))).toEqual([
 					{ path: '/Smith', isHidden: false, isExpanded: false },

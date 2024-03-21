@@ -14,7 +14,7 @@ import {
  * @param {Object} options - The configuration options used for deriving metadata and hierarchy from the data.
  * @returns {Object} An object representing the view, providing methods to manipulate and query the presentation state.
  */
-export function createView(data, options) {
+export function dataview(data, options) {
 	let sortGroup = []
 
 	const metadata = deriveMetadata(data, options)
