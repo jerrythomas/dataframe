@@ -204,40 +204,70 @@ function join(df, other, query, options = {}) {
  */
 function joinDataFrame(df, other, query, opts = {}) {
 	const { type = 'outer' } = opts
-
-	const leftRename = getAttributeRenamer(opts.left || {})
-	const rightRename = getAttributeRenamer(opts.right || {})
-	const leftRenameRow = getDataRenamer(leftRename, Object.keys(df.columns))
-	const rightRenameRow = getDataRenamer(rightRename, Object.keys(other.columns))
-
-	const combinedData = []
-
+	const renamer = getRenamer(Object.keys(df.columns), Object.keys(other.columns), opts)
 	// Process rows from the left DataFrame
-	df.data.forEach((x) => {
-		const matches = other.data
-			.filter((y) => query(x, y))
-			.map((y) => ({ ...rightRenameRow(y), ...leftRenameRow(x) }))
-		if (matches.length === 0 && ['left', 'full'].includes(type)) {
-			matches.push(leftRenameRow(x))
-		}
-		combinedData.push(...matches)
-	})
+	const combinedData = leftJoin(df.data, other.data, query, renamer.row, type)
 
 	// Process rows from the right DataFrame for full outer join
 	if (['full', 'right'].includes(type)) {
 		other.data.forEach((y) => {
 			if (!df.data.some((x) => query(x, y))) {
-				combinedData.push(rightRenameRow(y))
+				combinedData.push(renamer.row.right(y))
 			}
 		})
 	}
 
-	const leftMetadata = df.metadata.map((x) => ({ ...x, name: leftRename(x.name) }))
+	const leftMetadata = df.metadata.map((x) => ({ ...x, name: renamer.key.left(x.name) }))
 	const rightMetadata = other.metadata
-		.map((y) => ({ ...y, name: rightRename(y.name) }))
+		.map((y) => ({ ...y, name: renamer.key.right(y.name) }))
 		.filter((y) => !leftMetadata.some((x) => x.name === y.name))
 
 	return dataframe(combinedData, { metadata: leftMetadata.concat(rightMetadata) })
+}
+
+/**
+ * Returns a an object with renamers for keys and rows
+ * @param {Array<string>} first - columns of first data frame
+ * @param {Array<string>} second - columns of second data frame
+ * @param {import('./types').JoinOptions} opts - join options
+ * @returns {Object} - an object with renamers for keys and rows
+ */
+function getRenamer(first, second, opts) {
+	const renamer = {}
+	renamer.key = {
+		left: getAttributeRenamer(opts.left || {}),
+		right: getAttributeRenamer(opts.right || {})
+	}
+
+	renamer.row = {
+		left: getDataRenamer(renamer.key.left, first),
+		right: getDataRenamer(renamer.key.right, second)
+	}
+	return renamer
+}
+
+/**
+ * Performs a left join operation on two arrays based on the provided query condition.
+ *
+ * @param {Array<Object>} data - The first array to join, considered as the "left" side of the join.
+ * @param {Array<Object>} other - The second array to join, considered as the "right" side of the join.
+ * @param {Function} query - A callback function that defines the join condition. Should return true for items to be joined, false otherwise.
+ * @param {Function} renameRow - A callback function that renames the row based on the type of join.
+ * @param {string} type - The type of join to perform. Can be 'inner', 'left', 'right', or 'full'.
+ * @returns {Array<Object>} - The result of the left join operation.
+ */
+function leftJoin(data, other, query, renameRow, type) {
+	const combinedData = []
+	data.forEach((x) => {
+		const matches = other
+			.filter((y) => query(x, y))
+			.map((y) => ({ ...renameRow.right(y), ...renameRow.left(x) }))
+		if (matches.length === 0 && ['left', 'full'].includes(type)) {
+			matches.push(renameRow.left(x))
+		}
+		combinedData.push(...matches)
+	})
+	return combinedData
 }
 
 /**
