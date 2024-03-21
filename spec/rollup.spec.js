@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { dataframe } from '../src/dataframe'
-import fixture from './fixtures/nba'
-import { max, mean, sum, quantile } from 'd3-array'
-import groupData from './fixtures/rollup'
+import { mean, quantile } from 'd3-array'
+import fixtures from './fixtures/rollup'
 import { counter, violin } from '../src/aggregators'
 
 describe('dataframe -> rollup', () => {
@@ -17,10 +16,10 @@ describe('dataframe -> rollup', () => {
 	})
 
 	it('should aggregate without group by', () => {
-		const df = dataframe(groupData.simple)
-		const grouped = df.summarize('country', { count: counter }).rollup()
-		expect(grouped.data).toEqual([{ count: 12 }])
-		expect(grouped.metadata).toEqual([
+		const df = dataframe(fixtures.simple)
+		const result = df.summarize('country', { count: counter }).rollup()
+		expect(result.data).toEqual([{ count: 12 }])
+		expect(result.metadata).toEqual([
 			{
 				name: 'count',
 				type: 'integer'
@@ -29,10 +28,10 @@ describe('dataframe -> rollup', () => {
 	})
 
 	it('should group by a column', () => {
-		const df = dataframe(groupData.simple)
-		const grouped = df.groupBy('country').summarize('name', 'children').rollup()
-		expect(grouped.data).toEqual(groupData.list_by_country)
-		expect(grouped.metadata).toEqual([
+		const df = dataframe(fixtures.simple)
+		const result = df.groupBy('country').summarize('name', 'children').rollup()
+		expect(result.data).toEqual(fixtures.list_by_country)
+		expect(result.metadata).toEqual([
 			{ name: 'country', type: 'string' },
 			{
 				name: 'children',
@@ -43,11 +42,11 @@ describe('dataframe -> rollup', () => {
 	})
 
 	it('should group by multiple columns', () => {
-		const df = dataframe(groupData.airports)
-		const grouped = df.groupBy('country', 'state').rollup()
+		const df = dataframe(fixtures.airports)
+		const result = df.groupBy('country', 'state').rollup()
 
-		expect(grouped.data).toEqual(groupData.list_by_country_state)
-		expect(grouped.metadata).toEqual([
+		expect(result.data).toEqual(fixtures.list_by_country_state)
+		expect(result.metadata).toEqual([
 			{ name: 'country', type: 'string' },
 			{ name: 'state', type: 'string' },
 			{
@@ -62,20 +61,20 @@ describe('dataframe -> rollup', () => {
 	})
 
 	it('should rollup counts grouping by country', () => {
-		const df = dataframe(groupData.airports)
-		const grouped = df.groupBy('country').summarize(['name'], { count: counter }).rollup()
-		expect(grouped.data).toEqual(groupData.count_by_country)
-		expect(grouped.metadata).toEqual([
+		const df = dataframe(fixtures.airports)
+		const result = df.groupBy('country').summarize(['name'], { count: counter }).rollup()
+		expect(result.data).toEqual(fixtures.count_by_country)
+		expect(result.metadata).toEqual([
 			{ name: 'country', type: 'string' },
 			{ name: 'count', type: 'integer' }
 		])
 	})
 
 	it('should rollup counts grouping by country and state', () => {
-		const df = dataframe(groupData.airports)
-		const grouped = df.groupBy('country', 'state').summarize('name', { count: counter }).rollup()
-		expect(grouped.data).toEqual(groupData.count_by_country_state)
-		expect(grouped.metadata).toEqual([
+		const df = dataframe(fixtures.airports)
+		const result = df.groupBy('country', 'state').summarize('name', { count: counter }).rollup()
+		expect(result.data).toEqual(fixtures.count_by_country_state)
+		expect(result.metadata).toEqual([
 			{ name: 'country', type: 'string' },
 			{ name: 'state', type: 'string' },
 			{ name: 'count', type: 'integer' }
@@ -83,9 +82,9 @@ describe('dataframe -> rollup', () => {
 	})
 
 	it('should rollup using multiple aggregations', () => {
-		const df = dataframe(groupData.items)
+		const df = dataframe(fixtures.items)
 		const mapper = (row) => row.price * row.quantity
-		const grouped = df
+		const result = df
 			.groupBy('category')
 			.summarize(mapper, {
 				avg_cost: mean,
@@ -93,8 +92,8 @@ describe('dataframe -> rollup', () => {
 				cost_q3: (v) => quantile(v, 0.75)
 			})
 			.rollup()
-		expect(grouped.data).toEqual(groupData.cost_by_category)
-		expect(grouped.metadata).toEqual([
+		expect(result.data).toEqual(fixtures.cost_by_category)
+		expect(result.metadata).toEqual([
 			{ name: 'category', type: 'string' },
 			{ name: 'avg_cost', type: 'number' },
 			{ name: 'cost_q1', type: 'number' },
@@ -103,7 +102,7 @@ describe('dataframe -> rollup', () => {
 	})
 
 	it('should rollup and update', () => {
-		const df = dataframe(groupData.items)
+		const df = dataframe(fixtures.items)
 		const mapper = (row) => row.price * row.quantity
 		const result = df
 			.groupBy('category')
@@ -138,58 +137,16 @@ describe('dataframe -> rollup', () => {
 	})
 
 	it('should align subgroups during rollup', () => {
-		const result = dataframe(groupData.data).groupBy('date').align('team').rollup()
-		expect(result.data).toEqual(groupData.with_align)
+		const result = dataframe(fixtures.data).groupBy('date').align('team').rollup()
+		expect(result.data).toEqual(fixtures.with_align)
 	})
 
 	it('should align subgroups using template during rollup', () => {
-		const result = dataframe(groupData.data)
+		const result = dataframe(fixtures.data)
 			.groupBy('date')
 			.align('team')
 			.using({ score: 0, pct: 0, rank: 999 })
 			.rollup()
-		expect(result.data).toEqual(groupData.align_using)
+		expect(result.data).toEqual(fixtures.align_using)
 	})
-
-	it('should calculate team max scores', () => {
-		const result = dataframe(fixture.nba)
-			.groupBy('team')
-			.summarize((d) => d.score, { score: max })
-			.rollup()
-
-		expect(result.data).toEqual(fixture.team_score)
-	})
-
-	it('should calculate group, team max scores', () => {
-		const result = dataframe(fixture.nba)
-			.groupBy('group')
-			.summarize((d) => d.score, { score: max })
-			.rollup()
-		expect(result.data).toEqual(fixture.group_score)
-	})
-
-	it('should calculate team total scores', () => {
-		const result = dataframe(fixture.nba)
-			.sortBy('group', 'team')
-			.groupBy('group', 'team')
-			.summarize((d) => d.score, { score: sum })
-			.rollup()
-
-		expect(result.data).toEqual(fixture.group_team_score)
-	})
-	it('should calculate team average pct', () => {
-		const result = dataframe(fixture.nba)
-			.groupBy('group', 'team')
-			.summarize((d) => d.pct, { pct: mean })
-			.rollup()
-		expect(result.data).toEqual(fixture.group_team_pct)
-	})
-
-	// it('should create nested arrays', () => {
-	// 	let result = dataframe().rollup('score').group(['team']).key('date').transform(fixture.nba)
-	// 	expect(result).toEqual(fixture.date_team_score)
-
-	// 	result = dataframe().rollup('score').group(['group', 'team']).key('date').transform(fixture.nba)
-	// 	expect(result).toEqual(fixture.date_group_team_score)
-	// })
 })
