@@ -132,46 +132,6 @@ export function deriveColumnIndex(metadata) {
 }
 
 /**
- * Generates a renamer function which adds a prefix or suffix to a string.
- *
- * @param {OptionsToRenameKeys} options - Options to rename keys
- * @returns {Function} - A function that takes a string and adds a prefix or suffix.
- */
-export function getAttributeRenamer(options) {
-	const { prefix, suffix, separator = '_' } = options
-	let rename = identity
-	if (prefix) {
-		rename = (x) => [prefix, x].join(separator)
-	} else if (suffix) {
-		rename = (x) => [x, suffix].join(separator)
-	}
-	return rename
-}
-
-/**
- * Returns a function that renames all the keys of an object using a lookup object
- *
- * @param {Object} lookup - An object that maps old keys to new keys.
- * @returns {Function}    - A function that takes an object and returns a new object with renamed properties.
- */
-export function getRenamerUsingLookup(lookup) {
-	return (row) =>
-		Object.entries(row).reduce((acc, [key, value]) => ({ ...acc, [lookup[key]]: value }), {})
-}
-
-/**
- * Returns a function that renames all the keys of an object using a renamer function
- *
- * @param {Function} keyNamer - A function that takes a key and returns a new key.
- * @returns {Function}               - A function that takes an object and returns a new object with renamed properties.
- */
-export function getDataRenamer(keyNamer, keys) {
-	if (keyNamer === identity) return identity
-	const lookup = keys.reduce((acc, key) => ({ ...acc, [key]: keyNamer(key) }), {})
-	return getRenamerUsingLookup(lookup)
-}
-
-/**
  * Creates metadata for aggregated data based on original metadata and group by keys.
  *
  * @param {Array} data        - The aggregated data array.
@@ -193,4 +153,21 @@ export function buildMetadata(data, oldMetadata, groupByKeys, summaries) {
 		})
 	})
 	return metadata
+}
+
+/**
+ * Generates a renamer function which adds a prefix or suffix to a string.
+ *
+ * @param {OptionsToRenameKeys} options - Options to rename keys
+ * @returns {Function} - A function that takes a string and adds a prefix or suffix.
+ */
+export function getAttributeRenamer(options) {
+	const { prefix, suffix, separator = '_' } = options
+	let rename = identity
+	if (prefix) {
+		rename = (x) => [prefix, x].join(separator)
+	} else if (suffix) {
+		rename = (x) => [x, suffix].join(separator)
+	}
+	return rename
 }
