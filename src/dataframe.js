@@ -1,13 +1,7 @@
 import { equals, omit, pick, clone, identity } from 'ramda'
 import { defaultConfig, includeAll, pickAllowedConfig } from './constants'
 import { deriveSortableColumn } from './infer'
-import {
-	combineMetadata,
-	deriveColumnIndex,
-	deriveColumnMetadata,
-	getRenamerUsingLookup,
-	buildMetadata
-} from './metadata'
+import { combineMetadata, deriveColumnIndex, deriveColumnMetadata, buildMetadata } from './metadata'
 import {
 	groupDataByKeys,
 	fillAlignedData,
@@ -15,7 +9,7 @@ import {
 	aggregateData,
 	defaultAggregator
 } from './rollup'
-import { getRenamerUsingLookup, getRenamer, leftJoin } from './join'
+import { getRenamer, getRenamerUsingLookup, leftJoin } from './join'
 
 /**
  * Creates a new DataFrame object.

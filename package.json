@@ -28,6 +28,7 @@
     ".": "./src/index.js",
     "./index.d.ts": "./dist/index.d.ts"
   },
+  "files": ["dist", "src", "package.json"],
   "devDependencies": {
     "@types/d3-array": "^3.2.1",
     "@types/d3-collection": "^1.0.13",

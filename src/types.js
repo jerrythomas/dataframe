@@ -5,7 +5,17 @@
  */
 
 /**
- * @typedef {checked|unchecked|indeterminate} SelectionState
+ * Options for aligning text in a column.
+ * @typedef {'left'|'center'|'right'|'justify'} HorizontalAlignOptions
+ */
+
+/**
+ * Options for the action type of the column.
+ * @typedef {'edit'|'delete'|'select'} ActionTypes
+ */
+
+/**
+ * @typedef {'checked'|'unchecked'|'indeterminate'} SelectionState
  */
 
 /**
@@ -123,11 +133,11 @@
 
 /**
  * @typedef {Object} DataFrameConfig
- * @extends OverrideConfig
  * @property {Array<string>} group_by=[]         - The columns to group by.
  * @property {Array<string>} align_by=[]         - The columns to be aligned during rollup.
  * @property {Array<SummaryConfig>} summaries=[] - Array of summary configurations.
  * @property {any} template={}                   - Template row to be used for filling in missing rows.
+ * @extends OverrideConfig
  */
 
 /**

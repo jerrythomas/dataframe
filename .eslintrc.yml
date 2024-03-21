@@ -8,6 +8,8 @@ extends:
 parserOptions:
   ecmaVersion: latest
   sourceType: module
+ignorePatterns:
+  - dist
 rules:
   complexity:
     - error
