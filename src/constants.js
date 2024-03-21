@@ -2,6 +2,7 @@ import { identity, pick } from 'ramda'
 
 export const pickAllowedConfig = pick(['children', 'actual_flag'])
 
+/** @type {import('./types').DataFrameConfig */
 export const defaultConfig = {
 	children: 'children',
 	actual_flag: 'actual_flag',

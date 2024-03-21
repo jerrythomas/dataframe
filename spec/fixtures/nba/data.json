@@ -28,22 +28,22 @@
     "pct": 75
   },
   {
-    "date": "2020-01-01",
-    "team": "Los Angeles Clippers",
+    "date": "2020-02-01",
+    "team": "Los Angeles Lakers",
     "group": "Western Conference",
     "score": 108,
     "pct": 82
   },
   {
     "date": "2020-02-01",
-    "team": "Boston Celtics",
+    "team": "Toronto Raptors",
     "group": "Eastern Conference",
     "score": 115,
     "pct": 88
   },
   {
     "date": "2020-02-01",
-    "team": "Houston Rockets",
+    "team": "Golden State Warriors",
     "group": "Western Conference",
     "score": 107,
     "pct": 81

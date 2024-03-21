@@ -14,7 +14,6 @@ describe('library', () => {
 			'toHexString',
 			'getType',
 			'dataframe',
-			'tweenable',
 			'timelapse',
 			'createView'
 		])

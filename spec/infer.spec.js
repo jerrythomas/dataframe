@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { data } from './fixtures/data'
-import { counter } from '../src/aggregators'
 import { ascending, descending } from 'd3-array'
 
 import {
 	deriveColumns,
-	deriveAggregators,
 	deriveSortableColumn,
 	deriveDataTypes,
 	inferDataType,
@@ -107,25 +105,6 @@ describe('infer', () => {
 			expect(() => deriveSortableColumn({ name: 'a', sorter: false })).toThrow(
 				'Sorter should be a function'
 			)
-		})
-	})
-
-	describe('deriveAggregators', () => {
-		const aggCols = [['score'], ['score', 'time'], ['score', 'time', 'name']]
-
-		it.each(aggCols)('should derive column aggregators', (...cols) => {
-			const agg = deriveAggregators(...cols)
-			const res = cols.map((column) => ({
-				column,
-				aggregator: counter,
-				suffix: 'count'
-			}))
-
-			expect(agg).toEqual(res)
-
-			agg.forEach((col) => {
-				expect(col.aggregator([1, 2, 3, 4])).toEqual(4)
-			})
 		})
 	})
 

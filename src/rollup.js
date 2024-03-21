@@ -10,7 +10,7 @@ import { omit, pick, mergeLeft, map, difference, uniq, pipe, identity } from 'ra
  */
 export function groupDataByKeys(data, groupByKeys, summaries) {
 	const keysExtractor = pick(groupByKeys)
-	return data.reduce((grouped, row) => {
+	const groupedData = data.reduce((grouped, row) => {
 		const key = JSON.stringify(keysExtractor(row))
 		if (!grouped[key]) {
 			grouped[key] = { ...keysExtractor(row), ...initialValues(summaries) }
@@ -18,6 +18,8 @@ export function groupDataByKeys(data, groupByKeys, summaries) {
 		addToSummaries(grouped[key], row, summaries)
 		return grouped
 	}, {})
+
+	return Object.values(groupedData)
 }
 
 /**
@@ -108,15 +110,14 @@ export function getAlignGenerator(data, config) {
 /**
  * Returns an aggregator object with a mapper and reducer function.
  *
- * @param {string|string[]} from - The key or keys to aggregate.
- * @param {Function} using - The aggregation function.
- * @returns {Object} - An object with a mapper and reducer function.
+ * @param {Array<string>} from  - The key or keys to aggregate.
+ * @param {Function}      using - The aggregation function.
+ * @returns {import('./types').SummaryConfig}  - An object with a mapper and reducer function.
  */
 export function getAggregator(from, into, using = identity) {
-	const mapper = pick(Array.isArray ? from : [from])
-	// const reducer = typeof using === 'function' ? using : identity
+	// const mapper = pick(Array.isArray ? from : [from])
 	return {
-		mapper,
+		mapper: pick(from),
 		reducers: [{ field: into, formula: using }]
 	}
 }

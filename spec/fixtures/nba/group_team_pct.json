@@ -1,68 +1,42 @@
 [
   {
-    "group": "Western Conference",
-    "team": "Los Angeles Lakers",
-    "pct": 85,
-    "tweenVisibility": 1
-  },
-  {
-    "group": "Western Conference",
-    "team": "Golden State Warriors",
-    "pct": 80,
-    "tweenVisibility": 1
-  },
-  {
-    "group": "Western Conference",
-    "team": "Los Angeles Clippers",
-    "pct": 82,
-    "tweenVisibility": 1
-  },
-  {
-    "group": "Western Conference",
-    "team": "Houston Rockets",
-    "pct": 81,
-    "tweenVisibility": 1
-  },
-  {
-    "group": "Western Conference",
-    "team": "Denver Nuggets",
-    "pct": 86,
-    "tweenVisibility": 1
-  },
-  {
-    "group": "Western Conference",
-    "team": "Utah Jazz",
-    "pct": 80,
-    "tweenVisibility": 1
-  },
-  {
     "group": "Eastern Conference",
-    "team": "Milwaukee Bucks",
-    "pct": 90,
-    "tweenVisibility": 1
-  },
-  {
-    "group": "Eastern Conference",
-    "team": "Toronto Raptors",
-    "pct": 75,
-    "tweenVisibility": 1
-  },
-  {
-    "group": "Eastern Conference",
-    "team": "Boston Celtics",
-    "pct": 88,
-    "tweenVisibility": 1
-  },
-  {
-    "group": "Eastern Conference",
-    "team": "Miami Heat",
     "pct": 84,
-    "tweenVisibility": 1
+    "team": "Miami Heat"
   },
   {
     "group": "Eastern Conference",
-    "team": "Philadelphia 76ers",
+    "pct": 90,
+    "team": "Milwaukee Bucks"
+  },
+  {
+    "group": "Eastern Conference",
     "pct": 79,
-    "tweenVisibility": 1
+    "team": "Philadelphia 76ers"
+  },
+  {
+    "group": "Eastern Conference",
+    "pct": 81.5,
+    "team": "Toronto Raptors"
+  },
+  {
+    "group": "Western Conference",
+    "pct": 86,
+    "team": "Denver Nuggets"
+  },
+  {
+    "group": "Western Conference",
+    "pct": 80.5,
+    "team": "Golden State Warriors"
+  },
+  {
+    "group": "Western Conference",
+    "pct": 83.5,
+    "team": "Los Angeles Lakers"
+  },
+  {
+    "group": "Western Conference",
+    "pct": 80,
+    "team": "Utah Jazz"
   }
 ]

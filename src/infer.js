@@ -91,25 +91,6 @@ function objectValidator(value) {
 }
 
 /**
- * Derive an array of column aggregators from a list of aggregation names
- *
- * @param  {...[string|[string, function, string]]} cols
- * @returns {Array<{import('./types.js').ColumnAggregator}}>}
- */
-export function deriveAggregators(...cols) {
-	return cols.map((name) => {
-		if (Array.isArray(name)) {
-			return { column: name[0], aggregator: name[1], suffix: name[2] || '' }
-		}
-		return {
-			column: name,
-			aggregator: counter,
-			suffix: 'count'
-		}
-	})
-}
-
-/**
  * Creates a deep scan sample object that contains a union of all keys from all
  * objects in the array, pulling the values from the last item that contains the key.
  *
@@ -211,7 +192,6 @@ export function deriveMetadata(dataArray, options = {}) {
 
 	if (columns.length === 0) columns = deriveColumns(dataArray, options)
 	columns = addFormatters(columns, language)
-	// if (path) addPathAttribute(columns, path, separator)
 	if (actions.length > 0) columns = deriveActions(columns, actions)
 
 	return columns

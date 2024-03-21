@@ -24,7 +24,7 @@ import {
  * @param {Array} data  - Array of objects representing rows of data.
  * @param {Object} [options] - Optional parameters to control the DataFrame creation.
  * @param {Array} [options.metadata] - The metadata to use instead of deriving it from the data.
- * @returns {Object} A new DataFrame object with methods for data manipulation.
+ * @returns {import('./types').DataFrame} A new DataFrame object with methods for data manipulation.
  */
 export function dataframe(data, options = {}) {
 	if (!Array.isArray(data)) throw new Error('data must be an array of objects')
@@ -351,7 +351,7 @@ function dropColumns(df, ...fields) {
  * Sorts the DataFrame by the specified columns.
  *
  * @param {import('./types').DataFrame} df                                    - The DataFrame object to sort.
- * @param {...{import('./types').SortableColumn} columns - The columns to sort by.
+ * @param {import('./types').SortableColumn} fields - The columns to sort by.
  *
  * @returns {Object}  The sorted DataFrame object.
  */
@@ -440,18 +440,19 @@ function fill(df, values, original = undefined) {
  * @returns {import('./types').DataFrame}  The summarized DataFrame object.
  */
 function rollup(df) {
-	const summaries = [...df.config.summaries]
-	if (df.config.group_by.length === 0) {
-		throw new Error('Use groupBy to specify the columns to group by.')
+	if (df.config.group_by.length === 0 && df.config.summaries.length === 0) {
+		throw new Error(
+			'Use groupBy to specify the columns to group by or use summarize to add aggregators.'
+		)
 	}
 
+	const summaries = clone(df.config.summaries)
 	const hasAlignBy = df.config.align_by.length > 0
 	if (summaries.length === 0) {
 		summaries.push(defaultAggregator(df.metadata, df.config))
 	}
 
-	const groupedData = groupDataByKeys(df.data, df.config.group_by, summaries)
-	let alignedData = Object.values(groupedData)
+	let alignedData = groupDataByKeys(df.data, df.config.group_by, summaries)
 
 	if (hasAlignBy) {
 		const fillRows = getAlignGenerator(df.data, df.config)
@@ -461,10 +462,6 @@ function rollup(df) {
 	const aggregatedData = aggregateData(alignedData, summaries)
 	const newMetadata = buildMetadata(aggregatedData, df.metadata, df.config.group_by, summaries)
 
-	// Reset config group_by after rollup operation.
-	df.config.group_by = []
-	df.config.align_by = []
-	df.config.summaries = []
 	return dataframe(aggregatedData, { metadata: newMetadata })
 }
 

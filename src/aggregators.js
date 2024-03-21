@@ -1,5 +1,3 @@
-import { quantile } from 'd3-array'
-
 /**
  * Counts the number of values in an array.
  *
@@ -18,10 +16,9 @@ export const counter = (values) => values.length
  *                   interquartile range (iqr), and the minimum and maximum range values (qr_min, qr_max)
  *                   after applying the IQR rule for identifying potential outliers.
  */
-export const quantiles = (values) => {
-	const q1 = quantile(values, 0.25)
-	const q3 = quantile(values, 0.75)
+export const violin = (values) => {
+	const { q1, q3 } = values
 	const iqr = q3 - q1
 
-	return { q1, q3, iqr, qr_min: q1 - 1.5 * iqr, qr_max: q1 + 1.5 * iqr }
+	return { ...values, q1, q3, iqr, qr_min: q1 - 1.5 * iqr, qr_max: q1 + 1.5 * iqr }
 }
