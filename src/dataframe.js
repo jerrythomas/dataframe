@@ -1,5 +1,4 @@
-import { equals, omit, pick } from 'ramda'
-import { defaultAggregator } from './aggregators'
+import { equals, omit, pick, clone, identity } from 'ramda'
 import { defaultConfig, includeAll, pickAllowedConfig } from './constants'
 import { deriveSortableColumn } from './infer'
 import {
@@ -11,7 +10,13 @@ import {
 	getRenamerUsingLookup,
 	buildMetadata
 } from './metadata'
-import { groupDataByKeys, fillAlignedData, getAlignGenerator, aggregateData } from './rollup'
+import {
+	groupDataByKeys,
+	fillAlignedData,
+	getAlignGenerator,
+	aggregateData,
+	defaultAggregator
+} from './rollup'
 
 /**
  * Creates a new DataFrame object.
@@ -28,7 +33,7 @@ export function dataframe(data, options = {}) {
 
 	df.metadata = deriveColumnMetadata(data, options)
 	df.columns = deriveColumnIndex(df.metadata)
-	df.config = { ...defaultConfig, ...pickAllowedConfig(options) }
+	df.config = { ...clone(defaultConfig), ...pickAllowedConfig(options) }
 
 	// configure behaviour
 	df.override = (props) => overrideConfig(df, props)
@@ -36,6 +41,7 @@ export function dataframe(data, options = {}) {
 	df.groupBy = (...by) => groupBy(df, ...by)
 	df.align = (...fields) => alignColumns(df, ...fields)
 	df.using = (template) => usingTemplate(df, template)
+	df.summarize = (from, using) => summarize(df, from, using)
 
 	// join operations
 	df.join = (other, query, opts) => join(df, other, query, opts)
@@ -92,29 +98,6 @@ function overrideConfig(df, config = {}) {
 }
 
 /**
- * Aligns the columns of the DataFrame using the provided fields.
- *
- * @param {import('./types').DataFrame} df - The DataFrame object to align.
- * @param {...string} fields               - The fields to align.
- * @returns {import('./types').DataFrame}    The aligned DataFrame object.
- */
-function alignColumns(df, ...fields) {
-	df.config.align_by = excludeInvalidFields(fields, df.columns)
-	return df
-}
-
-/**
- * Sets the template for adding empty rows in the DataFrame.
- * @param {import('./types').DataFrame} df - The DataFrame object to set the template for.
- * @param {Object} template                - The template to use for adding empty rows.
- * @returns {import('./types').DataFrame}    The DataFrame object.
- */
-function usingTemplate(df, template) {
-	df.config.template = template
-	return df
-}
-
-/**
  * Adds a filter to the DataFrame using the provided condition. This filter is applied
  * in subsequent operations like select, delete, and update.
  *
@@ -138,6 +121,50 @@ function groupBy(df, ...fields) {
 	return df
 }
 
+/**
+ * Aligns the columns of the DataFrame using the provided fields.
+ *
+ * @param {import('./types').DataFrame} df - The DataFrame object to align.
+ * @param {...string} fields               - The fields to align.
+ * @returns {import('./types').DataFrame}    The aligned DataFrame object.
+ */
+function alignColumns(df, ...fields) {
+	df.config.align_by = excludeInvalidFields(fields, df.columns)
+	return df
+}
+
+/**
+ * Sets the template for adding empty rows in the DataFrame.
+ * @param {import('./types').DataFrame} df - The DataFrame object to set the template for.
+ * @param {Object} template                - The template to use for adding empty rows.
+ * @returns {import('./types').DataFrame}    The DataFrame object.
+ */
+function usingTemplate(df, template) {
+	df.config.template = template
+	return df
+}
+
+/**
+ * Adds a summary field to the DataFrame.
+ *
+ * @param {import('./types').DataFrame} df - The DataFrame object to add the summary field to.
+ *
+ * @param {string|Array<string>|Function}  from  - The field or function to fetch data for summary
+ * @param {string|Object<string:Function>} using - The target field & formula to use for summarizing.
+ * @returns {import('./types').DataFrame}          The DataFrame object.
+ */
+function summarize(df, from, using) {
+	const mapper = typeof from === 'function' ? from : Array.isArray(from) ? pick(from) : pick([from])
+	const reducers = []
+
+	if (typeof using === 'string') reducers.push({ field: using, formula: identity })
+	if (typeof using === 'object')
+		Object.entries(using).forEach(([field, formula]) => reducers.push({ field, formula }))
+
+	df.config.summaries.push({ mapper, reducers })
+
+	return df
+}
 /**
  * Joins the DataFrame with another dataframe or object array.
  * @param {import('./types'.DataFrame)} df     - The DataFrame object to join.
@@ -412,7 +439,8 @@ function fill(df, values, original = undefined) {
  *
  * @returns {import('./types').DataFrame}  The summarized DataFrame object.
  */
-function rollup(df, summaries = []) {
+function rollup(df) {
+	const summaries = [...df.config.summaries]
 	if (df.config.group_by.length === 0) {
 		throw new Error('Use groupBy to specify the columns to group by.')
 	}
@@ -435,6 +463,8 @@ function rollup(df, summaries = []) {
 
 	// Reset config group_by after rollup operation.
 	df.config.group_by = []
+	df.config.align_by = []
+	df.config.summaries = []
 	return dataframe(aggregatedData, { metadata: newMetadata })
 }
 

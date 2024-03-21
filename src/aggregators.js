@@ -1,5 +1,5 @@
 import { quantile } from 'd3-array'
-import { pick, identity } from 'ramda'
+
 /**
  * Counts the number of values in an array.
  *
@@ -24,34 +24,4 @@ export const quantiles = (values) => {
 	const iqr = q3 - q1
 
 	return { q1, q3, iqr, qr_min: q1 - 1.5 * iqr, qr_max: q1 + 1.5 * iqr }
-}
-
-/**
- * Returns an aggregator object with a mapper and reducer function.
- *
- * @param {string|string[]} keys - The key or keys to aggregate.
- * @param {Function} agg - The aggregation function.
- * @returns {Object} - An object with a mapper and reducer function.
- */
-export function getAggregator(keys, agg) {
-	const mapper = pick(Array.isArray ? keys : [keys])
-	const reducer = typeof agg === 'function' ? agg : identity
-	return {
-		mapper,
-		reducer
-	}
-}
-
-/**
- * Returns the default aggregator which rolls up the columns other than the group_by columns into a single object.
- *
- * @param {import('./types').Metadata} metadata - The metadata for the columns to be aggregated.
- * @param {Object} config                       - The configuration used to build the aggregator.
- *
- * @returns {Object} An object containing the default aggregator for the specified metadata and configuration.
- */
-export function defaultAggregator(metadata, config) {
-	const child = metadata.filter((col) => !config.group_by.includes(col.name))
-	const keys = child.map((col) => col.name)
-	return { name: config.children, ...getAggregator(keys), metadata: child }
 }

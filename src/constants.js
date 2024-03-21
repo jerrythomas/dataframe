@@ -7,7 +7,8 @@ export const defaultConfig = {
 	actual_flag: 'actual_flag',
 	group_by: [],
 	align_by: [],
-	template: {}
+	template: {},
+	summaries: []
 }
 
 export const defaultPathOptions = {

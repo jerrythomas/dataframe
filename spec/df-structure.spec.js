@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { dataframe } from '../src/dataframe'
 import fixture from './fixtures/group'
-import { counter, getAggregator } from '../src/aggregators'
+import { counter } from '../src/aggregators'
 import { mean, quantile } from 'd3-array'
 import groupData from './fixtures/rollup'
 
@@ -64,7 +64,7 @@ describe('dataframe -> alter structure', () => {
 
 		it('should group by a column', () => {
 			const df = dataframe(fixture.simple)
-			const grouped = df.groupBy('country').rollup()
+			const grouped = df.groupBy('country').summarize('name', 'children').rollup()
 			expect(grouped.data).toEqual(fixture.list_by_country)
 			expect(grouped.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -79,6 +79,7 @@ describe('dataframe -> alter structure', () => {
 		it('should group by multiple columns', () => {
 			const df = dataframe(fixture.airports)
 			const grouped = df.groupBy('country', 'state').rollup()
+
 			expect(grouped.data).toEqual(fixture.list_by_country_state)
 			expect(grouped.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -96,8 +97,7 @@ describe('dataframe -> alter structure', () => {
 
 		it('should rollup counts grouping by country', () => {
 			const df = dataframe(fixture.airports)
-			const operators = [{ name: 'count', ...getAggregator(['name'], counter) }]
-			const grouped = df.groupBy('country').rollup(operators)
+			const grouped = df.groupBy('country').summarize(['name'], { count: counter }).rollup()
 			expect(grouped.data).toEqual(fixture.count_by_country)
 			expect(grouped.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -107,8 +107,7 @@ describe('dataframe -> alter structure', () => {
 
 		it('should rollup counts grouping by country and state', () => {
 			const df = dataframe(fixture.airports)
-			const operators = [{ name: 'count', ...getAggregator(['name'], counter) }]
-			const grouped = df.groupBy('country', 'state').rollup(operators)
+			const grouped = df.groupBy('country', 'state').summarize('name', { count: counter }).rollup()
 			expect(grouped.data).toEqual(fixture.count_by_country_state)
 			expect(grouped.metadata).toEqual([
 				{ name: 'country', type: 'string' },
@@ -117,22 +116,17 @@ describe('dataframe -> alter structure', () => {
 			])
 		})
 
-		it('should rollup using custom aggregations', () => {
+		it('should rollup using multiple aggregations', () => {
 			const df = dataframe(fixture.items)
-			const operators = [
-				{ name: 'avg_cost', mapper: (row) => row.price * row.quantity, reducer: mean },
-				{
-					name: 'cost_q1',
-					mapper: (row) => row.price * row.quantity,
-					reducer: (v) => quantile(v, 0.25)
-				},
-				{
-					name: 'cost_q3',
-					mapper: (row) => row.price * row.quantity,
-					reducer: (v) => quantile(v, 0.75)
-				}
-			]
-			const grouped = df.groupBy('category').rollup(operators)
+			const mapper = (row) => row.price * row.quantity
+			const grouped = df
+				.groupBy('category')
+				.summarize(mapper, {
+					avg_cost: mean,
+					cost_q1: (v) => quantile(v, 0.25),
+					cost_q3: (v) => quantile(v, 0.75)
+				})
+				.rollup()
 			expect(grouped.data).toEqual(fixture.cost_by_category)
 			expect(grouped.metadata).toEqual([
 				{ name: 'category', type: 'string' },

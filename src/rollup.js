@@ -1,4 +1,5 @@
-import { omit, pick, mergeLeft, map, difference, uniq, pipe } from 'ramda'
+import { omit, pick, mergeLeft, map, difference, uniq, pipe, identity } from 'ramda'
+
 /**
  * Groups data by specified keys.
  *
@@ -26,7 +27,8 @@ export function groupDataByKeys(data, groupByKeys, summaries) {
  * @returns {Object} An object with keys for each summary initialized to empty arrays.
  */
 export function initialValues(summaries) {
-	return summaries.reduce((acc, { name }) => ({ ...acc, [name]: [] }), {})
+	const fields = summaries.map(({ reducers }) => reducers.map((r) => r.field)).flat()
+	return fields.reduce((acc, name) => ({ ...acc, [name]: [] }), {})
 }
 
 /**
@@ -37,8 +39,11 @@ export function initialValues(summaries) {
  * @param {Array} summaries - An array of summary objects.
  */
 export function addToSummaries(group, row, summaries) {
-	summaries.forEach(({ name, mapper }) => {
-		group[name].push(mapper(row))
+	summaries.forEach(({ mapper, reducers }) => {
+		const value = mapper(row)
+		reducers.forEach((r) => {
+			group[r.field].push(value)
+		})
 	})
 }
 
@@ -69,12 +74,13 @@ export function fillAlignedData(groupedData, config, fillRowsFunc) {
  * @returns {Array} Aggregated data array with computed summary values.
  */
 export function aggregateData(dataArray, summaries) {
+	const fields = summaries.map(({ name, reducers }) => reducers.map((r) => ({ name, ...r }))).flat()
 	return dataArray.map((row) => ({
 		...row,
-		...summaries.reduce(
-			(acc, { name, reducer }) => ({
+		...fields.reduce(
+			(acc, { field, formula }) => ({
 				...acc,
-				[name]: reducer(row[name])
+				[field]: formula(row[field])
 			}),
 			{}
 		)
@@ -97,4 +103,35 @@ export function getAlignGenerator(data, config) {
 	const subset = pipe(map(pick(align_by)), uniq)(data)
 
 	return pipe(map(pick(align_by)), uniq, difference(subset), map(mergeLeft(template)))
+}
+
+/**
+ * Returns an aggregator object with a mapper and reducer function.
+ *
+ * @param {string|string[]} from - The key or keys to aggregate.
+ * @param {Function} using - The aggregation function.
+ * @returns {Object} - An object with a mapper and reducer function.
+ */
+export function getAggregator(from, into, using = identity) {
+	const mapper = pick(Array.isArray ? from : [from])
+	// const reducer = typeof using === 'function' ? using : identity
+	return {
+		mapper,
+		reducers: [{ field: into, formula: using }]
+	}
+}
+
+/**
+ * Returns the default aggregator which rolls up the columns other than the group_by columns into a single object.
+ *
+ * @param {import('./types').Metadata} metadata - The metadata for the columns to be aggregated.
+ * @param {Object} config                       - The configuration used to build the aggregator.
+ *
+ * @returns {Object} An object containing the default aggregator for the specified metadata and configuration.
+ */
+export function defaultAggregator(metadata, config) {
+	const child = metadata.filter((col) => !config.group_by.includes(col.name))
+	const keys = child.map((col) => col.name)
+
+	return { ...getAggregator(keys, config.children), metadata: child }
 }

@@ -1,4 +1,4 @@
-import { identity, pick } from 'ramda'
+import { identity } from 'ramda'
 import { defaultPathOptions } from './constants'
 import { getDeepScanSample } from './infer'
 import { getType } from './utils'
@@ -182,13 +182,15 @@ export function getDataRenamer(keyNamer, keys) {
  */
 export function buildMetadata(data, oldMetadata, groupByKeys, summaries) {
 	const metadata = oldMetadata.filter((col) => groupByKeys.includes(col.name))
-	summaries.forEach(({ name }) => {
-		const type = getType(data[0][name])
-		if (type === 'array') {
-			metadata.push({ name, type, metadata: deriveColumnMetadata(data[0][name]) })
-		} else {
-			metadata.push({ name, type })
-		}
+	summaries.forEach(({ reducers }) => {
+		reducers.forEach(({ field }) => {
+			const type = getType(data[0][field])
+			if (type === 'array') {
+				metadata.push({ name: field, type, metadata: deriveColumnMetadata(data[0][field]) })
+			} else {
+				metadata.push({ name: field, type })
+			}
+		})
 	})
 	return metadata
 }
