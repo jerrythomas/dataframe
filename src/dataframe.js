@@ -68,7 +68,7 @@ export function dataframe(data, options = {}) {
 	df.delete = () => deleteRows(df)
 
 	// transform data
-	df.rollup = (fields) => rollup(df, fields)
+	df.rollup = () => rollup(df)
 	df.apply = (fn) => applyFn(df, fn)
 
 	df.select = (...fields) => select(df, ...fields)

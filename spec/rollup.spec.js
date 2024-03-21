@@ -152,7 +152,7 @@ describe('dataframe -> rollup', () => {
 	})
 
 	it('should calculate team max scores', () => {
-		let result = dataframe(fixture.nba)
+		const result = dataframe(fixture.nba)
 			.groupBy('team')
 			.summarize((d) => d.score, { score: max })
 			.rollup()

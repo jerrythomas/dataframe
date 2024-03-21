@@ -1,5 +1,4 @@
 import { ascending, descending } from 'd3-array'
-import { counter } from './aggregators'
 import { createFormatter } from './formatter'
 import { defaultViewOptions, defaultActionOrder } from './constants'
 import { compact } from './string'
