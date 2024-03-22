@@ -22,7 +22,7 @@ rules:
   no-implicit-coercion: error
   max-lines-per-function:
     - error
-    - max: 50
+    - max: 25
       skipBlankLines: true
       skipComments: true
 overrides:
