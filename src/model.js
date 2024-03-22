@@ -1,29 +1,44 @@
 import { getDeepScanSample } from './infer'
 import { getType } from './utils'
-import { identity } from 'ramda'
+import { identity, clone as copy } from 'ramda'
 
-export function model(options = {}) {
-	const { scanDeep } = options
+/**
+ * A model is a representation of a dataset
+ * @returns an object with methods to manipulate the model
+ */
+export function model() {
 	let data = []
 
-	const fns = {
+	const actions = {
 		get: () => data,
-		useDeepScan: () => model({ ...options, scanDeep: true }),
+		/*
+		 * Creates a clone from another model
+		 * @param {Object} other - the other model object to clone from
+		 */
+		clone: (other) => {
+			data = copy(other.get())
+			return actions
+		},
+		/**
+		 * Renames the reference names using a renamer
+		 * @param {Function} rename - the renamer function
+		 */
 		renameUsing: (rename = identity) => {
 			if (rename !== identity) {
 				data = data.map((x) => ({ ...x, name: rename(x.name) }))
 			}
-			return fns
+			return actions
 		},
 		/**
 		 * Analyzes the input data and derives a model from it
 		 *
-		 * @param {Array|Object} value - the data to derive the model from
+		 * @param {Array|Object} value      - the data to derive the model from
+		 * @param {boolean}      sparseData - indicates that rows may have missing attributes
 		 * @returns {Object}     this
 		 */
-		from: (value) => {
-			data = deriveModel(value, scanDeep)
-			return fns
+		from: (value, sparseData) => {
+			data = deriveModel(value, sparseData)
+			return actions
 		},
 		/**
 		 * Merges the model with another model
@@ -34,10 +49,10 @@ export function model(options = {}) {
 		 */
 		merge: (other, override = false) => {
 			data = mergeModels(data, other.get(), override)
-			return fns
+			return actions
 		}
 	}
-	return fns
+	return actions
 }
 
 /**

@@ -6,7 +6,8 @@ describe('model', () => {
 		const first = model()
 		expect(first).toEqual({
 			get: expect.any(Function),
-			useDeepScan: expect.any(Function),
+			clone: expect.any(Function),
+			// useDeepScan: expect.any(Function),
 			renameUsing: expect.any(Function),
 			from: expect.any(Function),
 			merge: expect.any(Function)
@@ -15,7 +16,7 @@ describe('model', () => {
 	})
 	it('should derive model from data', () => {
 		let first = model().from([{ id: 1 }, { name: 'Alpha' }])
-		expect(Object.keys(first)).toEqual(['get', 'useDeepScan', 'renameUsing', 'from', 'merge'])
+		expect(Object.keys(first)).toEqual(['get', 'clone', 'renameUsing', 'from', 'merge'])
 		expect(first.get()).toEqual([{ name: 'id', type: 'integer' }])
 		first = model().from({ id: 1 })
 		expect(first.get()).toEqual([{ name: 'id', type: 'integer' }])
@@ -23,8 +24,8 @@ describe('model', () => {
 
 	it('should allow deep scan', () => {
 		const first = model()
-			.useDeepScan()
-			.from([{ name: 'Alpha' }, { id: 1 }])
+			// .useDeepScan()
+			.from([{ name: 'Alpha' }, { id: 1 }], true)
 		expect(first.get()).toEqual([
 			{ name: 'name', type: 'string' },
 			{ name: 'id', type: 'integer' }
@@ -69,11 +70,14 @@ describe('model', () => {
 
 	it('should merge models using override for conflicts', () => {
 		const second = model().from([{ id: 1, name: 'Beta' }])
-		const first = model()
-			.from([{ id: 'Alpha', name: 'Alpha' }])
-			.merge(second, true)
-		expect(first.get()).toEqual([
+		const first = model().from([{ id: 'Alpha', name: 'Alpha' }])
+		const result = model().clone(first).merge(second, true)
+		expect(result.get()).toEqual([
 			{ name: 'id', type: 'integer', mixedTypes: true },
+			{ name: 'name', type: 'string' }
+		])
+		expect(first.get()).toEqual([
+			{ name: 'id', type: 'string' },
 			{ name: 'name', type: 'string' }
 		])
 	})

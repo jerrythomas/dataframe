@@ -13,6 +13,8 @@ describe('library', () => {
 			'compact',
 			'toHexString',
 			'getType',
+			'renamer',
+			'model',
 			'dataframe',
 			'tweenable',
 			'dataview'

@@ -1,6 +1,8 @@
 import './types'
 export * from './string'
 export * from './utils'
+export { renamer } from './renamer'
+export { model } from './model'
 export { dataframe } from './dataframe'
 export { tweenable } from './tweenable'
 export { dataview } from './view'

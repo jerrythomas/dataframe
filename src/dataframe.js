@@ -19,6 +19,7 @@ import { getRenamer, getRenamerUsingLookup, leftJoin } from './join'
  * @param {Array} [options.metadata] - The metadata to use instead of deriving it from the data.
  * @returns {import('./types').DataFrame} A new DataFrame object with methods for data manipulation.
  */
+// eslint-disable-next-line max-lines-per-function
 export function dataframe(data, options = {}) {
 	if (!Array.isArray(data)) throw new Error('data must be an array of objects')
 
