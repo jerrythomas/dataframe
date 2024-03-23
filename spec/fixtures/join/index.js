@@ -5,6 +5,9 @@ import left from './left.json'
 import right from './right.json'
 import full from './full.json'
 import nested from './nested.json'
+import cross from './cross.json'
+import semi from './semi.json'
+import anti from './anti.json'
 
 export default {
 	groups,
@@ -13,5 +16,8 @@ export default {
 	left,
 	right,
 	full,
-	nested
+	nested,
+	cross,
+	semi,
+	anti
 }

@@ -229,9 +229,9 @@ function joinDataFrame(df, other, query, opts = {}) {
  *
  * @returns {import('./types').DataFrame} - New DataFrame of parent objects with children nested under them.
  */
-export function nestedJoin(child, parent, using, how = {}) {
+export function nestedJoin(parent, child, using, how = {}) {
 	const { children = 'children' } = how
-	const data = parent.data.map((p) => ({ ...p, [children]: child.data.filter((c) => using(c, p)) }))
+	const data = parent.data.map((p) => ({ ...p, [children]: child.data.filter((c) => using(p, c)) }))
 	const metadata = [...parent.metadata, { name: children, type: 'array', metadata: child.metadata }]
 	return dataframe(data, { metadata })
 }

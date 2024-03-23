@@ -5,7 +5,7 @@ import joindata from './fixtures/join'
 describe('dataframe -> join operations', () => {
 	const child = dataframe([...joindata.ships])
 	const parent = dataframe([...joindata.groups])
-	const matcher = (child, parent) => child.group_id === parent.id
+	const matcher = (child, parent) => child.group_id === parent.group_id
 
 	describe('inner join', () => {
 		it('should perform inner join', () => {
@@ -32,7 +32,7 @@ describe('dataframe -> join operations', () => {
 		})
 
 		it('should perform inner join renaming second', () => {
-			const result = child.join(parent, matcher, { right: { prefix: 'group' } })
+			const result = child.join(parent, matcher, { right: { prefix: 'y' } })
 			expect(result.data).toEqual(joindata.inner.with_y_rename)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(child.data).toEqual(joindata.ships)
@@ -41,7 +41,8 @@ describe('dataframe -> join operations', () => {
 				{ name: 'id', type: 'integer' },
 				{ name: 'name', type: 'string' },
 				{ name: 'group_id', type: 'integer' },
-				{ name: 'group_class', type: 'string' }
+				{ name: 'y_group_id', type: 'integer' },
+				{ name: 'y_class', type: 'string' }
 			])
 		})
 
@@ -55,7 +56,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'x_id', type: 'integer' },
 				{ name: 'x_name', type: 'string' },
 				{ name: 'x_group_id', type: 'integer' },
-				{ name: 'id', type: 'integer' },
+				{ name: 'group_id', type: 'integer' },
 				{ name: 'class', type: 'string' }
 			])
 		})
@@ -69,7 +70,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'x_id', type: 'integer' },
 				{ name: 'x_name', type: 'string' },
 				{ name: 'x_group_id', type: 'integer' },
-				{ name: 'y_id', type: 'integer' },
+				{ name: 'y_group_id', type: 'integer' },
 				{ name: 'y_class', type: 'string' }
 			])
 		})
@@ -103,7 +104,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'id', type: 'integer' },
 				{ name: 'name', type: 'string' },
 				{ name: 'group_id', type: 'integer' },
-				{ name: 'y_id', type: 'integer' },
+				{ name: 'y_group_id', type: 'integer' },
 				{ name: 'y_class', type: 'string' }
 			])
 		})
@@ -117,7 +118,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'x_id', type: 'integer' },
 				{ name: 'x_name', type: 'string' },
 				{ name: 'x_group_id', type: 'integer' },
-				{ name: 'id', type: 'integer' },
+				{ name: 'group_id', type: 'integer' },
 				{ name: 'class', type: 'string' }
 			])
 		})
@@ -135,7 +136,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'x_id', type: 'integer' },
 				{ name: 'x_name', type: 'string' },
 				{ name: 'x_group_id', type: 'integer' },
-				{ name: 'y_id', type: 'integer' },
+				{ name: 'y_group_id', type: 'integer' },
 				{ name: 'y_class', type: 'string' }
 			])
 		})
@@ -169,7 +170,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'id', type: 'integer' },
 				{ name: 'name', type: 'string' },
 				{ name: 'group_id', type: 'integer' },
-				{ name: 'y_id', type: 'integer' },
+				{ name: 'y_group_id', type: 'integer' },
 				{ name: 'y_class', type: 'string' }
 			])
 		})
@@ -183,7 +184,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'x_id', type: 'integer' },
 				{ name: 'x_name', type: 'string' },
 				{ name: 'x_group_id', type: 'integer' },
-				{ name: 'id', type: 'integer' },
+				{ name: 'group_id', type: 'integer' },
 				{ name: 'class', type: 'string' }
 			])
 		})
@@ -201,7 +202,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'x_id', type: 'integer' },
 				{ name: 'x_name', type: 'string' },
 				{ name: 'x_group_id', type: 'integer' },
-				{ name: 'y_id', type: 'integer' },
+				{ name: 'y_group_id', type: 'integer' },
 				{ name: 'y_class', type: 'string' }
 			])
 		})
@@ -234,7 +235,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'id', type: 'integer' },
 				{ name: 'name', type: 'string' },
 				{ name: 'group_id', type: 'integer' },
-				{ name: 'y_id', type: 'integer' },
+				{ name: 'y_group_id', type: 'integer' },
 				{ name: 'y_class', type: 'string' }
 			])
 		})
@@ -248,7 +249,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'x_id', type: 'integer' },
 				{ name: 'x_name', type: 'string' },
 				{ name: 'x_group_id', type: 'integer' },
-				{ name: 'id', type: 'integer' },
+				{ name: 'group_id', type: 'integer' },
 				{ name: 'class', type: 'string' }
 			])
 		})
@@ -266,7 +267,7 @@ describe('dataframe -> join operations', () => {
 				{ name: 'x_id', type: 'integer' },
 				{ name: 'x_name', type: 'string' },
 				{ name: 'x_group_id', type: 'integer' },
-				{ name: 'y_id', type: 'integer' },
+				{ name: 'y_group_id', type: 'integer' },
 				{ name: 'y_class', type: 'string' }
 			])
 		})
@@ -274,12 +275,12 @@ describe('dataframe -> join operations', () => {
 
 	describe('nested join', () => {
 		it('should perform nested join using `nestedJoin`', () => {
-			const result = child.nestedJoin(parent, matcher)
+			const result = parent.nestedJoin(child, matcher)
 			expect(result.data).toEqual(joindata.nested)
 			expect(child.data).toEqual(joindata.ships)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(result.metadata).toEqual([
-				{ name: 'id', type: 'integer' },
+				{ name: 'group_id', type: 'integer' },
 				{ name: 'class', type: 'string' },
 				{
 					metadata: [
@@ -294,12 +295,12 @@ describe('dataframe -> join operations', () => {
 		})
 
 		it('should join generating a nested dataframe', () => {
-			const result = child.join(parent, matcher, { type: 'nested' })
+			const result = parent.join(child, matcher, { type: 'nested' })
 			expect(result.data).toEqual(joindata.nested)
 			expect(child.data).toEqual(joindata.ships)
 			expect(parent.data).toEqual(joindata.groups)
 			expect(result.metadata).toEqual([
-				{ name: 'id', type: 'integer' },
+				{ name: 'group_id', type: 'integer' },
 				{ name: 'class', type: 'string' },
 				{
 					metadata: [
