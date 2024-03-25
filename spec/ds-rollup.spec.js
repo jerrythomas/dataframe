@@ -109,4 +109,22 @@ describe('dataset -> rollup', () => {
 			.rollup()
 		expect(result.select()).toEqual(fixtures.align_using)
 	})
+
+	it('should generate timelapse groups', () => {
+		function tweenable(data, by, group, template) {
+			return dataset(data)
+				.sortBy(...group)
+				.groupBy(by)
+				.using(template)
+				.alignBy(...group)
+				.rollup()
+				.sortBy(by)
+				.select()
+		}
+		const result = tweenable(fixtures.nba, 'date', ['group', 'team'], {
+			score: 0,
+			pct: 0
+		})
+		expect(result).toEqual(fixtures.nba_by_date)
+	})
 })

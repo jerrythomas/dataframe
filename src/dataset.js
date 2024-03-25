@@ -20,17 +20,18 @@ export function dataset(data, options = {}) {
 		alignBy: (...fields) => dataset(data, alignBy(config, ...fields)),
 		using: (template) => dataset(data, using(config, template)),
 		summarize: (from, using) => dataset(data, summarize(config, from, using)),
-		// modifiers
-		sortBy: (...fields) => dataset(sortDataBy(data, ...fields)),
+		// alter keys
 		rename: (how) => dataset(renameKeys(data, how)),
 		drop: (...fields) => dataset(dropKeys(data, ...fields)),
+		// alter rows in place
+		sortBy: (...fields) => dataset(sortDataBy(data, ...fields)),
 		delete: () => dataset(deleteRows(data, config.filter || identity)),
 		update: (value) => dataset(updateRows(data, config.filter || identity, value)),
-		apply: (callback) => dataset(data.map(callback)),
 		fillNA: (value) => dataset(fillNA(data, value)),
+		// transform data
+		apply: (callback) => dataset(data.map(callback)),
 		rollup: () => dataset(rollup(data, config)),
 		select: (...cols) => selectKeys(data, config, ...cols),
-
 		// set operations
 		union: (other) => dataset(data.concat(other)),
 		minus: (other) => dataset(data.filter((d) => !other.find((x) => equals(x, d)))),
