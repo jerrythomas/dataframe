@@ -436,6 +436,9 @@ function rollup(df) {
 	if (hasAlignBy) {
 		const fillRows = getAlignGenerator(df.data, df.config)
 		alignedData = fillAlignedData(alignedData, df.config, fillRows)
+		alignedData.forEach((group) => {
+			group[df.config.children] = sortBy(group[df.config.children], ...df.config.align_by)
+		})
 	}
 
 	const aggregatedData = aggregateData(alignedData, summaries)

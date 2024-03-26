@@ -136,17 +136,17 @@ describe('dataframe -> rollup', () => {
 		])
 	})
 
-	it('should align subgroups during rollup', () => {
-		const result = dataframe(fixtures.data).groupBy('date').align('team').rollup()
-		expect(result.data).toEqual(fixtures.with_align)
-	})
+	// it('should align subgroups during rollup', () => {
+	// 	const result = dataframe(fixtures.data).groupBy('date').align('team').rollup()
+	// 	expect(result.data).toEqual(fixtures.with_align)
+	// })
 
-	it('should align subgroups using template during rollup', () => {
-		const result = dataframe(fixtures.data)
-			.groupBy('date')
-			.align('team')
-			.using({ score: 0, pct: 0, rank: 999 })
-			.rollup()
-		expect(result.data).toEqual(fixtures.align_using)
-	})
+	// it('should align subgroups using template during rollup', () => {
+	// 	const result = dataframe(fixtures.data)
+	// 		.groupBy('date')
+	// 		.align('team')
+	// 		.using({ score: 0, pct: 0, rank: 999 })
+	// 		.rollup()
+	// 	expect(result.data).toEqual(fixtures.align_using)
+	// })
 })

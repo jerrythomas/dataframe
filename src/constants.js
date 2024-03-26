@@ -6,6 +6,7 @@ export const pickAllowedConfig = pick(['children', 'actual_flag'])
 export const defaultConfig = {
 	children: 'children',
 	actual_flag: 'actual_flag',
+	inplace: false,
 	group_by: [],
 	align_by: [],
 	template: {},

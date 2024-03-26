@@ -3,20 +3,6 @@
     "children": [
       {
         "actual_flag": 1,
-        "pct": 85,
-        "rank": 1,
-        "score": 110,
-        "team": "Los Angeles Lakers"
-      },
-      {
-        "actual_flag": 1,
-        "pct": 80,
-        "rank": 2,
-        "score": 105,
-        "team": "Miami Heat"
-      },
-      {
-        "actual_flag": 1,
         "pct": 90,
         "rank": 3,
         "score": 112,
@@ -28,6 +14,20 @@
         "score": 0,
         "rank": 999,
         "team": "Houston Rockets"
+      },
+      {
+        "actual_flag": 1,
+        "pct": 85,
+        "rank": 1,
+        "score": 110,
+        "team": "Los Angeles Lakers"
+      },
+      {
+        "actual_flag": 1,
+        "pct": 80,
+        "rank": 2,
+        "score": 105,
+        "team": "Miami Heat"
       }
     ],
     "date": "2020-01-01"
@@ -49,18 +49,18 @@
         "team": "Houston Rockets"
       },
       {
-        "actual_flag": 1,
-        "pct": 84,
-        "rank": 3,
-        "score": 110,
-        "team": "Miami Heat"
-      },
-      {
         "actual_flag": 0,
         "pct": 0,
         "score": 0,
         "rank": 999,
         "team": "Los Angeles Lakers"
+      },
+      {
+        "actual_flag": 1,
+        "pct": 84,
+        "rank": 3,
+        "score": 110,
+        "team": "Miami Heat"
       }
     ],
     "date": "2020-02-01"

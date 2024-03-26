@@ -16,7 +16,7 @@ describe('library', () => {
 			'renamer',
 			'model',
 			'dataframe',
-			'tweenable',
+			'dataset',
 			'dataview'
 		])
 	})

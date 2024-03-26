@@ -11,6 +11,7 @@ import with_align from './with_align.json'
 import align_using from './align_using.json'
 import nba from './nba.json'
 import nba_by_date from './nba_by_date.json'
+import tweenable from './tweenable.json'
 
 export default {
 	simple,
@@ -25,5 +26,6 @@ export default {
 	with_align,
 	align_using,
 	nba,
-	nba_by_date
+	nba_by_date,
+	tweenable
 }

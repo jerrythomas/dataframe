@@ -9,6 +9,7 @@ describe('dataset', () => {
 	it('should return an object with methods', () => {
 		const ds = dataset([])
 		expect(ds).toEqual({
+			override: expect.any(Function),
 			where: expect.any(Function),
 			groupBy: expect.any(Function),
 			alignBy: expect.any(Function),
@@ -98,19 +99,19 @@ describe('dataset', () => {
 		describe('rename', () => {
 			it('should perform rename using function', () => {
 				const { renameObject } = renamer({ prefix: 'x', keys: ['a'] }).get()
-				const result = dataset([{ a: 1 }, { a: 2 }])
-					.rename(renameObject)
-					.select()
+				const data = [{ a: 1 }, { a: 2 }]
+				const result = dataset(data).rename(renameObject).select()
 				expect(result).toEqual([{ x_a: 1 }, { x_a: 2 }])
+				expect(result).not.toEqual(data)
 			})
 			it('should perform rename using a key map', () => {
-				const result = dataset([
+				const data = [
 					{ b: 'X', a: 1, c: 3 },
 					{ a: 2, b: 'Y' }
-				])
-					.rename({ a: 'b' })
-					.select()
+				]
+				const result = dataset(data).rename({ a: 'b' }).select()
 				expect(result).toEqual([{ b: 1, c: 3 }, { b: 2 }])
+				expect(result).not.toEqual(data)
 			})
 		})
 		describe('drop', () => {
@@ -150,7 +151,7 @@ describe('dataset', () => {
 					{ a: 'x', b: 3 },
 					{ a: 'x', b: 4 }
 				])
-				expect(result.select()).toEqual(data)
+				expect(result.select()).not.toEqual(data)
 			})
 
 			it('should update a record with multiple attributes', () => {
@@ -160,7 +161,7 @@ describe('dataset', () => {
 					{ a: 2, b: 3, c: 2, y: 4 },
 					{ a: 3, b: 4, c: 2, y: 4 }
 				])
-				expect(result.select()).toEqual(data)
+				expect(result.select()).not.toEqual(data)
 			})
 
 			it('should update selected rows only', () => {
@@ -171,11 +172,11 @@ describe('dataset', () => {
 					{ a: 9, b: 3 },
 					{ a: 3, b: 4 }
 				])
-				expect(result.select()).toEqual(data)
+				expect(result.select()).not.toEqual(data)
 			})
 
 			it('should update using a function', () => {
-				const result = dataset(data).update((row) => (row.a = row.a * 2))
+				const result = dataset(data).update((row) => ({ ...row, a: row.a * 2 }))
 				expect(result.select()).toEqual([
 					{ a: 2, b: 2 },
 					{ a: 4, b: 3 },
@@ -197,7 +198,7 @@ describe('dataset', () => {
 			it('should delete all records', () => {
 				const result = dataset(data).delete()
 				expect(result.select()).toEqual([])
-				expect(result.select()).toEqual(data)
+				expect(result.select()).not.toEqual(data)
 			})
 
 			it('should delete selected rows only', () => {
@@ -207,7 +208,7 @@ describe('dataset', () => {
 					{ a: 1, b: 2 },
 					{ a: 3, b: 4 }
 				])
-				expect(result.select()).toEqual(data)
+				expect(result.select()).not.toEqual(data)
 			})
 		})
 
@@ -224,6 +225,7 @@ describe('dataset', () => {
 					{ a: 2, b: 0 },
 					{ a: null, b: 4 }
 				])
+				expect(result.select()).not.toEqual(data)
 			})
 		})
 		describe('sort', () => {

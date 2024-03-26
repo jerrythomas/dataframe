@@ -1,6 +1,6 @@
 import { equals, identity, pick, omit, clone } from 'ramda'
 import { descending } from 'd3-array'
-import { defaultConfig } from './constants'
+import { pickAllowedConfig, defaultConfig, includeAll } from './constants'
 import { deriveSortableColumn } from './infer'
 import { groupDataByKeys, fillAlignedData, getAlignGenerator, aggregateData } from './rollup'
 /**
@@ -15,6 +15,7 @@ export function dataset(data, options = {}) {
 
 	const actions = {
 		// configuration
+		override: (props) => dataset(data, { ...config, ...pickAllowedConfig(props) }),
 		where: (condition) => dataset(data, where(config, condition)),
 		groupBy: (...fields) => dataset(data, groupBy(config, ...fields)),
 		alignBy: (...fields) => dataset(data, alignBy(config, ...fields)),
@@ -23,9 +24,9 @@ export function dataset(data, options = {}) {
 		// alter keys
 		rename: (how) => dataset(renameKeys(data, how)),
 		drop: (...fields) => dataset(dropKeys(data, ...fields)),
-		// alter rows in place
+		// alter rows
 		sortBy: (...fields) => dataset(sortDataBy(data, ...fields)),
-		delete: () => dataset(deleteRows(data, config.filter || identity)),
+		delete: () => dataset(deleteRows(data, config.filter || includeAll)),
 		update: (value) => dataset(updateRows(data, config.filter || identity, value)),
 		fillNA: (value) => dataset(fillNA(data, value)),
 		// transform data
@@ -296,10 +297,7 @@ function dropKeys(data, ...keys) {
  * @returns {Array<Object>}         - The updated data with rows deleted based on the condition.
  */
 function deleteRows(data, condition) {
-	for (let i = data.length - 1; i >= 0; i--) {
-		if (condition(data[i])) data.splice(i, 1)
-	}
-	return data
+	return data.filter((row) => !condition(row))
 }
 
 /**
@@ -314,15 +312,9 @@ function updateRows(data, filter, value) {
 	if (typeof value !== 'function' && typeof value !== 'object') {
 		throw new Error('Value must be an object or function')
 	}
-	const updater =
-		typeof value === 'function'
-			? value
-			: (row) => Object.entries(value).forEach(([k, v]) => (row[k] = v))
-	data.forEach((row) => {
-		if (filter(row)) updater(row)
-	})
-
-	return data
+	return data.map((row) =>
+		filter(row) ? (typeof value === 'function' ? value(row) : { ...row, ...value }) : row
+	)
 }
 
 /**
@@ -334,12 +326,15 @@ function updateRows(data, filter, value) {
  */
 function fillNA(data, value) {
 	const fill = (row) => {
+		const filled = {}
 		Object.entries(value).forEach(([k, v]) => {
-			if (row[k] === undefined || row[k] === null) row[k] = v
+			if (row[k] === undefined || row[k] === null) {
+				filled[k] = v
+			}
 		})
+		return { ...row, ...filled }
 	}
-	data.forEach(fill)
-	return data
+	return data.map(fill)
 }
 
 /**
@@ -407,15 +402,16 @@ function rollup(data, config) {
 
 	const summaries = clone(config.summaries)
 	const hasAlignBy = config.align_by.length > 0
-	if (summaries.length === 0) {
-		summaries.push(defaultAggregator(config))
-	}
+	if (summaries.length === 0) summaries.push(defaultAggregator(config))
 
 	let alignedData = groupDataByKeys(data, config.group_by, summaries)
 
 	if (hasAlignBy) {
 		const fillRows = getAlignGenerator(data, config)
 		alignedData = fillAlignedData(alignedData, config, fillRows)
+		alignedData.forEach((group) => {
+			group[config.children] = sortDataBy(group[config.children], ...config.align_by)
+		})
 	}
 
 	const aggregatedData = aggregateData(alignedData, summaries)
@@ -433,5 +429,8 @@ function rollup(data, config) {
  * @returns {Object} An object containing the default aggregator for the specified metadata and configuration.
  */
 export function defaultAggregator(config) {
-	return { mapper: omit(config.group_by), reducers: [{ field: 'children', formula: identity }] }
+	return {
+		mapper: omit(config.group_by),
+		reducers: [{ field: config.children, formula: identity }]
+	}
 }
