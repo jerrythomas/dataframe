@@ -114,13 +114,13 @@ export function getAlignGenerator(data, config) {
  * @param {Function}      using - The aggregation function.
  * @returns {import('./types').SummaryConfig}  - An object with a mapper and reducer function.
  */
-export function getAggregator(from, into, using = identity) {
-	// const mapper = pick(Array.isArray ? from : [from])
-	return {
-		mapper: pick(from),
-		reducers: [{ field: into, formula: using }]
-	}
-}
+// export function getAggregator(from, into, using = identity) {
+// 	// const mapper = pick(Array.isArray ? from : [from])
+// 	return {
+// 		mapper: pick(from),
+// 		reducers: [{ field: into, formula: using }]
+// 	}
+// }
 
 /**
  * Returns the default aggregator which rolls up the columns other than the group_by columns into a single object.
@@ -130,9 +130,9 @@ export function getAggregator(from, into, using = identity) {
  *
  * @returns {Object} An object containing the default aggregator for the specified metadata and configuration.
  */
-export function defaultAggregator(metadata, config) {
-	const child = metadata.filter((col) => !config.group_by.includes(col.name))
-	const keys = child.map((col) => col.name)
+// export function defaultAggregator(metadata, config) {
+// 	const child = metadata.filter((col) => !config.group_by.includes(col.name))
+// 	const keys = child.map((col) => col.name)
 
-	return { ...getAggregator(keys, config.children), metadata: child }
-}
+// 	return { ...getAggregator(keys, config.children), metadata: child }
+// }

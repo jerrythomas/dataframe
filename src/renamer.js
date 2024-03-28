@@ -30,44 +30,16 @@ import { omit, identity } from 'ramda'
  */
 export function renamer(options = {}) {
 	const { prefix, suffix, separator = '_', keys = [] } = options
+	const rename = getRenamer(prefix, suffix, separator)
+	const renameObject = getObjectRenamer(rename, keys)
 
-	/**
-	 * Get the renamer functions.
-	 */
-	function get() {
-		const rename = getRenamer(prefix, suffix, separator)
-		const renameObject = getObjectRenamer(rename, keys)
-		return { rename, renameObject }
+	return {
+		get: () => ({ rename, renameObject }),
+		setPrefix: (value) => renamer({ ...omit(['suffix'], options), prefix: value }),
+		setSuffix: (value) => renamer({ ...omit(['prefix'], options), suffix: value }),
+		setKeys: (value) => renamer({ ...options, keys: value }),
+		setSeparator: (value) => renamer({ ...options, separator: value })
 	}
-	/**
-	 * Set the prefix
-	 */
-	function setPrefix(value) {
-		return renamer({ ...omit(['suffix'], options), prefix: value })
-	}
-
-	/**
-	 * Set the suffix
-	 */
-	function setSuffix(value) {
-		return renamer({ ...omit(['prefix'], options), suffix: value })
-	}
-
-	/**
-	 * Set the keys
-	 */
-	function setKeys(value) {
-		return renamer({ ...options, keys: value })
-	}
-
-	/**
-	 * Set the separator
-	 */
-	function setSeparator(value) {
-		return renamer({ ...options, separator: value })
-	}
-
-	return { get, setPrefix, setSuffix, setKeys, setSeparator }
 }
 
 /**

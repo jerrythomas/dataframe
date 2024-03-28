@@ -84,22 +84,22 @@ export function deriveColumnProperties(sample, options) {
  *
  * @returns {import('./types').Metadata} The combined array of metadata.
  */
-export function combineMetadata(first, second, overwrite = false) {
-	const metadata = [...first]
-	second.forEach(({ name, type }) => {
-		const existing = metadata.find((x) => x.name === name)
-		if (existing) {
-			if (overwrite) {
-				existing.type = type
-			} else if (existing.type !== type) {
-				throw new Error(`Metadata conflict: ${name} has conflicting types`)
-			}
-		} else {
-			metadata.push({ name, type })
-		}
-	})
-	return metadata
-}
+// export function combineMetadata(first, second, overwrite = false) {
+// 	const metadata = [...first]
+// 	second.forEach(({ name, type }) => {
+// 		const existing = metadata.find((x) => x.name === name)
+// 		if (existing) {
+// 			if (overwrite) {
+// 				existing.type = type
+// 			} else if (existing.type !== type) {
+// 				throw new Error(`Metadata conflict: ${name} has conflicting types`)
+// 			}
+// 		} else {
+// 			metadata.push({ name, type })
+// 		}
+// 	})
+// 	return metadata
+// }
 
 /**
  * Derives the column metadata from the provided data and options.
@@ -124,12 +124,12 @@ export function deriveColumnMetadata(data, options = {}) {
  * @param {Array} metadata - The metadata array.
  * @returns {Object} - The column index object.
  */
-export function deriveColumnIndex(metadata) {
-	return metadata.reduce((acc, col, index) => {
-		acc[col.name] = index
-		return acc
-	}, {})
-}
+// export function deriveColumnIndex(metadata) {
+// 	return metadata.reduce((acc, col, index) => {
+// 		acc[col.name] = index
+// 		return acc
+// 	}, {})
+// }
 
 /**
  * Creates metadata for aggregated data based on original metadata and group by keys.
@@ -140,20 +140,20 @@ export function deriveColumnIndex(metadata) {
  * @param {Array} summaries   - The summaries to include in the metadata.
  * @returns {Array} An array of updated metadata objects.
  */
-export function buildMetadata(data, oldMetadata, groupByKeys, summaries) {
-	const metadata = oldMetadata.filter((col) => groupByKeys.includes(col.name))
-	summaries.forEach(({ reducers }) => {
-		reducers.forEach(({ field }) => {
-			const type = getType(data[0][field])
-			if (type === 'array') {
-				metadata.push({ name: field, type, metadata: deriveColumnMetadata(data[0][field]) })
-			} else {
-				metadata.push({ name: field, type })
-			}
-		})
-	})
-	return metadata
-}
+// export function buildMetadata(data, oldMetadata, groupByKeys, summaries) {
+// 	const metadata = oldMetadata.filter((col) => groupByKeys.includes(col.name))
+// 	summaries.forEach(({ reducers }) => {
+// 		reducers.forEach(({ field }) => {
+// 			const type = getType(data[0][field])
+// 			if (type === 'array') {
+// 				metadata.push({ name: field, type, metadata: deriveColumnMetadata(data[0][field]) })
+// 			} else {
+// 				metadata.push({ name: field, type })
+// 			}
+// 		})
+// 	})
+// 	return metadata
+// }
 
 /**
  * Generates a renamer function which adds a prefix or suffix to a string.

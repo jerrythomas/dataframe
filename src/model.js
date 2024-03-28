@@ -70,7 +70,10 @@ function deriveModel(value, sparse = false) {
 
 	const kv = Object.entries(item)
 	kv.forEach(([key, value]) => {
-		data.push({ name: key, type: getType(value) })
+		data.push({
+			name: key,
+			type: getType(value)
+		})
 	})
 	return data
 }

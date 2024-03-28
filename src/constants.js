@@ -33,6 +33,18 @@ export const defaultActionOrder = {
 	delete: 2
 }
 
+/**
+ * Returns the default properties for a column
+ * @param {string} key - the key to use for the column
+ * @returns {Object} the default properties for a column
+ */
+// export const defaultProps = (key) => ({
+// 	sortable: true,
+// 	filterable: true,
+// 	sorted: 'none',
+// 	fields: { text: key }
+// })
+
 export const filterOperations = {
 	'=': (value, pattern) => value === pattern,
 	'<': (value, pattern) => value < pattern,
