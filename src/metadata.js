@@ -77,31 +77,6 @@ export function deriveColumnProperties(sample, options) {
 }
 
 /**
- * Combines two arrays of metadata into a single array.
- *
- * @param {import('./types).Metadata} first  - The first array of metadata.
- * @param {import('./types).Metadata} second - The second array of metadata.
- *
- * @returns {import('./types').Metadata} The combined array of metadata.
- */
-// export function combineMetadata(first, second, overwrite = false) {
-// 	const metadata = [...first]
-// 	second.forEach(({ name, type }) => {
-// 		const existing = metadata.find((x) => x.name === name)
-// 		if (existing) {
-// 			if (overwrite) {
-// 				existing.type = type
-// 			} else if (existing.type !== type) {
-// 				throw new Error(`Metadata conflict: ${name} has conflicting types`)
-// 			}
-// 		} else {
-// 			metadata.push({ name, type })
-// 		}
-// 	})
-// 	return metadata
-// }
-
-/**
  * Derives the column metadata from the provided data and options.
  *
  * @param {Array} data                       - The data to derive the column metadata from.
@@ -129,30 +104,6 @@ export function deriveColumnMetadata(data, options = {}) {
 // 		acc[col.name] = index
 // 		return acc
 // 	}, {})
-// }
-
-/**
- * Creates metadata for aggregated data based on original metadata and group by keys.
- *
- * @param {Array} data        - The aggregated data array.
- * @param {Array} oldMetadata - Original metadata.
- * @param {Array} groupByKeys - The keys used for grouping.
- * @param {Array} summaries   - The summaries to include in the metadata.
- * @returns {Array} An array of updated metadata objects.
- */
-// export function buildMetadata(data, oldMetadata, groupByKeys, summaries) {
-// 	const metadata = oldMetadata.filter((col) => groupByKeys.includes(col.name))
-// 	summaries.forEach(({ reducers }) => {
-// 		reducers.forEach(({ field }) => {
-// 			const type = getType(data[0][field])
-// 			if (type === 'array') {
-// 				metadata.push({ name: field, type, metadata: deriveColumnMetadata(data[0][field]) })
-// 			} else {
-// 				metadata.push({ name: field, type })
-// 			}
-// 		})
-// 	})
-// 	return metadata
 // }
 
 /**

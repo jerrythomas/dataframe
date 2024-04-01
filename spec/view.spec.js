@@ -232,6 +232,22 @@ describe('view', () => {
 					}
 				])
 			})
+			it('should clear and sort by multiple columns', () => {
+				const view = dataview(data, { path: 'lineage' })
+				view.sortBy('age')
+				view.clearSort()
+				view.sortBy('name')
+				expect(view.hierarchy.map(({ row }) => row)).toEqual([
+					{ name: 'Smith', lineage: '/Smith', age: 90 },
+					{ name: 'Alice', lineage: '/Smith/Alice', age: 55 },
+					{ name: 'Lexi', lineage: '/Smith/Alice/Lexi', age: 30 },
+					{ name: 'Sofia', lineage: '/Smith/Alice/Sofia', age: 25 },
+					{ name: 'Bob', lineage: '/Smith/Bob', age: 20 },
+					{ name: 'Snow', lineage: '/Snow', age: 80 },
+					{ name: 'Charlie', lineage: '/Snow/Charlie', age: 35 },
+					{ name: 'Eve', lineage: '/Snow/Eve', age: 40 }
+				])
+			})
 
 			it('should select/deselect a child row', () => {
 				const view = dataview(data, { path: 'lineage' })

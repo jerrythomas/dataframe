@@ -45,7 +45,8 @@ export function dataset(data, options = {}) {
 		crossJoin: (other, condition) => dataset(crossJoin(data, other.select(), condition)),
 		semiJoin: (other, condition) => dataset(semiJoin(data, other.select(), condition)),
 		antiJoin: (other, condition) => dataset(antiJoin(data, other.select(), condition)),
-		nestedJoin: (other, condition) => dataset(nestedJoin(data, other.select(), condition))
+		nestedJoin: (other, condition) =>
+			dataset(nestedJoin(data, other.select(), condition, config.children))
 	}
 
 	return actions
@@ -325,6 +326,11 @@ function updateRows(data, filter, value) {
  * @returns {Array<Object>}     - The updated data with missing values filled.
  */
 function fillNA(data, value) {
+	/**
+	 * Fills missing values in a single row based on the provided value.
+	 *
+	 * @param {Object} row - The row to fill missing values in.
+	 */
 	const fill = (row) => {
 		const filled = {}
 		Object.entries(value).forEach(([k, v]) => {

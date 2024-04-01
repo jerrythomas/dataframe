@@ -5,6 +5,7 @@ import left from './left.json'
 import right from './right.json'
 import full from './full.json'
 import nested from './nested.json'
+import nested_override from './nested_override.json'
 import cross from './cross.json'
 import semi from './semi.json'
 import anti from './anti.json'
@@ -17,6 +18,7 @@ export default {
 	right,
 	full,
 	nested,
+	nested_override,
 	cross,
 	semi,
 	anti

@@ -131,7 +131,7 @@ describe('dataset', () => {
 			})
 		})
 		describe('update', () => {
-			let data
+			let data = []
 
 			beforeEach(() => {
 				data = [
@@ -185,7 +185,7 @@ describe('dataset', () => {
 			})
 		})
 		describe('delete', () => {
-			let data
+			let data = []
 
 			beforeEach(() => {
 				data = [
@@ -229,7 +229,7 @@ describe('dataset', () => {
 			})
 		})
 		describe('sort', () => {
-			let data
+			let data = []
 			beforeEach(() => {
 				data = clone(scores)
 			})
@@ -343,6 +343,12 @@ describe('dataset', () => {
 		it('should perform nested join', () => {
 			const result = parent.nestedJoin(child, matcher)
 			expect(result.select()).toEqual(joindata.nested)
+			expect(result).not.toEqual(child)
+			expect(result).not.toEqual(parent)
+		})
+		it('should perform nested join with override', () => {
+			const result = parent.override({ children: 'data' }).nestedJoin(child, matcher)
+			expect(result.select()).toEqual(joindata.nested_override)
 			expect(result).not.toEqual(child)
 			expect(result).not.toEqual(parent)
 		})

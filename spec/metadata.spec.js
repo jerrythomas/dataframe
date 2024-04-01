@@ -35,6 +35,27 @@ describe('metadata', () => {
 				{ name: 'b', type: 'integer' }
 			])
 		})
+
+		it('should return predefined metadata if provided', () => {
+			const data = [{ a: 1 }, { b: 2 }]
+			const metadata = deriveColumnMetadata(data, {
+				deepScan: true,
+				metadata: [{ name: 'a', type: 'string' }]
+			})
+			expect(metadata).toEqual([{ name: 'a', type: 'string' }])
+		})
+		it('should return empty if data is empty', () => {
+			const metadata = deriveColumnMetadata([])
+			expect(metadata).toEqual([])
+		})
+		it('should identify metadata from first row', () => {
+			const data = [{ name: 'John', age: 25 }]
+			const metadata = deriveColumnMetadata(data)
+			expect(metadata).toEqual([
+				{ name: 'name', type: 'string' },
+				{ name: 'age', type: 'integer' }
+			])
+		})
 	})
 	describe('deriveColumnProperties', () => {
 		it('should derive column properties', () => {
