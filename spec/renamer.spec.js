@@ -3,8 +3,7 @@ import { renamer } from '../src/renamer'
 
 describe('renamer', () => {
 	it('should return an object with methods', () => {
-		const r = renamer()
-		expect(r).toEqual({
+		expect(renamer()).toEqual({
 			get: expect.any(Function),
 			setPrefix: expect.any(Function),
 			setSuffix: expect.any(Function),
