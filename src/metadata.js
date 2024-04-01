@@ -1,4 +1,3 @@
-import { identity } from 'ramda'
 import { defaultPathOptions } from './constants'
 import { getDeepScanSample } from './infer'
 import { getType } from './utils'
@@ -105,20 +104,3 @@ export function deriveColumnMetadata(data, options = {}) {
 // 		return acc
 // 	}, {})
 // }
-
-/**
- * Generates a renamer function which adds a prefix or suffix to a string.
- *
- * @param {OptionsToRenameKeys} options - Options to rename keys
- * @returns {Function} - A function that takes a string and adds a prefix or suffix.
- */
-export function getAttributeRenamer(options) {
-	const { prefix, suffix, separator = '_' } = options
-	let rename = identity
-	if (prefix) {
-		rename = (x) => [prefix, x].join(separator)
-	} else if (suffix) {
-		rename = (x) => [x, suffix].join(separator)
-	}
-	return rename
-}

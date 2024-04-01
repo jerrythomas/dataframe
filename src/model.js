@@ -58,24 +58,24 @@ export function model() {
 /**
  * Derives a model from the input data
  *
- * @param {Array|Object} value  - the data to derive the model from
+ * @param {Array|Object} data  - the data to derive the model from
  * @param {Boolean}      sparse - whether the data set contains sparse data
  * @returns {Array}             - the derived model
  */
-function deriveModel(value, sparse = false) {
-	const data = []
-	let item = value
+function deriveModel(data, sparse = false) {
+	const model = []
+	let item = data
 
-	if (Array.isArray(value)) item = sparse ? getDeepScanSample(value) : value[0]
+	if (Array.isArray(data)) item = sparse ? getDeepScanSample(data) : data[0]
 
 	const kv = Object.entries(item)
 	kv.forEach(([key, value]) => {
-		data.push({
+		model.push({
 			name: key,
 			type: getType(value)
 		})
 	})
-	return data
+	return model
 }
 
 /**

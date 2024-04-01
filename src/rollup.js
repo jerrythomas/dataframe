@@ -1,4 +1,4 @@
-import { omit, pick, mergeLeft, map, difference, uniq, pipe, identity } from 'ramda'
+import { omit, pick, mergeLeft, map, difference, uniq, pipe } from 'ramda'
 
 /**
  * Groups data by specified keys.

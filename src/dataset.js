@@ -19,8 +19,8 @@ export function dataset(data, options = {}) {
 		where: (condition) => dataset(data, where(config, condition)),
 		groupBy: (...fields) => dataset(data, groupBy(config, ...fields)),
 		alignBy: (...fields) => dataset(data, alignBy(config, ...fields)),
-		using: (template) => dataset(data, using(config, template)),
-		summarize: (from, using) => dataset(data, summarize(config, from, using)),
+		using: (template) => dataset(data, usingTemplate(config, template)),
+		summarize: (from, fields) => dataset(data, summarize(config, from, fields)),
 		// alter keys
 		rename: (how) => dataset(renameKeys(data, how)),
 		drop: (...fields) => dataset(dropKeys(data, ...fields)),
@@ -42,7 +42,7 @@ export function dataset(data, options = {}) {
 		leftJoin: (other, condition) => dataset(leftJoin(data, other.select(), condition)),
 		rightJoin: (other, condition) => dataset(rightJoin(data, other.select(), condition)),
 		fullJoin: (other, condition) => dataset(fullJoin(data, other.select(), condition)),
-		crossJoin: (other, condition) => dataset(crossJoin(data, other.select(), condition)),
+		crossJoin: (other) => dataset(crossJoin(data, other.select())),
 		semiJoin: (other, condition) => dataset(semiJoin(data, other.select(), condition)),
 		antiJoin: (other, condition) => dataset(antiJoin(data, other.select(), condition)),
 		nestedJoin: (other, condition) =>
@@ -93,7 +93,7 @@ function alignBy(config, ...fields) {
  * @param {Object} template    - The template to use for adding empty rows.
  * @returns {Object}           - The updated configuration.
  */
-function using(config, template) {
+function usingTemplate(config, template) {
 	config.template = template
 	return config
 }
