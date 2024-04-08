@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { dataset } from '../src/dataset'
 import { mean, quantile } from 'd3-array'
+import { dataset } from '../src/dataset'
 import fixtures from './fixtures/rollup'
 import { counter, violin } from '../src/aggregators'
 

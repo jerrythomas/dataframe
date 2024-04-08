@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { data } from './fixtures/data'
 import { ascending, descending } from 'd3-array'
+import scores from './fixtures/scores.json'
 
 import {
 	deriveColumns,
@@ -128,7 +128,7 @@ describe('infer', () => {
 
 	describe('deriveDataTypes', () => {
 		it('should infer string and numeric columns', () => {
-			const dataTypes = deriveDataTypes(data)
+			const dataTypes = deriveDataTypes(scores)
 			expect(dataTypes).toEqual({
 				string: ['country', 'name'],
 				number: ['age', 'score', 'time', 'rank', 'level']

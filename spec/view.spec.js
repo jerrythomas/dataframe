@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { dataview, determineSelectedState } from '../src/view'
 import { pick, omit } from 'ramda'
+import { dataview, determineSelectedState } from '../src/view'
 
 describe('view', () => {
 	describe('dataview', () => {

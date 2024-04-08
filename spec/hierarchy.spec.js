@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+import { pick } from 'ramda'
 import {
 	removeChildren,
 	flattenNestedChildren,
 	hierarchicalFilter,
 	deriveHierarchy
 } from '../src/hierarchy'
-import { pick } from 'ramda'
 
 describe('hierarchy', () => {
 	describe('removeChildren', () => {
