@@ -7,7 +7,6 @@ describe('model', () => {
 		expect(first).toEqual({
 			get: expect.any(Function),
 			clone: expect.any(Function),
-			// useDeepScan: expect.any(Function),
 			renameUsing: expect.any(Function),
 			from: expect.any(Function),
 			merge: expect.any(Function)

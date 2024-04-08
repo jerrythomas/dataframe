@@ -1,7 +1,9 @@
-import fs from 'fs'
-import yaml from 'js-yaml'
 import { nest } from 'd3-collection'
-
+export { default as add } from './list/add'
+export { default as remove } from './list/remove'
+export { default as modify } from './list/modify'
+export { default as altKey } from './list/altkey'
+export { default as sorting } from './list/sort'
 export const data = [
 	{ id: 2, name: 'Beta', lookup_id: 1 },
 	{ id: 3, name: 'Charlie', lookup_id: 1 },
@@ -43,10 +45,3 @@ export const groupSearchResult = [
 		data: [{ id: 1, name: 'Alpha', lookup_id: 1 }]
 	}
 ]
-
-export const add = yaml.load(fs.readFileSync('spec/fixtures/list/add.yml'))
-export const remove = yaml.load(fs.readFileSync('spec/fixtures/list/remove.yml'))
-
-export const modify = yaml.load(fs.readFileSync('spec/fixtures/list/modify.yml'))
-export const altKey = yaml.load(fs.readFileSync('spec/fixtures/list/alt-key.yml'))
-export const sorting = yaml.load(fs.readFileSync('spec/fixtures/list/sort.yml'))
